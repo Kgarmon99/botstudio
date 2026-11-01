@@ -667,6 +667,40 @@ button.perk:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 16px 40px 
 .ctier.t3{background:rgba(251,191,36,.15);color:#FDE68A;border-color:rgba(251,191,36,.5)}
 .flbtns{display:grid;gap:6px}
 .flbtns .btn{text-align:left;justify-content:flex-start}
+
+/* ===== round 16: SaaS dashboard, accelerator, tower, UI polish ===== */
+.btn{position:relative;border-radius:12px;padding:8px 13px;letter-spacing:.01em;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease,background .12s ease,filter .12s}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.28)}
+.btn:active:not(:disabled){transform:translateY(0) scale(.98)}
+.btn.pri{box-shadow:0 6px 22px rgba(0,230,118,.38),inset 0 1px 0 rgba(255,255,255,.28)}
+.btn.pri:hover:not(:disabled){filter:brightness(1.06);box-shadow:0 10px 28px rgba(0,230,118,.5),inset 0 1px 0 rgba(255,255,255,.35)}
+#inspect{box-shadow:0 18px 50px rgba(0,0,0,.55),0 0 0 1px rgba(0,230,118,.08)}
+#modal{background:rgba(2,6,23,.72);backdrop-filter:blur(10px)}
+#modal .card{border:1px solid rgba(0,230,118,.32);box-shadow:0 28px 90px rgba(0,0,0,.65),0 0 80px rgba(0,230,118,.1),inset 0 1px 0 rgba(255,255,255,.06)}
+#modal .x{background:rgba(255,255,255,.08);border:1px solid var(--line)}
+#advisor .bubble{background:linear-gradient(180deg,#FBFEFF,#E2E8F0);border:1px solid rgba(255,255,255,.55);box-shadow:0 12px 36px rgba(0,0,0,.5),0 0 0 1px rgba(0,230,118,.12)}
+#advisor .bubble::after{content:"";position:absolute;left:-7px;bottom:16px;border:8px solid transparent;border-right-color:#E2E8F0;border-left:0}
+.toast{border-radius:14px;padding:10px 14px;box-shadow:0 12px 32px rgba(0,0,0,.42),0 0 24px rgba(0,230,118,.08);animation:tin .38s cubic-bezier(.2,.9,.2,1)}
+.take{gap:12px;border-radius:16px;padding:12px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.take p{font-size:14.5px!important;line-height:1.5}
+.choices .btn{border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.05);border-left:3px solid rgba(0,230,118,.55)}
+.choices .btn:hover:not(:disabled){background:rgba(0,230,118,.1);border-color:rgba(0,230,118,.55)}
+.card2{border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))}
+.saas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 4px}
+.saas .tile{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;padding:10px 12px;background:linear-gradient(160deg,rgba(0,230,118,.1),rgba(255,255,255,.03))}
+.saas .tile label{display:block;font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted)}
+.saas .tile b{display:block;font-family:var(--mono);font-size:20px;margin-top:4px;color:var(--neon)}
+.saas .tile small{display:block;margin-top:4px;font-size:11.5px;color:#CBD5E1;line-height:1.35}
+.saas .tile.warn{background:linear-gradient(160deg,rgba(239,68,68,.14),rgba(255,255,255,.03));border-color:rgba(239,68,68,.35)}
+.saas .tile.warn b{color:#FCA5A5}
+.saas .tile.ok{background:linear-gradient(160deg,rgba(0,230,118,.16),rgba(251,191,36,.06))}
+.pathcard{margin-top:10px;padding:12px 14px;border-radius:16px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.08)}
+.pathcard b{color:#7DD3FC}
+.accHero{display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;border:1px solid rgba(192,132,252,.45);background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(0,230,118,.06))}
+.accHero img{width:64px;height:76px;object-fit:contain}
+.lrow .tag{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:1px 6px;color:var(--muted);margin-left:6px}
+.lrow .tag.priv{color:#C4B5FD;border-color:rgba(196,181,253,.45)}
+@media (max-width:640px){ .saas{grid-template-columns:1fr 1fr} }
 </style>
 <canvas id="gl" tabindex="0"></canvas>
 <script>document.body.classList.add("titling")</script>
@@ -728,7 +762,7 @@ button.perk:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 16px 40px 
     <h1>BOT<br>STUDIO</h1>
     <p class="tag">Startup Tycoon</p>
     <p>Start a tech studio in a garage with $5,000 and MoneyBot as your co-founder. Win clients, ship games, websites, AI and security work, hire a team, and grow into a company with your name on the tower.</p>
-    <div class="teach"><span>Revenue vs. cash</span><span>Burn rate</span><span>Runway</span><span>Payroll</span><span>Pricing work</span><span>Scope and deadlines</span></div>
+    <div class="teach"><span>Revenue vs. cash</span><span>MRR &amp; ARR</span><span>Burn rate</span><span>Runway</span><span>Payroll</span><span>Demo Day</span></div>
     <div class="acts">
       <button class="btn pri" id="btnNew" disabled>Loading MoneyBot…</button>
       <button class="btn" id="btnCont" hidden>Continue</button>
@@ -1168,7 +1202,7 @@ function endDay(){
   if(S.day>=S.nextCands){ refreshCands(3); refreshSpecs(); S.nextCands=S.day+7; }
   // events
   if(--S.eventT<=0){ S.eventT=ri(5,9); rollEvent(); }
-  productsDay(); trendDay(); researchDay(); boardDay(); headsDay(); questTick();
+  productsDay(); trendDay(); researchDay(); boardDay(); headsDay(); questTick(); accelDay();
   { const pi=S.products.reduce((a,p)=>a+(p.launched?(p.rate||0):0),0); if(pi>0) coinRain(Math.min(4,1+Math.floor(pi/2500))); }
   if(S.day%30===1) endMonth();
   setTimeout(refreshDrawer,0);
@@ -1416,8 +1450,8 @@ function productsDay(onlyRates){
   const g=has('growth')?1.15:1, ad=(has('ads')?1.2:1)*upgMul('prod')*(1+.1*Math.min(3,jobN('mkt'))), srvC=(has('cloud')?.7:1)*upgMul('srv')*srvMult();
   S.products.forEach(p=>{ if(!p.launched) return; const promo=(p.promoT>0?1+p.promoLvl*.6:1)*(p.boost||1)*legacyMult();
     if(!onlyRates){ p.age++; if(p.promoT>0) p.promoT--; if(p.boost>1) p.boost=Math.max(1,p.boost-.04); }
-    if(p.kind==='game'){ const decay=18+p.score*4; const units=p.peak*Math.exp(-p.age/decay)*promo*g + p.score*.4; p.unitsDay=units; if(!onlyRates) p.units+=units; p.rate=units*p.price*.7*ad; p.srv=0; }
-    else { if(!onlyRates){ const add=p.grow*promo*g*Math.max(.25,1-p.age/400); p.users=Math.max(0, p.users + add - p.users*p.churn/30); } p.rate=p.users*p.price/30*ad; p.srv=p.users*.35/30*srvC*((S.floors||[]).some(f=>f.dept==='servers')?.6:1); }
+    if(p.kind==='game'){ const decay=18+p.score*4; const units=p.peak*Math.exp(-p.age/decay)*promo*g + p.score*.4; p.unitsDay=units; if(!onlyRates) p.units+=units; p.rate=units*p.price*.7*ad*accelProdMul(); p.srv=0; }
+    else { if(!onlyRates){ const add=p.grow*promo*g*Math.max(.25,1-p.age/400); p.users=Math.max(0, (p.users||0) + add - (p.users||0)*p.churn/30); } p.rate=(p.users||0)*p.price/30*ad*accelProdMul(); p.srv=(p.users||0)*.35/30*srvC*((S.floors||[]).some(f=>f.dept==='servers')?.6:1); }
   });
 }
 function launchShow(prod, revs, fit, combo, trend){
@@ -1450,7 +1484,7 @@ function productsPanel(){
   $$('[data-promo]').forEach(b=>b.onclick=()=>{ const p=S.products.find(x=>x.id===+b.dataset.promo), c=promoCost(p); if(S.cash<c){ toast('Not enough cash.','bad'); sfx('err'); return; } S.cash-=c; S.month.marketing+=c; p.promo=(p.promo||0)+1; p.promoLvl=Math.min(4,p.promo); p.promoT=14; productsDay(true); sfx('coin'); openPanel('products'); });
 }
 function promoCost(p){ return Math.round(800*Math.pow(1.7,p.promo||0)*SIZES[p.size].mult/50)*50; }
-function valuation(){ if(!S) return 0; const h=S.history.slice(-3), rev=h.length?h.reduce((a,r)=>a+r.revenue,0)/h.length*12:0; const prodY=S.products.reduce((a,p)=>a+(p.launched?((p.rate||0)-(p.srv||0))*365:0),0); return Math.max(0, S.cash-S.loan + rev*1.5 + prodY*3 + S.rep*1000); }
+function valuation(){ if(!S) return 0; const h=S.history.slice(-3), rev=h.length?h.reduce((a,r)=>a+r.revenue,0)/h.length*12:0; const prodY=S.products.reduce((a,p)=>a+(p.launched?((p.rate||0)-(p.srv||0))*365:0),0); return Math.max(0, S.cash-S.loan + rev*1.5 + prodY*3 + S.rep*1000 + (S.accel&&S.accel.bump||0)); }
 function exitPanel(){
   const v=Math.max(valuation(), ...S.funding.rounds.map(r=>r.pre+r.amt)), mine=v*myShare()/100, pts=Math.floor(Math.sqrt(mine/100000)), L=legacy();
   openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Exit</div><h2>Sell ${S.name}?</h2>
@@ -1571,21 +1605,46 @@ function addFloorModal(){
 let statueRig=null;
 function buildTowerExterior(){
   while(towerG.children.length) towerG.remove(towerG.children[0]);
-  const plaza=new THREE.Mesh(new THREE.BoxGeometry(14,.2,10), mat('#1E293B')); plaza.position.y=-.1; plaza.receiveShadow=true; towerG.add(plaza);
-  const W=6.4, D=4.4, FH=1.5; const glass=new THREE.MeshStandardMaterial({color:'#0B1220', roughness:.15, metalness:.6});
-  bx(towerG,W+.6,1.6,D+.6,0,0,0,mat('#0F172A')); signPlane(towerG,(S.name||'BotStudio').toUpperCase(),'#0A0A1A','#00E676',4.2,.7,0,.9,D/2+.31,.9);
-  S.floors.forEach((f,i)=>{ const y=1.6+i*FH, c=DEPTS[f.dept].color;
-    bx(towerG,W,FH-.1,D,0,y,0,glass);
-    const band=new THREE.Mesh(new THREE.BoxGeometry(W+.02,.5,D+.02), new THREE.MeshStandardMaterial({color:c, emissive:c, emissiveIntensity:.55, transparent:true, opacity:.75})); band.position.y=y+FH*.48; towerG.add(band);
-    bx(towerG,W+.1,.08,D+.1,0,y+FH-.1,0,mat('#94A3B8',{metalness:.6,roughness:.3}),false);
-    signPlane(towerG,DEPTS[f.dept].name.toUpperCase(),'#0A0A1A',c,2.2,.32,W/2-1.25,y+.2,D/2+.03,.8); });
-  const top=1.6+S.floors.length*FH;
-  bx(towerG,W*.5,.3,D*.5,0,top,0,mat('#0F172A'));
-  cy(towerG,.05,1.6,1.8,top+.3,-1,mat('#E2E8F0')); halo(towerG,1.8,top+1.95,-1,'#EF4444',.6,.9);
-  const logo=new THREE.Mesh(new THREE.CircleGeometry(.7,32), new THREE.MeshBasicMaterial({map:logoTex()})); logo.position.set(-2,top+1.2,D/2-.6); towerG.add(logo);
-  if(GLTF.hero){ if(!statueRig){ statueRig=makeRig(GLTF.hero, MB.coin, 2.2); setShadow(statueRig,true); } statueRig.root.position.set(0,top+.3,0); statueRig.root.rotation.y=.4; towerG.add(statueRig.root); }
-  for(let i=0;i<10;i++){ const h=rand(3,9), x=pick([-1,1])*rand(5,9), z=rand(-6,-2); bx(towerG,rand(1.5,2.5),h,rand(1.5,2.5),x,0,z,mat(pick(['#1E293B','#334155','#273449'])),true); }
+  towerG.userData.wins=[]; towerG.userData.ant=null;
+  const plaza=new THREE.Mesh(new THREE.BoxGeometry(22,.2,16), mat('#0B1220')); plaza.position.set(0,-.1,2); plaza.receiveShadow=true; towerG.add(plaza);
+  bx(towerG,3.6,.03,18,0,-.08,7,mat('#111827'),false);
+  const W=6.6, D=4.6, FH=1.55; const glass=new THREE.MeshStandardMaterial({color:'#0A1628', roughness:.08, metalness:.85, transparent:true, opacity:.72});
+  bx(towerG,W+.8,1.7,D+.8,0,0,0,mat('#0F172A',{metalness:.45,roughness:.32}));
+  signPlane(towerG,(S.name||'BotStudio').toUpperCase(),'#0A0A1A','#00E676',4.6,.7,0,.95,D/2+.42,.95);
+  S.floors.forEach((f,i)=>{ const y=1.7+i*FH, c=DEPTS[f.dept].color;
+    bx(towerG,W,FH-.08,D,0,y,0,glass);
+    for(let k=0;k<8;k++) bx(towerG,.045,FH-.12,D+.05,-W/2+.45+k*((W-.9)/7),y,0,mat('#94A3B8',{metalness:.7,roughness:.25}),false);
+    for(let col=0; col<6; col++) for(let row=0; row<2; row++){
+      const lit=Math.random()>.28, m=new THREE.MeshStandardMaterial({color:lit?c:'#071018', emissive:lit?c:'#000000', emissiveIntensity:lit?.6:0, roughness:.12});
+      const win=new THREE.Mesh(BOX, m); win.scale.set(.72,.36,.035); win.position.set(-W/2+.75+col*((W-1.3)/5), y+.38+row*.58, D/2+.03); towerG.add(win);
+      const back=win.clone(); back.material=m; back.position.z=-D/2-.03; towerG.add(back);
+      towerG.userData.wins.push({m, on:lit, t:rand(3,14)});
+    }
+    const band=new THREE.Mesh(new THREE.BoxGeometry(W+.08,.1,D+.08), new THREE.MeshStandardMaterial({color:c, emissive:c, emissiveIntensity:.75, transparent:true, opacity:.9})); band.position.y=y+FH-.1; towerG.add(band);
+    signPlane(towerG,DEPTS[f.dept].name.toUpperCase(),'#0A0A1A',c,2.15,.3,W/2-1.2,y+.22,D/2+.04,.85);
+  });
+  const top=1.7+S.floors.length*FH;
+  bx(towerG,W+.5,.28,D+.5,0,top,0,mat('#05060D',{metalness:.65,roughness:.28}));
+  const crown=new THREE.Mesh(new THREE.BoxGeometry(W+.15,.07,D+.15), new THREE.MeshStandardMaterial({color:'#00E676', emissive:'#00E676', emissiveIntensity:1.5})); crown.position.y=top+.09; towerG.add(crown);
+  signPlane(towerG,(S.name||'BotStudio').toUpperCase(),'#03140C','#00E676',Math.min(W,5.4),.88,0,top+.62,D/2+.22,1);
+  cy(towerG,.045,2.35,0,top+.28,-D*.12,mat('#E2E8F0',{metalness:.85,roughness:.2}));
+  const ant=sp(towerG,.09,.09,.09,0,top+2.72,-D*.12,new THREE.MeshStandardMaterial({color:'#EF4444', emissive:'#EF4444', emissiveIntensity:2}));
+  towerG.userData.ant=ant.material; halo(towerG,0,top+2.72,-D*.12,'#EF4444',1,.95);
+  const pad=new THREE.Mesh(new THREE.CircleGeometry(.72,28), new THREE.MeshBasicMaterial({color:'#00E676'})); pad.rotation.x=-Math.PI/2; pad.position.set(1.7,top+.3,.35); towerG.add(pad);
+  const logo=new THREE.Mesh(new THREE.CircleGeometry(.62,32), new THREE.MeshBasicMaterial({map:logoTex()})); logo.position.set(-2.05,top+1.15,D/2-.55); towerG.add(logo);
+  if(GLTF.hero){ if(!statueRig){ statueRig=makeRig(GLTF.hero, MB.coin, 2.05); setShadow(statueRig,true); } statueRig.root.position.set(0,top+.32,0); statueRig.root.rotation.y=.4; towerG.add(statueRig.root); }
+  const sky=['#0F172A','#1E293B','#162032','#243044'];
+  for(let i=0;i<20;i++){
+    const h=rand(2.8,12), x=pick([-1,1])*rand(6.2,14.5), z=rand(-11,-2.4), bw=rand(1.2,2.5), bd=rand(1.2,2.3);
+    bx(towerG,bw,h,bd,x,0,z,mat(pick(sky)),true);
+    if(h>4) for(let wy=1; wy<h-.4; wy+=.55){ if(Math.random()>.5) continue; const wm=new THREE.MeshStandardMaterial({color:'#FDE68A', emissive:'#FBBF24', emissiveIntensity:rand(.25,.85)}); const w=new THREE.Mesh(BOX,wm); w.scale.set(.16,.16,.03); w.position.set(x+(x>0?bw/2:-bw/2), wy, z); towerG.add(w); }
+  }
   towerG.userData.top=top;
+}
+function animTower(dt){
+  if(!towerG.visible) return;
+  if(towerG.userData.ant) towerG.userData.ant.emissiveIntensity=.35+(Math.sin(clock.elapsedTime*7)*.5+.5)*2.1;
+  (towerG.userData.wins||[]).forEach(w=>{ w.t-=dt; if(w.t>0) return; w.t=rand(4,16); w.on=Math.random()>.38; w.m.emissiveIntensity=w.on?.65:0; });
 }
 
 /* ---------------- glossary ---------------- */
@@ -1597,7 +1656,10 @@ const GLOSS = {
   dilution:'Dilution: your ownership shrinks each time you sell shares to investors.',
   valuation:'Valuation: what investors or buyers think the whole company is worth.',
   revenue:'Revenue: money you earned from selling work or products, before costs.',
-  fixed:'Fixed costs: bills that come every month no matter how much you sell, like salaries and rent.'
+  fixed:'Fixed costs: bills that come every month no matter how much you sell, like salaries and rent.',
+  mrr:'MRR (monthly recurring revenue): what your subscription products would earn in a month if today kept repeating. One-time game sales are not MRR.',
+  arr:'ARR (annual recurring revenue): MRR times 12. Investors use it to compare subscription businesses.',
+  demo:'Demo Day: the last day of an accelerator. Startups pitch a room of investors in a few minutes.'
 };
 function G(word, key){ return `<abbr class="gl" tabindex="0" title="${GLOSS[key]}" data-gl="${key}">${word}</abbr>`; }
 document.addEventListener('click', e=>{ const a=e.target.closest('[data-gl]'); if(a){ _toastRaw('<b>'+GLOSS[a.dataset.gl].replace(':', ':</b>'), 'info'); } });
@@ -1617,6 +1679,8 @@ function nextUp(){
   if(S.team.some(p=>p.energy<25) && !S.furn.some(f=>f.kind==='coffee')) return {ic:'💤', t:'Your team is tired. A coffee machine helps them recharge', b:'Place one · $300', f:()=>{ hidePalette(); setTool('place','coffee'); }, g:'office'};
   const rw=runway(); if(rw!==Infinity && rw<3 && S.day>20) return {ic:'⚠️', t:'Cash runs out in about <b>'+rw.toFixed(1)+' months</b>', b:'Check money', f:()=>openPanel('finance'), g:'company'};
   const nx=STAGES[S.stage+1]; if(nx && S.chapter>=nx.need.ch && S.rep>=nx.need.rep && S.cash>=nx.cost) return {ic:'🏢', t:'You can move to the <b>'+nx.name+'</b>', b:'Take a look', f:()=>openPanel('build'), g:'office'};
+  if(S.accel && S.accel.status==='demo') return {ic:'🎤', t:'<b>Demo Day</b> is today. Pitch the Bot City Accelerator', b:'Pitch', f:()=>openPanel('accel'), g:'company'};
+  if(accelEligible() && !S.accel) return {ic:'🚀', t:'You can apply to the <b>Bot City Accelerator</b>', b:'Apply', f:()=>openPanel('accel'), g:'company'};
   const nr=nextRound(); if(nr && nr.ok() && !(S.funding.cool>S.day)) return {ic:'💰', t:'Investors are ready for your <b>'+nr.name+'</b>', b:'Pitch', f:()=>openPanel('funding'), g:'company'};
   const free=S.projects.length < Math.max(2, Math.ceil(S.team.filter(x=>!x.job).length/2)+1); if(free && S.offers.length && idle.length) return {ic:'📋', t:'You have room for another contract', b:'See contracts', f:()=>openPanel('contracts'), g:'work'};
   if(S.stats.delivered>=3 && !S.products.length) return {ic:'🎮', t:'Try making your own game or app', b:'New product', f:()=>{ openPanel('products'); }, g:'work'};
@@ -1633,7 +1697,7 @@ function renderNextUp(){ const N=$('#nextUp'); if(!S || titleMode){ N.hidden=tru
 function refreshBadges(){ if(!S) return; const set=(g,n,cls)=>{ const el=$(`#dockInner [data-g="${g}"] .badge`); if(!el) return; el.hidden=!n; el.textContent=n>9?'9+':n; el.className='badge '+(cls||''); };
   const ready=S.projects.filter(p=>p.done>=p.pts).length; set('work', ready||S.offers.length, ready?'gold':'');
   set('team', idlePeople().length && S.projects.some(p=>p.done<p.pts) ? idlePeople().length : 0, 'red');
-  set('company', (nextRound()&&nextRound().ok()&&!(S.funding.cool>S.day))?1:0, 'gold');
+  set('company', ((nextRound()&&nextRound().ok()&&!(S.funding.cool>S.day)) || (S.accel&&S.accel.status==='demo') || (accelEligible()&&!S.accel))?1:0, 'gold');
   const g=goalNext(); set('story', 0);
   $$('#dockInner [data-g]').forEach(b=>b.classList.toggle('attn', b.dataset.g===ui.nuGroup && !b.classList.contains('on'))); }
 function refreshPaused(){ const el=$('#paused'); if(!S || titleMode){ el.hidden=true; return; } if(modalOpen){ el.hidden=false; el.textContent='⏸ Paused while this window is open'; } else if(S.speed===0){ el.hidden=false; el.innerHTML='⏸ Paused · press <b>Space</b> or ▶ to resume'; } else el.hidden=true; }
@@ -1678,7 +1742,7 @@ function initThree(){
   resize(); window.addEventListener('resize', resize);
 }
 function resize(){ const w=innerWidth, h=innerHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); const cf=$('#confetti'), d=Math.min(2,devicePixelRatio||1); cf.width=w*d; cf.height=h*d; }
-function setCam(){ if(S && S.stage>=3 && ui.fl===-1){ const t=(towerG.userData.top||6); controls.target.set(0,t*.45,0); camera.position.set(14,t*.6+4,16); controls.maxDistance=60; controls.update(); return; } const st=stageDef(), d=Math.max(st.w,st.h)*1.05+5; controls.target.set(0,0,.5); camera.position.set(d*.62, d*.78, d*.72); controls.minDistance=4; controls.maxDistance=d*1.8; controls.update(); }
+function setCam(){ if(S && S.stage>=3 && ui.fl===-1){ const t=(towerG.userData.top||6); controls.target.set(0,t*.4,0); camera.position.set(18,t*.75+6,22); controls.maxDistance=70; controls.update(); return; } const st=stageDef(), d=Math.max(st.w,st.h)*1.05+5; controls.target.set(0,0,.5); camera.position.set(d*.62, d*.78, d*.72); controls.minDistance=4; controls.maxDistance=d*1.8; controls.update(); }
 function floorTex(kind){
   const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d');
   if(kind===0){ g.fillStyle='#9AA3B0'; g.fillRect(0,0,128,128); for(let i=0;i<500;i++){ g.fillStyle=`rgba(0,0,0,${Math.random()*.06})`; g.fillRect(Math.random()*128,Math.random()*128,2,2); } g.strokeStyle='rgba(0,0,0,.12)'; g.lineWidth=2; g.strokeRect(0,0,128,128); }
@@ -1976,9 +2040,9 @@ function fitWord(f){ return f>=55?'Great':f>=38?'Good':f>=25?'OK':'Weak'; }
 function fitColor(f){ return f>=55?'var(--neon)':f>=38?'#86EFAC':f>=25?'var(--gold)':'var(--red)'; }
 function offerScore(o){ const f=teamFit(PTYPES[o.type].w); return (f/100)*o.pay/Math.max(1,estDays(o)) * (estDays(o)<=o.days?1:.3); }
 function teamFit(w){ const ppl=S.team.filter(p=>!p.job && !p.training).map(p=>eff(p,w)).sort((a,b)=>b-a); return ppl.length?ppl[0]:0; }
-const GROUPS = {work:['contracts','projects','products'], team:['team','hire'], office:['build'], company:['finance','funding','upgrades','research'], story:['story','rank','inbox']};
-const SUBN = {contracts:'Contracts', projects:'Projects', products:'Products', team:'Team', hire:'Hire', finance:'Money', funding:'Funding', upgrades:'Upgrades', research:'Research', story:'Story', rank:'Leaderboard', inbox:'Inbox'};
-const DRAWER = ['contracts','projects','products','team','hire','finance','funding','upgrades','research','story','rank','inbox'];
+const GROUPS = {work:['contracts','projects','products'], team:['team','hire'], office:['build'], company:['finance','funding','accel','upgrades','research'], story:['story','rank','inbox']};
+const SUBN = {contracts:'Contracts', projects:'Projects', products:'Products', team:'Team', hire:'Hire', finance:'Money', funding:'Funding', accel:'Accelerator', upgrades:'Upgrades', research:'Research', story:'Story', rank:'Leaderboard', inbox:'Inbox'};
+const DRAWER = ['contracts','projects','products','team','hire','finance','funding','accel','upgrades','research','story','rank','inbox'];
 function groupOf(p){ for(const g in GROUPS) if(GROUPS[g].includes(p)) return g; return null; }
 function markTabs(){ const g = ui.panel ? groupOf(ui.panel) : (!$('#palette').hidden ? 'office' : null); $$('#dockInner [data-g]').forEach(b=>b.classList.toggle('on', b.dataset.g===g)); }
 function openPanel(p){
@@ -2038,6 +2102,7 @@ function panelBody(p){
   }
   if(p==='finance') financePanel();
   if(p==='funding') fundingPanel();
+  if(p==='accel') accelPanel();
   if(p==='research') researchPanel();
   if(p==='rank') rankPanel();
   if(p==='inbox') inboxPanel();
@@ -2105,17 +2170,48 @@ function moveUp(){
   queueModal(()=>openModal(`<div class="eyebrow">New space</div><h2>Welcome to the ${nx.name}</h2><div class="take"><img src="${PORT.celebrate}" alt=""><p>${nx.desc} Your furniture came with you. Rent is now <b>${money(nx.rent)}</b> a month.</p></div><div class="lesson">Rent is a fixed cost. It doesn't care whether you had a good month. Bigger space only pays off if you fill it with people doing paid work.</div><div class="mactions"><button class="btn pri" data-close>Let's go</button></div>`));
   renderElevator(); gainXP(80); checkGoals(); refreshHUD();
 }
+function saasNow(){
+  if(!S) return {mrr:0,arr:0,gameMo:0,prodMo:0,srvMo:0,apps:0,games:0};
+  const apps=S.products.filter(p=>p.launched && p.kind!=='game');
+  const games=S.products.filter(p=>p.launched && p.kind==='game');
+  const mrr=apps.reduce((a,p)=>a+(p.rate||0)*30,0);
+  const srvMo=S.products.reduce((a,p)=>a+(p.srv||0)*30,0);
+  const gameMo=games.reduce((a,p)=>a+(p.rate||0)*30,0);
+  return {mrr, arr:mrr*12, gameMo, prodMo:mrr+gameMo-srvMo, srvMo, apps:apps.length, games:games.length};
+}
+function pathToProfit(){
+  const b=burn(), rw=runway();
+  if(b==null) return {kind:'wait', t:'Your first month report will show whether this path works. Keep playing until a month closes.'};
+  if(b>=0) return {kind:'ok', t:'You are profitable. Recurring revenue plus client work covers the bills.'};
+  let growMo=0;
+  S.products.forEach(p=>{
+    if(!p.launched || p.kind==='game') return;
+    const add=(p.grow||0)*30*Math.max(.25,1-(p.age||0)/400);
+    growMo += add*(p.price||0) - add*.35*upgMul('srv')*srvMult();
+  });
+  if(growMo<50) return {kind:'stuck', t:'You burn about '+money(Math.round(-b))+' a month, and subscription growth is too small to catch it. Cut costs, raise, or ship a product that people keep paying for.'};
+  const months=Math.max(1, Math.ceil((-b)/growMo));
+  if(rw!==Infinity && months>rw) return {kind:'late', t:'At this growth, profit is about '+months+' months away — but runway is only '+rw.toFixed(1)+' months. Cut burn or raise before the money runs out.'};
+  return {kind:'path', t:'If subscriptions keep growing like this, you hit profit in about '+months+' month'+(months===1?'':'s')+', before cash runs out.'};
+}
 function financePanel(){
   const M=S.month, rw=runway(), b=burn(), fixed=S.team.reduce((a,p)=>a+p.salary,0)+rentNow()+stageDef().util+45*S.team.length;
-  const recvTot=S.recv.reduce((a,r)=>a+r.amt,0);
+  const recvTot=S.recv.reduce((a,r)=>a+r.amt,0), m=saasNow(), path=pathToProfit();
   openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Finances · ${dateStr()}</div><h2>${money(Math.round(S.cash))} in the bank</h2>
-    <canvas id="chart" width="1160" height="320"></canvas><p class="hint">Green bars: cash collected each month. Red bars: what you spent. Gold line: cash in the bank.</p>
-    <div class="kv big"><div><label>Monthly ${G('fixed costs','fixed')}</label><b class="negc">${money(fixed)}</b></div><div><label>Avg. monthly ${b!=null&&b>=0?'profit':'burn'}</label><b class="${b!=null&&b>=0?'pos':'negc'}">${b==null?'—':money(Math.round(Math.abs(b)))}</b></div><div><label>${G('Runway','runway')}</label><b>${rw===Infinity?'Profitable':rw.toFixed(1)+' months'}</b></div><div><label>Owed to you</label><b class="pos">${money(recvTot)}</b></div></div>
+    <div class="saas">
+      <div class="tile"><label>${G('MRR','mrr')}</label><b>${fmt(m.mrr)}</b><small>${m.apps?m.apps+' subscription product'+(m.apps===1?'':'s'):'Launch an app to start MRR'}</small></div>
+      <div class="tile"><label>${G('ARR','arr')}</label><b>${fmt(m.arr)}</b><small>MRR × 12 · what investors quote</small></div>
+      <div class="tile ${b!=null&&b<0?'warn':'ok'}"><label>${G('Burn','burn')}</label><b>${b==null?'—':(b>=0?'+':'−')+fmt(Math.abs(b))}</b><small>${b==null?'Need a full month of books':b>=0?'Collected more than you spent':'Average monthly cash going out'}</small></div>
+      <div class="tile ${rw!==Infinity&&rw<4?'warn':''}"><label>${G('Runway','runway')}</label><b>${rw===Infinity?'Profitable':rw.toFixed(1)+' mo'}</b><small>${rw===Infinity?'Cash is growing on its own':'Months until cash hits zero at this burn'}</small></div>
+    </div>
+    <div class="pathcard"><b>Path to profit.</b> ${path.t}</div>
+    <canvas id="chart" width="1160" height="320"></canvas><p class="hint">Green bars: cash collected each month. Red bars: what you spent. Gold line: cash in the bank. Game sales are one-time; ${G('MRR','mrr')} only counts subscriptions.</p>
+    <div class="kv big"><div><label>Monthly ${G('fixed costs','fixed')}</label><b class="negc">${money(fixed)}</b></div><div><label>Product net / month</label><b class="${m.prodMo>=0?'pos':'negc'}">${fmt(m.prodMo)}</b></div><div><label>Game sales / month</label><b>${fmt(m.gameMo)}</b></div><div><label>Owed to you</label><b class="pos">${money(recvTot)}</b></div></div>
     <div class="sec"><h5>This month so far</h5><table class="pl"><tr><td>Invoiced (revenue)</td><td>${money(M.invoiced)}</td></tr><tr><td>Cash collected</td><td>${money(M.collected)}</td></tr><tr><td>Furniture, hiring, training and other</td><td>−${money(M.furniture+M.hiring+M.training+M.other+M.moving)}</td></tr><tr class="sub"><td>Due at month end: salaries, rent, utilities, software${S.loan?', interest':''}</td><td>−${money(Math.round(fixed+S.loan*.015))}</td></tr></table></div>
     <div class="sec"><h5>Money owed to you (${G('receivables','receivables')})</h5>${S.recv.length?'<table class="pl">'+S.recv.slice().sort((a,b)=>a.due-b.due).map(r=>`<tr><td>${r.client} · in ${r.due-S.day} day${r.due-S.day===1?'':'s'}</td><td>${money(r.amt)}</td></tr>`).join('')+'</table>':'<p class="hint">Nobody owes you money right now.</p>'}</div>
     <div class="sec"><h5>Ownership</h5><div class="row"><span>You own <b>${myShare().toFixed(1)}%</b> of ${S.name}${S.funding.rounds.length?' after '+S.funding.rounds.length+' round'+(S.funding.rounds.length>1?'s':''):''}.</span><button class="btn pri" id="fFund">Raise money</button></div></div>
     <div class="sec"><h5>Bank</h5><div class="row"><span>Loan balance <b style="font-family:var(--mono)">${money(S.loan)}</b> · 1.5% interest a month</span><span class="btnrow"><button class="btn" id="fRepay" ${S.loan&&S.cash>=5000?'':'disabled'}>Repay $5,000</button><button class="btn" id="fBorrow" ${S.loan<loanMax()?'':'disabled'}>Borrow $5,000</button></span></div><p class="hint">Borrowing limit: ${money(loanMax())}. It grows with your reputation and office.</p></div>
-    <div class="lesson">Runway is how many months you can survive at today's burn before the money runs out. Most startups don't die from a lack of ideas. They die from a lack of runway.</div>`);
+    <div class="lesson">Runway is how many months you can survive at today's burn before the money runs out. ${G('MRR','mrr')} is the part that can stack. Most startups don't die from a lack of ideas. They die from a lack of runway.</div>`);
   drawChart($('#chart'));
   $('#fFund').onclick=()=>{ openPanel('funding'); };
   $('#fBorrow').onclick=()=>{ S.loan+=5000; S.cash+=5000; sfx('coin'); openPanel('finance'); refreshHUD(); };
@@ -2638,11 +2734,18 @@ function buildDecor(s, W, H, wh){
     for(let i=0;i<6;i++) edison(-W/2+2.6+i*(W-4)/5, 1.5+(i%2)*.8, 3.6, .5+(i%2)*.2);
     wallClock(W/2-.6, wh-.4, B+.03);
   } else {
-    const dp=DEPTS[(S.floors[curFloor()]||{}).dept||'general'];
+    const dept=(S.floors[curFloor()]||{}).dept||'general', dp=DEPTS[dept];
     neon('F'+(curFloor()+1), dp.color, 1.3, L, 1.55, -1.5, 'left');
     poster([dp.name.toUpperCase(),'MoneyBot Tower','#0A0A1A','#F8FAFC',dp.color,'robot'], L, 1.5, 2.5, 'left');
     bulbString([new THREE.Vector3(-W/2+.2,wh-.15,B+.08), new THREE.Vector3(W/2-.2,wh-.15,B+.08)], .05);
     wallClock(W/2-.6, wh-.4, B+.03);
+    if(dept==='games'){ neon('PLAY', dp.color, 1.7, L, 1.55, .6, 'left'); for(let i=0;i<3;i++){ const s=new THREE.Mesh(BOX, new THREE.MeshStandardMaterial({color:'#0B1220', emissive:pick(['#22D3EE','#A855F7','#22C55E']), emissiveIntensity:.95})); s.scale.set(.5,.3,.03); s.position.set(-W/2+2.1+i*2.1, 1.45, -H/2+.05); roomG.add(s); } }
+    if(dept==='web'){ neon('SHIP', dp.color, 1.5, L, 1.55, .5, 'left'); }
+    if(dept==='ai'){ neon('MODEL', dp.color, 1.8, L, 1.55, .4, 'left'); for(let i=0;i<4;i++) bx(roomG,.48,1.55,.38, W/2-.38, 0, -H/2+1.15+i*1.25, mat('#1E1B4B',{metalness:.45,roughness:.35})); }
+    if(dept==='sec'){ neon('SECURE', dp.color, 1.9, L, 1.55, .3, 'left'); bx(roomG,W,.05,.05,0,wh-.18,-H/2+.07, mat('#F59E0B',{emissive:'#F59E0B',emissiveIntensity:.9}), false); }
+    if(dept==='design'){ neon('MAKE', dp.color, 1.6, L, 1.55, .45, 'left'); const pl=new THREE.PointLight(0xEC4899,.5,12); pl.position.set(0,2.1,0); roomG.add(pl); }
+    if(dept==='servers'){ neon('UPTIME', dp.color, 1.9, L, 1.55, .2, 'left'); for(let i=0;i<5;i++) bx(roomG,.68,1.75,.52, W/2-.42, 0, -H/2+1+i*1.12, mat('#0B1220',{metalness:.55,roughness:.3})); }
+    if(dept==='general') neon('HQ', dp.color, 1.35, L, 1.55, .5, 'left');
   }
 }
 
@@ -2732,10 +2835,103 @@ function upgradesPanel(){
 }
 
 /* =====================================================================
-   LEADERBOARD · your studio vs. real tech companies
-   Market caps: approximate, around Oct 30, 2026 (rounded).
+   BOT CITY ACCELERATOR · 90 days, then Demo Day
    ===================================================================== */
-const RANK_ASOF = 'Oct 30, 2026';
+function accelEligible(){ return !!(S && S.stage>=1 && (S.stats.delivered>=3 || S.products.some(p=>p.launched))); }
+function accelProdMul(){ if(!S || !S.accel) return 1; if(S.accel.status==='in' || S.accel.status==='demo') return 1.08; if(S.accel.status==='done') return 1+Math.min(.12,(S.accel.score||0)*.03); return 1; }
+function accelDay(){
+  const A=S.accel; if(!A) return;
+  if(A.status==='in'){
+    S.rep=clamp(S.rep+.04,0,100);
+    if(S.day>=A.demo){ A.status='demo'; banner('🎤','Demo Day is today','Pitch the Bot City Accelerator. Open Company → Accelerator.','#C084FC'); advise('Partner. <b>Demo Day</b> is today. A room full of investors. Know your '+G('MRR','mrr')+' and tell a short story.',{mood:'point', dur:12000}); }
+    else if(S.day>A.start && (S.day-A.start)%7===0){
+      news(pick(['Ada: "Talk to customers this week, not just your code."','Accelerator office hours: know your MRR cold.','Mentor note: show progress, not slides.','Launchpad: "Demo Day rewards a crisp one-liner."']),'info');
+    }
+  }
+}
+function accelApply(){
+  S.accel={status:'in', start:S.day, demo:S.day+90, score:0, bump:0};
+  S.rep=clamp(S.rep+2,0,100);
+  confetti(); sfx('fanfare');
+  news(S.name+' joined the Bot City Accelerator. Demo Day is in 90 days.','good');
+  advise('We\'re in. For the next 90 days we get mentors, a little extra product lift, and then we pitch. Use it.',{mood:'celebrate', dur:10000});
+  openPanel('accel');
+}
+function accelPanel(){
+  const A=S.accel, m=saasNow();
+  if(!A){
+    const ok=accelEligible();
+    openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Bot City Accelerator</div><h2>Apply</h2>
+      <div class="accHero"><img src="${PORT.ada||PORT.point}" alt=""><div><p style="margin:0">Ada Vault and Launchpad Ventures run a 90-day program out of Bot City. You keep your company. They give you mentors, a Demo Day stage, and a stipend if you finish.</p></div></div>
+      <p>Need: an office, and either 3 delivered projects or a launched product. ${ok?'You qualify.':'Not yet.'}</p>
+      <table class="pl"><tr><td>Program</td><td>90 days</td></tr><tr><td>Product lift while you\'re in</td><td>+8%</td></tr><tr><td>${G('Demo Day','demo')}</td><td>Pitch a room of investors</td></tr><tr><td>Stipend</td><td>Paid at Demo Day · bigger if the pitch lands</td></tr></table>
+      <div class="lesson">An accelerator is a short, intense school for startups. You trade a little time and attention for a network, a deadline, and a stage.</div>
+      <div class="mactions"><button class="btn pri" id="accGo" ${ok?'':'disabled'}>${ok?'Join the cohort':'Not eligible yet'}</button></div>`);
+    const b=$('#accGo'); if(b) b.onclick=()=>{ if(!ok) return; closeModal(); accelApply(); };
+    return;
+  }
+  if(A.status==='in'){
+    const left=Math.max(0, A.demo-S.day);
+    openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Accelerator · day ${S.day-A.start+1} of 90</div><h2>You\'re in the cohort</h2>
+      <p>${left} day${left===1?'':'s'} until ${G('Demo Day','demo')}. Product revenue is running 8% hotter while you\'re here.</p>
+      <div class="saas"><div class="tile"><label>${G('MRR','mrr')}</label><b>${fmt(m.mrr)}</b></div><div class="tile"><label>${G('ARR','arr')}</label><b>${fmt(m.arr)}</b></div><div class="tile"><label>Demo Day</label><b>${dateStr(A.demo)}</b></div><div class="tile"><label>Mentors</label><b>Ada + Launchpad</b></div></div>
+      <div class="take"><img src="${PORT.point}" alt=""><p>Know three numbers cold: ${G('MRR','mrr')}, ${G('burn','burn')}, and ${G('runway','runway')}. Investors can smell a founder who doesn\'t.</p></div>
+      <div class="lesson">The program is a forcing function. The pitch is the exam.</div>`);
+    return;
+  }
+  if(A.status==='demo'){
+    openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">${G('Demo Day','demo')} · ${dateStr()}</div><h2>The room is full</h2>
+      <div class="accHero"><img src="${PORT.ada||PORT.point}" alt=""><div><p style="margin:0">Ada: "Three minutes. Tell them how you make money, what the numbers are, and what a check would buy. Then sit down."</p></div></div>
+      <p>Current ${G('MRR','mrr')}: <b class="pos">${fmt(m.mrr)}</b> · ${G('ARR','arr')}: <b>${fmt(m.arr)}</b></p>
+      <div class="mactions"><button class="btn pri" id="accPitch">Walk on stage</button></div>`);
+    $('#accPitch').onclick=()=>{ closeModal(); accelPitch(); };
+    return;
+  }
+  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Accelerator · alumni</div><h2>Demo Day is done</h2>
+    <p>You pitched on ${dateStr(A.day)}. Stipend <b class="pos">${fmt(A.grant||0)}</b>. The Demo Day bump still sits in your valuation.</p>
+    <div class="lesson">Alumni networks are the real product of an accelerator. The check is the souvenir.</div>`);
+}
+function accelPitch(){
+  const m=saasNow();
+  const qs=[
+    {q:'In one sentence: how does this company make money?', a:[['Subscriptions and product sales, with client work paying the bills until that scales.',1],['We will figure out monetization after we have users.',-1],['Mostly whatever clients will pay us.',0]]},
+    {q:'What is your traction today?', a:[[`${G('MRR','mrr')} is ${fmt(m.mrr)} and ${G('ARR','arr')} is ${fmt(m.arr)}. Here is the chart.`,1],['The product is going viral in our group chat.',-1],['We have some users and some revenue.',0]]},
+    {q:'If we write a check today, what happens in 12 months?', a:[['Two more products shipped, MRR up, and a team that can run without us on every desk.',1],['A much cooler office and a launch party.',-1],['We grow.',0]]}
+  ];
+  let i=0, score=0;
+  const ask=()=>{
+    const q=qs[i];
+    openModal(`<div class="eyebrow">Demo Day · question ${i+1} of 3</div><h2>The room goes quiet</h2><div class="take"><img src="${PORT.ada||PORT.point}" alt=""><p>“${q.q}”</p></div><div class="choices">${q.a.slice().sort(()=>Math.random()-.5).map(a=>`<button class="btn" data-sc="${a[1]}">${a[0]}</button>`).join('')}</div>`);
+    $$('[data-sc]').forEach(b=>b.onclick=()=>{ score+=+b.dataset.sc; i++; closeModal(); if(i<3) ask(); else accelFinish(score); });
+  };
+  ask();
+}
+function accelFinish(score){
+  const grant=Math.round((15000+Math.max(0,score)*18000)*Math.pow(1.5,S.stage)/1000)*1000;
+  const bump=grant*10;
+  S.cash+=grant; S.month.funding=(S.month.funding||0)+grant;
+  S.accel={status:'done', score, grant, bump, day:S.day};
+  S.rep=clamp(S.rep+2+Math.max(0,score)*2,0,100);
+  S.fans=(S.fans||0)+40+Math.max(0,score)*40;
+  S.products.filter(p=>p.launched).forEach(p=>{ if(p.kind!=='game') p.users=(p.users||0)*(1+Math.max(0,score)*.1); else p.boost=Math.max(p.boost||1, 1+Math.max(0,score)*.2); });
+  productsDay(true);
+  confetti(); sfx('fanfare');
+  const line=score>=2?'The room clapped. Two angels asked for a follow-up.':score>=0?'Polite applause. The stipend still clears.':'A tough room. You still leave with the stipend and a list of homework.';
+  openModal(`<div class="eyebrow">Demo Day</div><h2>${score>=2?'You crushed it':'Demo Day is over'}</h2>
+    <div class="take"><img src="${PORT[score>=2?'celebrate':'wave']}" alt=""><p>${line}</p></div>
+    <table class="pl"><tr><td>Stipend in the bank</td><td class="pos">${fmt(grant)}</td></tr><tr><td>Paper valuation bump</td><td>${fmt(bump)}</td></tr><tr><td>Fans from the livestream</td><td>+${40+Math.max(0,score)*40}</td></tr></table>
+    <div class="lesson">Demo Day is theater with a term sheet waiting in the hallway. The number that matters next is still ${G('runway','runway')}.</div>
+    <div class="mactions"><button class="btn pri" data-close>Back to work</button></div>`);
+  news(S.name+' finished the Bot City Accelerator. Stipend: '+fmt(grant)+'.','good');
+  checkGoals(); refreshHUD();
+}
+
+/* =====================================================================
+   LEADERBOARD · your studio vs. real tech companies
+   Public market caps around Oct 30, 2026. Private marks: latest reported
+   round or tender as of Nov 1, 2026 (OpenAI round still open).
+   ===================================================================== */
+const RANK_ASOF = 'Nov 1, 2026';
 const LADDER = [
   {n:'Lemonade stand', ceo:'A kid down the street', v:200, fic:1, i:'🍋'},
   {n:'Chip\'s Diner', ceo:'Chip', v:400000, fic:1, i:'🍕'},
@@ -2748,14 +2944,26 @@ const LADDER = [
   {n:'Unity', ceo:'Matt Bromberg', v:17.75e9, i:'🧊'},
   {n:'Take-Two Interactive', ceo:'Strauss Zelnick', v:38.02e9, i:'🚗'},
   {n:'Roblox', ceo:'David Baszucki', v:38.84e9, i:'🧱'},
+  {n:'Canva', ceo:'Melanie Perkins', v:42e9, priv:1, i:'🎨'},
+  {n:'DeepSeek', ceo:'Liang Wenfeng', v:52e9, priv:1, i:'🐋'},
+  {n:'Ramp', ceo:'Eric Glyman', v:60e9, priv:1, i:'💳'},
   {n:'MegaCorp', ceo:'Mr. Gray', v:60e9, fic:1, i:'🏢'},
+  {n:'Anduril', ceo:'Palmer Luckey', v:90e9, priv:1, i:'🛡️'},
+  {n:'Revolut', ceo:'Nik Storonsky', v:115e9, priv:1, i:'🏦'},
+  {n:'Waymo', ceo:'Tekedra Mawakana', v:126e9, priv:1, i:'🚗'},
+  {n:'Blue Origin', ceo:'Dave Limp', v:140e9, priv:1, i:'🔵'},
   {n:'Sony', ceo:'Hiroki Totoki', v:152.44e9, i:'🎮'},
+  {n:'Stripe', ceo:'Patrick & John Collison', v:159e9, priv:1, i:'💸'},
   {n:'Salesforce', ceo:'Marc Benioff', v:188.61e9, i:'☁️'},
+  {n:'Databricks', ceo:'Ali Ghodsi', v:190e9, priv:1, i:'🧱'},
   {n:'Shopify', ceo:'Tobi Lütke', v:202.63e9, i:'🛍️'},
   {n:'Netflix', ceo:'Ted Sarandos & Greg Peters', v:258.5e9, i:'🎬'},
+  {n:'ByteDance', ceo:'Liang Rubo', v:330e9, priv:1, i:'🎵'},
   {n:'Oracle', ceo:'Clay Magouyrk & Mike Sicilia', v:396.13e9, i:'🗄️'},
   {n:'Palantir', ceo:'Alex Karp', v:442.43e9, i:'🔮'},
   {n:'AMD', ceo:'Lisa Su', v:824.07e9, i:'🔺'},
+  {n:'Anthropic', ceo:'Dario Amodei', v:965e9, priv:1, i:'🔮'},
+  {n:'OpenAI', ceo:'Sam Altman', v:1.25e12, priv:1, i:'✦'},
   {n:'Broadcom', ceo:'Hock Tan', v:1.56e12, i:'📡'},
   {n:'Meta', ceo:'Mark Zuckerberg', v:1.57e12, i:'♾️'},
   {n:'Tesla', ceo:'Elon Musk', v:1.58e12, i:'⚡'},
@@ -2775,8 +2983,8 @@ function rankPanel(){
   openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Leaderboard</div><h2>How big is ${S.name}?</h2>
     <p>Your studio is worth about <b class="pos">${bigFmt(v)}</b>. That ranks <b>#${pos}</b> of ${all.length}. ${nx?`Next up: <b>${nx.n}</b>${nx.fic?'':' (CEO '+nx.ceo+')'}, ${bigFmt(nx.v-v)} ahead.`:'You are the most valuable company on the board!'}</p>
     ${nx?`<div class="upbar"><i style="width:${Math.max(2,Math.min(100,Math.log10(Math.max(1,v))/Math.log10(nx.v)*100))}%"></i></div>`:''}
-    <div class="ladder">${all.map((c,i)=>`<div class="lrow ${c.me?'me':''} ${!c.me&&v>c.v?'passed':''}" ${c.me?'id="lrMe"':''}><span class="lp">${i+1}</span><span class="li">${c.i}</span><div class="ln"><b>${c.me?c.n+' (you)':c.n}</b><small>${c.me?'Founder: you':c.fic?c.ceo+' · Bot City':'CEO: '+c.ceo}</small></div><span class="lv">${bigFmt(c.v)}</span></div>`).join('')}</div>
-    <p class="hint">Real companies are ranked by market value (share price times shares) around ${RANK_ASOF}, rounded. Real values move every day. Bot City companies are made up. Your studio's value comes from cash, revenue, products and what investors last paid.</p>
+    <div class="ladder">${all.map((c,i)=>`<div class="lrow ${c.me?'me':''} ${!c.me&&v>c.v?'passed':''}" ${c.me?'id="lrMe"':''}><span class="lp">${i+1}</span><span class="li">${c.i}</span><div class="ln"><b>${c.me?c.n+' (you)':c.n}${c.priv?'<span class="tag priv">Private</span>':''}</b><small>${c.me?'Founder: you':c.fic?c.ceo+' · Bot City':(c.priv?'Latest reported valuation · ':'CEO: ')+c.ceo}</small></div><span class="lv">${bigFmt(c.v)}</span></div>`).join('')}</div>
+    <p class="hint">Public companies are ranked by market value around ${RANK_ASOF}, rounded. Private companies (OpenAI, Stripe, Databricks and others) use the latest reported round or tender. Real values move. Bot City companies are made up. Your studio's value comes from cash, revenue, products and what investors last paid.</p>
     <div class="lesson"><b>Market cap</b> is what the stock market says a whole company is worth. Most of the giants at the top started tiny: Apple and Amazon both started in a garage.</div>`);
   setTimeout(()=>{ const m=$('#lrMe'), L=$('.ladder'); if(m&&L) L.scrollTop=m.offsetTop-L.offsetTop-L.clientHeight/2+m.offsetHeight/2; }, 50);
 }
@@ -3010,7 +3218,7 @@ function frame(){
     let dm=dt*90*S.speed; simDt=dm; while(dm>0){ const s=Math.min(dm,5); step(s); dm-=s; if(modalOpen) break; } }
   if(S && GLTF.crowd){
     if(world.roomDirty) buildRoom(); if(world.furnDirty) syncFurn();
-    updateWalkers(dt, simDt); updateFloaters(dt); updateGhost(); updateFx(dt); ambientFx(dt); dayLight(); animUnlocks(dt);
+    updateWalkers(dt, simDt); updateFloaters(dt); updateGhost(); updateFx(dt); ambientFx(dt); dayLight(); animUnlocks(dt); animTower(dt);
     for(const g of furnMeshes.values()){ if(g.userData.born!=null){ const k=(clock.elapsedTime-g.userData.born)/.5; if(k>=1){ g.scale.setScalar(1); delete g.userData.born; } else g.scale.setScalar(.2+.8*(1-Math.pow(1-k,3))); } }
     halos.forEach(h=>{ h.visible=true; h.material.opacity=h.userData.base*.45; });
     // remove walkers for departed people
