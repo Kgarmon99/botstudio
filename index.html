@@ -783,6 +783,8 @@ body.titling #modal{z-index:40}
 .paints{display:flex;flex-wrap:wrap;gap:5px}
 .pt{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.25);cursor:pointer;padding:0;background:#0F172A;color:#CBD5E1;font-size:11px}
 .pt.on{border-color:#fff;box-shadow:0 0 0 2px var(--neon)}.pt.lock{opacity:.25;cursor:not-allowed}
+.dchips button.full{border-color:var(--gold);color:#FDE68A}
+
 
 
 
@@ -4362,6 +4364,133 @@ function equipGridHTML(){ const cat=ui.ecat||'work'; const L=EQ_KEYS.filter(k=>F
 })();
 
 (function(){ const _gx=gainXP; gainXP=function(n){ return _gx(n*(S?equipFx('xp'):1)); }; })();
+
+/* =====================================================================
+   ROUND 21 · COLLECTIONS · ~107 one-of-a-kind unlockables in 12 groups
+   ===================================================================== */
+FXN.click=v=>'Hustle +'+((v-1)*100).toFixed(0)+'%';
+const CGROUPS = {story:['📖','Story gifts'], city:['🌍','City souvenirs'], rival:['⚔️','Rival trophies'], relic:['🔬','Research relics'], award:['🏆','Award trophies'], client:['🤝','Client gifts'], pet:['🐾','Pet milestones'], ach:['🎖️','Achievement milestones'], season:['📅','Seasonal'], secret:['🕵️','Secrets'], legacy:['🌳','Legacy heirlooms'], master:['👑','Masterpieces']};
+// part templates (same DSL as equipment)
+const PED=(c,h)=>[['b',.55,h||.5,.55,0,0,0,c||'#E5E7EB']];
+const CUP=(c,b)=>[...PED(b||'#1F2937',.45),['c',.05,.15,0,.45,0,c],['k',.18,.32,0,.6,0,c],['t',.08,.02,-.2,.8,0,c],['t',.08,.02,.2,.8,0,c]];
+const STATUE=(c,shape)=>[...PED('#E5E7EB',.6),shape==='s'?['s',.2,.2,.2,0,.85,0,c]:shape==='k'?['k',.22,.5,0,.6,0,c]:['b',.3,.4,.3,0,.6,0,c]];
+const FRAME=(c,g)=>[['b',.04,1.1,.04,-.25,0,0,'#78350F'],['b',.04,1.1,.04,.25,0,0,'#78350F'],['b',.7,.55,.04,0,.6,.04,'#1F2937'],['b',.6,.45,.02,0,.65,.07,c,g]];
+const GLOW=(c)=>c;
+const COLL = [
+ // ---- story gifts
+ ['story','quilt','Mom\'s Quilt',{morale:1},'Finish the prologue',()=>!!seen('intro'),[['b',1,.3,.6,0,0,0,'#78350F'],['b',1,.08,.6,0,.3,0,'#F472B6'],['b',.33,.081,.2,-.33,.3,-.2,'#38BDF8'],['b',.33,.081,.2,.33,.3,.2,'#FDE047']]],
+ ['story','firstpizza','Chip\'s First Pizza Box',{morale:1},'Meet Chip',()=>!!seen('chip'),[...PED('#1F2937',.5),['b',.4,.06,.4,0,.5,0,'#FDE68A'],['c',.17,.02,0,.56,0,'#EF4444']]],
+ ['story','rustykeys','Rusty\'s Car Keys',{pay:1.01},'Meet Rusty',()=>!!seen('rusty1'),[...PED('#1F2937',.6),['t',.08,.015,0,.65,0,'#CBD5E1'],['b',.04,.15,.02,.06,.62,0,'#DC2626']]],
+ ['story','momsign','Garage Door Plaque',{xp:1.02},'Move out of the garage',()=>S.stage>=1,[['b',.9,.6,.06,0,.3,0,'#E2E8F0'],['b',.8,.1,.07,0,.55,0,'#94A3B8'],['b',.06,.3,.06,0,0,0,'#1F2937']]],
+ ['story','junoarticle','Juno\'s First Article',{fans:1.03},'Meet Juno',()=>!!seen('office'),FRAME('#F5F5F4')],
+ ['story','adapen','Ada\'s Lucky Pen',{pay:1.01},'Meet Ada Vault',()=>!!seen('ada'),[...PED('#4C1D95',.6),['c',.02,.3,0,.6,0,'#C4B5FD']]],
+ ['story','titanlogo','Titan Trust Contract',{pay:1.02},'Win the Titan pitch',()=>!!(S.story&&S.story.flags.titan),FRAME('#FBBF24')],
+ ['story','megabot','MegaBot Prototype',{bots:1.05},'See MegaBot on TV',()=>!!seen('studio'),[...PED('#1F2937',.4),['b',.3,.35,.25,0,.4,0,'#FBBF24'],['s',.15,.15,.15,0,.9,0,'#FBBF24'],['b',.12,.04,.02,0,.92,.14,'#EF4444','#EF4444']]],
+ ['story','dipumbrella','Dip Survivor Umbrella',{drain:.98},'Survive The Dip',()=>!!seen('crisis'),[['c',.02,1.2,0,0,0,'#1F2937'],['k',.5,.3,0,1.1,0,'#0EA5E9']]],
+ ['story','gamejam','Game Jam Trophy',{score:.03},'Accept Vera\'s game jam',()=>!!(S.story&&S.story.flags.vera==='jam'),CUP('#FDE047')],
+ ['story','cookiejar','Mom\'s Cookie Jar',{morale:1},'Mom visits the office',()=>!!seen('momvisit'),[...PED('#1F2937',.5),['c',.15,.25,0,.5,0,'#BAE6FD'],['s',.15,.06,.15,0,.78,0,'#93C5FD']]],
+ ['story','ribbon','Golden Scissors',{xp:1.02},'Ribbon day at the Tower',()=>!!seen('tower'),[...PED('#7F1D1D',.5),['b',.5,.04,.06,0,.55,0,'#FBBF24'],['t',.07,.02,-.25,.56,0,'#FBBF24'],['t',.07,.02,-.25,.56,.12,'#FBBF24']]],
+ ['story','scrapsign','ScrapCo Sign',{pay:1.01},'Settle things with ScrapCo',()=>!!(S.story&&S.story.flags.scrap),[['b',1,.35,.06,0,.6,0,'#EA580C'],['b',.05,.6,.05,-.4,0,0,'#1F2937'],['b',.05,.6,.05,.4,0,0,'#1F2937']]],
+ ['story','grayoffer','Mr. Gray\'s Offer Letter',{pay:1.02},'Hear MegaCorp\'s offer',()=>!!seen('finale'),FRAME('#94A3B8')],
+ ['story','storybook','The Story So Far',{xp:1.03},'Finish the story',()=>!!(S.story&&S.story.flags.ending),[...PED('#1F2937',.6),['b',.4,.08,.3,0,.6,0,'#7C3AED'],['b',.38,.02,.28,0,.68,0,'#F8FAFC']]],
+ // ---- city souvenirs
+ ['city','liberty','Mini Statue of Liberty',{pay:1.01},'Open the New York office',()=>cityOpen('nyc'),[...PED('#78716C',.4),['c',.08,.5,0,.4,0,'#5EEAD4'],['s',.07,.07,.07,0,.97,0,'#5EEAD4'],['k',.08,.12,0,1.05,0,'#5EEAD4'],['c',.02,.25,.1,.95,0,'#FBBF24']]],
+ ['city','bigben','Big Ben Clock',{speed:1.01},'Open the London office',()=>cityOpen('lon'),[['b',.35,1.5,.35,0,0,0,'#A16207'],['c',.13,.02,0,1.2,.18,'#F8FAFC'],['k',.22,.4,0,1.5,0,'#57534E']]],
+ ['city','tokyoarcade','Tokyo Arcade Cabinet',{score:.02},'Open the Tokyo office',()=>cityOpen('tok'),[['b',.6,1.5,.6,0,0,0,'#EC4899'],['b',.45,.35,.02,0,1,.31,'#0B1220','#22D3EE'],['b',.6,.15,.62,0,1.5,0,'#FDE047','#FDE047']]],
+ ['city','seoultrophy','Seoul Esports Cup',{fans:1.03},'Open the Seoul office',()=>cityOpen('seo'),CUP('#38BDF8')],
+ ['city','berlinwall','Berlin Wall Piece',{qual:.5},'Open the Berlin office',()=>cityOpen('ber'),[['b',.6,1.3,.25,0,0,0,'#A8A29E'],['b',.4,.3,.01,0,.6,.13,'#EC4899'],['b',.3,.2,.01,0,.95,.13,'#22C55E']]],
+ ['city','chaicart','Bangalore Chai Cart',{drain:.98},'Open the Bangalore office',()=>cityOpen('blr'),[['b',.8,.6,.5,0,.2,0,'#DC2626'],['c',.2,.05,-.25,0,.25,'#1F2937'],['c',.08,.25,.2,.8,0,'#CBD5E1']]],
+ ['city','merlion','Singapore Merlion',{prod:1.02},'Open the Singapore office',()=>cityOpen('sgp'),[...PED('#E5E7EB',.4),['s',.15,.25,.15,0,.65,0,'#F8FAFC'],['s',.12,.12,.12,0,1,.05,'#F8FAFC'],['c',.02,.3,0,1,.2,'#38BDF8']]],
+ ['city','talkingdrum','Lagos Talking Drum',{fans:1.03},'Open the Lagos office',()=>cityOpen('lag'),[['c',.18,.5,0,0,0,'#92400E'],['t',.18,.02,0,.05,0,'#22C55E'],['t',.18,.02,0,.45,0,'#22C55E']]],
+ ['city','samba','São Paulo Samba Drum',{morale:1},'Open the São Paulo office',()=>cityOpen('sao'),[['c',.25,.4,0,0,0,'#FBBF24'],['t',.25,.02,0,.4,0,'#16A34A'],['t',.25,.02,0,0,0,'#16A34A']]],
+ ['city','cntower','CN Tower Model',{learn:1.02},'Open the Toronto office',()=>cityOpen('tor'),[['c',.05,1.6,0,0,0,'#CBD5E1'],['s',.12,.08,.12,0,1.2,0,'#94A3B8'],['k',.03,.3,0,1.6,0,'#CBD5E1']]],
+ ['city','opera','Sydney Opera Model',{morale:1},'Open the Sydney office',()=>cityOpen('syd'),[['b',.8,.1,.5,0,0,0,'#E5E7EB'],['k',.18,.4,-.2,.1,0,'#F8FAFC'],['k',.22,.5,.05,.1,0,'#F8FAFC'],['k',.15,.3,.28,.1,0,'#F8FAFC']]],
+ ['city','burj','Burj Khalifa Model',{pay:1.01},'Open the Dubai office',()=>cityOpen('dxb'),[['b',.3,.5,.3,0,0,0,'#CBD5E1'],['b',.2,.6,.2,0,.5,0,'#CBD5E1'],['b',.12,.5,.12,0,1.1,0,'#CBD5E1'],['k',.05,.4,0,1.6,0,'#CBD5E1']]],
+ ['city','moonflag','Moon Flag',{xp:1.05},'Open the Moon Base',()=>cityOpen('moon'),[['s',.35,.12,.35,0,0,0,'#9CA3AF'],['c',.015,1.2,0,.1,0,'#CBD5E1'],['b',.4,.25,.01,.2,1.05,0,'#00E676','#00E676']]],
+ // ---- rival trophies
+ ['rival','anvil','Pixel Forge Anvil',{qual:.5},'Pass Pixel Forge',()=>!!(S.rivalPassed||{}).pixel,[...PED('#1F2937',.4),['b',.5,.15,.2,0,.4,0,'#475569'],['b',.25,.15,.15,0,.55,0,'#475569'],['k',.08,.2,.3,.6,0,'#475569']]],
+ ['rival','scrapwrench','Golden Wrench',{bots:1.03},'Pass ScrapCo',()=>!!(S.rivalPassed||{}).scrap,[...PED('#1F2937',.5),['b',.06,.4,.04,0,.55,0,'#FBBF24'],['t',.06,.025,0,.98,0,'#FBBF24']]],
+ ['rival','novatelescope','NovaSoft Telescope',{learn:1.02},'Pass NovaSoft',()=>!!(S.rivalPassed||{}).nova,[['k',.25,.9,0,0,0,'#1F2937'],['c',.07,.6,0,.95,0,'#F8FAFC'],['s',.08,.08,.08,0,1.55,0,'#38BDF8']]],
+ ['rival','surfboard','Bytewave Surfboard',{morale:1},'Pass Bytewave',()=>!!(S.rivalPassed||{}).byte,[['s',.15,.9,.04,0,.9,0,'#0EA5E9'],['b',.3,.06,.3,0,0,0,'#1F2937']]],
+ ['rival','lightbulb','Lumen Lightbulb',{speed:1.01},'Pass Lumen Labs',()=>!!(S.rivalPassed||{}).lumen,[...PED('#1F2937',.5),['s',.2,.25,.2,0,.8,0,'#FEF3C7','#FDE047'],['c',.08,.1,0,.5,0,'#94A3B8']]],
+ ['rival','megastock','MegaCorp Stock Certificate',{pay:1.03},'Become worth more than MegaCorp',()=>!!(S.rivalPassed||{}).mega,FRAME('#22C55E')],
+ // ---- research relics
+ ...Object.entries(RBRANCH).filter(([k])=>k!=='core').map(([k,B],i)=>['relic','relic_'+k,B.n+' Relic',[{speed:1.03},{qual:1},{prod:1.03},{bug:.97},{pay:1.03},{fans:1.05},{morale:2},{xp:1.05}][i],'Finish every '+B.n+' research project',()=>TECH.filter(t=>t.br===k).every(t=>S.rsch.done[t.id]),[...PED('#0F172A',.6),['s',.18,.18,.18,0,.85,0,['#38BDF8','#F472B6','#A855F7','#F97316','#FBBF24','#22C55E','#EC4899','#E0F2FE'][i],['#38BDF8','#F472B6','#A855F7','#F97316','#FBBF24','#22C55E','#EC4899','#E0F2FE'][i]]]]),
+ // ---- award trophies
+ ['award','goty','Game of the Year Statue',{score:.05},'Win Game of the Year',()=>(S.awards||[]).some(a=>a.you&&a.cat==='goty'),CUP('#FBBF24')],
+ ['award','aoty','App of the Year Statue',{prod:1.03},'Win App of the Year',()=>(S.awards||[]).some(a=>a.you&&a.cat==='aoty'),CUP('#E5E7EB')],
+ ['award','soty','Studio of the Year Plaque',{rep:.01},'Win Studio of the Year',()=>(S.awards||[]).some(a=>a.you&&a.cat==='studio'),FRAME('#FBBF24','#B45309')],
+ ['award','threepeat','Three-Peat Trophy',{fans:1.05},'Win 3 awards',()=>(S.awards||[]).filter(a=>a.you).length>=3,CUP('#C084FC')],
+ ['award','gotyx3','Triple Crown',{score:.05},'Win Game of the Year 3 times',()=>(S.awards||[]).filter(a=>a.you&&a.cat==='goty').length>=3,[...PED('#1F2937',.5),['c',.2,.12,0,.5,0,'#FBBF24'],['k',.05,.12,-.12,.62,0,'#FBBF24'],['k',.05,.12,.12,.62,0,'#FBBF24'],['k',.05,.15,0,.62,.12,'#FBBF24']]],
+ ['award','dynasty','Dynasty Trophy',{pay:1.03},'Win 10 awards',()=>(S.awards||[]).filter(a=>a.you).length>=10,CUP('#F472B6','#FBBF24')],
+ // ---- client gifts
+ ...[['Neon Pizza Sign','#EF4444'],['Bolt Bikes Bicycle','#22C55E'],['Pixel Pets Plushie','#F9A8D4'],['Volt Energy Battery','#FDE047'],['Echo Records Gold Record','#FBBF24'],['Gizmo Games Controller','#7C3AED'],['Sprocket Bakery Cake','#FDBA74'],['Flux Fitness Kettlebell','#1F2937'],['Rivet Realty Key','#CBD5E1'],['City Council Medal','#0EA5E9']].map(([n,c],i)=>['client','cg'+i,n,[{morale:1},{drain:.98},{morale:1},{speed:1.01},{fans:1.02},{score:.02},{morale:1},{drain:.98},{pay:1.01},{rep:.005}][i],(i+1)+' VIP client'+(i?'s':''),()=>Object.keys(S.clients||{}).filter(x=>clientTier(x)>=3).length>=i+1,[...PED('#1F2937',.5),i===4?['c',.2,.02,0,.55,0,c]:i===7?['s',.15,.15,.15,0,.65,0,c]:['b',.3,.25,.2,0,.5,0,c,i===0?c:null]]]),
+ // ---- pet milestones
+ ['pet','cattree','Cat Tree',{morale:1},'Collect 10 pets',()=>petDexCount()>=10,[['b',.6,.08,.6,0,0,0,'#D6B98C'],['c',.05,1.4,0,0,0,'#D6B98C'],['b',.4,.06,.4,0,.6,0,'#F472B6'],['b',.4,.06,.4,0,1.2,0,'#F472B6']]],
+ ['pet','doghouse','Doghouse',{morale:1},'Collect 25 pets',()=>petDexCount()>=25,[['b',.7,.5,.7,0,0,0,'#DC2626'],['k',.5,.35,0,.5,0,'#78350F'],['b',.25,.3,.02,0,0,.36,'#111827']]],
+ ['pet','petpond','Koi Pond',{morale:2},'Collect 50 pets',()=>petDexCount()>=50,[['c',.8,.1,0,0,0,'#57534E'],['c',.7,.02,0,.1,0,'#0EA5E9','#0369A1'],['s',.08,.03,.04,.2,.12,.1,'#F97316']]],
+ ['pet','petcastle','Pet Castle',{morale:2},'Collect 100 pets',()=>petDexCount()>=100,[['b',1,.6,1,0,0,0,'#E5E7EB'],['c',.15,.9,-.4,0,-.4,'#E5E7EB'],['c',.15,.9,.4,0,.4,'#E5E7EB'],['k',.18,.3,-.4,.9,-.4,'#7C3AED'],['k',.18,.3,.4,.9,.4,'#7C3AED']]],
+ ['pet','petstatue','Every Pet Statue',{xp:1.05},'Collect all 145 pets',()=>petDexCount()>=145,STATUE('#FBBF24','s')],
+ ['pet','legendbed','Legendary Pet Throne',{morale:2},'Own a legendary pet',()=>petsOwned().some(p=>SPECIES[p.sp].r==='l'),[['b',.6,.4,.6,0,0,0,'#7C2D12'],['b',.6,.6,.12,0,.4,-.25,'#7C2D12'],['b',.5,.06,.5,0,.4,0,'#FBBF24']]],
+ // ---- achievement milestones
+ ...[25,50,75,100,125,150,175,200].map((n,i)=>['ach','am'+n,n+' Achievements Shield',[{xp:1.02},{morale:1},{pay:1.01},{speed:1.01},{fans:1.03},{qual:.5},{score:.03},{xp:1.05}][i],'Earn '+n+' achievements',()=>Object.keys(ACHS).length>=n,[['b',.06,.8,.06,0,0,0,'#1F2937'],['s',.3,.36,.06,0,1,0,['#CD7F32','#C0C0C0','#FBBF24','#E5E4E2','#38BDF8','#A855F7','#F472B6','#22C55E'][i]]]]),
+ // ---- seasonal (complete each month at least once)
+ ...[['Snow Globe','#E0F2FE'],['Heart Balloon','#F472B6'],['Lucky Clover','#22C55E'],['Rain Boots','#FDE047'],['Flower Basket','#F9A8D4'],['Beach Ball','#38BDF8'],['Firework Rocket','#EF4444'],['Ice Cream Cart','#FDBA74'],['Backpack','#2563EB'],['Jack-o\'-Lantern','#F97316'],['Turkey Platter','#A16207'],['Snowman','#F8FAFC']].map(([n,c],i)=>['season','m'+i,n,{morale:1},'Play through '+MONTHS[i],()=>!!(S.seasons||{})[i],i===11?[['s',.3,.3,.3,0,.3,0,c],['s',.22,.22,.22,0,.75,0,c],['s',.15,.15,.15,0,1.1,0,c],['k',.04,.15,0,1.1,.15,'#F97316']]:i===9?[['s',.3,.25,.3,0,.25,0,c,'#F97316'],['c',.03,.1,0,.48,0,'#16A34A']]:i===1?[['c',.01,1,0,0,0,'#94A3B8'],['s',.2,.2,.08,0,1.1,0,c]]:[...PED('#1F2937',.5),['s',.18,.18,.18,0,.7,0,c]]]),
+ // ---- secrets
+ ['secret','sec_speed','Speed Demon Helmet',{speed:1.02},'Deliver 3 projects in one day',()=>(S.maxDelDay||0)>=3,[...PED('#1F2937',.5),['s',.2,.18,.22,0,.65,0,'#EF4444']]],
+ ['secret','sec_hustle','Golden Mouse',{click:1.05},'Hustle 50,000 times',()=>S.hustles>=50000,[...PED('#1F2937',.5),['s',.12,.06,.18,0,.55,0,'#FBBF24']]],
+ ['secret','sec_bots','Bot Swarm Hive',{bots:1.05},'Own 50 Hustle Bots',()=>S.bots>=50,[['s',.35,.4,.35,0,.4,0,'#CBD5E1'],['b',.15,.04,.02,0,.5,.34,'#22C55E','#22C55E']]],
+ ['secret','sec_name','MoneyBot Bobblehead',{xp:1.03},'???',()=>/money\s*bot/i.test(S.name||''),[...PED('#1F2937',.4),['c',.04,.2,0,.4,0,'#1F2937'],['s',.18,.15,.15,0,.7,0,'#F8FAFC'],['b',.16,.06,.02,0,.72,.14,'#22C55E','#22C55E']]],
+ ['secret','sec_ten','Perfect Ten Plaque',{score:.05},'Launch a product that scores 10',()=>S.products.some(p=>p.launched&&p.score>=10),FRAME('#FBBF24','#FBBF24')],
+ ['secret','sec_flop','Spectacular Flop Trophy',{learn:1.03},'Launch a product scoring under 3',()=>S.products.some(p=>p.launched&&p.score<3),CUP('#78350F')],
+ ['secret','sec_close','Close Call Piggy Bank',{pay:1.01},'Survive a month in the red',()=>S.negMonths>=1&&S.cash>0,[['s',.3,.25,.25,0,.3,0,'#F9A8D4'],['b',.1,.02,.02,0,.55,0,'#111827']]],
+ ['secret','sec_rich','Scrooge\'s Money Bin',{pay:1.02},'Hold $1 billion in cash',()=>S.cash>=1e9,[['b',.8,.8,.8,0,0,0,'#78716C'],['b',.7,.1,.7,0,.8,0,'#FBBF24']]],
+ ['secret','sec_zoo','Zookeeper Hat',{morale:1},'Have 15 pets out at once',()=>petsOwned().filter(p=>p.act).length>=15,[...PED('#1F2937',.5),['c',.2,.12,0,.5,0,'#D6B98C'],['c',.3,.02,0,.5,0,'#D6B98C']]],
+ ['secret','sec_combo','Combo Breaker Gloves',{click:1.05},'Hit a 40x hustle combo',()=>(S.maxCombo||0)>=40,[...PED('#1F2937',.5),['s',.12,.12,.08,-.1,.6,0,'#EF4444'],['s',.12,.12,.08,.1,.6,0,'#EF4444']]],
+ ['secret','sec_worker','Burnt-Out Coffee Mug',{drain:.98},'Let someone hit 0 energy',()=>!!S.hitZero,[...PED('#1F2937',.5),['c',.1,.15,0,.5,0,'#57534E']]],
+ ['secret','sec_rich2','Pocket Change Jar',{pay:1.01},'End a month with under $1,000',()=>!!S.pocketChange,[...PED('#1F2937',.5),['c',.12,.25,0,.5,0,'#BAE6FD'],['c',.1,.08,0,.5,0,'#FBBF24']]],
+ // ---- legacy heirlooms
+ ['legacy','leg_plaque','Serial Founder Plaque',{xp:1.03},'Exit a company once',()=>legacy().exits.length>=1,FRAME('#CD7F32')],
+ ['legacy','leg_sign','Your First Studio Sign',{morale:1},'Exit 2 companies',()=>legacy().exits.length>=2,[['b',1,.3,.06,0,.7,0,'#00E676','#00E676'],['b',.05,.7,.05,-.4,0,0,'#1F2937'],['b',.05,.7,.05,.4,0,0,'#1F2937']]],
+ ['legacy','leg_door','Gold Garage Door',{pay:1.02},'Exit 3 companies',()=>legacy().exits.length>=3,[['b',1,1.2,.06,0,0,0,'#FBBF24'],['b',1,.03,.07,0,.3,0,'#B45309'],['b',1,.03,.07,0,.6,0,'#B45309'],['b',1,.03,.07,0,.9,0,'#B45309']]],
+ ['legacy','leg_tree','Legacy Bonsai',{learn:1.03},'Buy 6 legacy tree nodes',()=>Object.keys(legacy().tree||{}).length>=6,[['c',.25,.2,0,0,0,'#78350F'],['s',.25,.2,.25,0,.5,0,'#FBBF24']]],
+ ['legacy','leg_hall','Hall of Fame Bust',{rep:.01},'Exit 5 companies',()=>legacy().exits.length>=5,STATUE('#FBBF24')],
+ ['legacy','leg_crown','Founder\'s Crown',{speed:1.03},'Exit 10 companies',()=>legacy().exits.length>=10,[...PED('#7C3AED',.6),['c',.18,.12,0,.6,0,'#FBBF24'],['k',.04,.12,-.12,.72,0,'#FBBF24'],['k',.04,.12,.12,.72,0,'#FBBF24'],['k',.04,.15,0,.72,.12,'#FBBF24']]],
+ // ---- masterpieces (complete a set)
+ ['master','globe','Golden Globe',{pay:1.05},'Collect every city souvenir',()=>collDone('city'),[...PED('#0F172A',.6),['s',.35,.35,.35,0,1,0,'#FBBF24'],['t',.4,.02,0,1,0,'#FBBF24']]],
+ ['master','warroom','Rival War Room Map',{speed:1.03},'Collect every rival trophy',()=>collDone('rival'),[['b',1,.05,.7,0,.75,0,'#14532D'],['b',.05,.75,.05,-.45,0,-.3,'#1F2937'],['b',.05,.75,.05,.45,0,.3,'#1F2937'],['k',.05,.12,-.2,.8,0,'#EF4444'],['k',.05,.12,.2,.8,.1,'#3B82F6']]],
+ ['master','brain','Giant Brain in a Jar',{xp:1.1},'Collect every research relic',()=>collDone('relic'),[['c',.35,.8,0,0,0,'#E0F2FE'],['s',.25,.22,.25,0,.45,0,'#F9A8D4','#EC4899']]],
+ ['master','calendar','Perpetual Calendar',{morale:3},'Collect all seasonal items',()=>collDone('season'),[['b',.8,1,.1,0,.3,0,'#F8FAFC'],['b',.8,.25,.11,0,1.05,0,'#EF4444'],['b',.05,.3,.05,0,0,0,'#1F2937']]],
+ ['master','vault','The Secret Vault',{pay:1.05,score:.05},'Find every secret',()=>collDone('secret'),[['b',1,1.6,.8,0,0,0,'#0F172A'],['c',.3,.08,0,.8,.41,'#FBBF24'],['b',.6,.04,.02,0,.8,.45,'#FBBF24']]]
+];
+const COLL_KEYS=[];
+COLL.forEach(([grp,id,name,fx,hint,ok,parts])=>{ const k='c_'+id; EQ['coll_'+id]={parts}; FURN[k]={name, cost:Math.round(500+Math.random()*0)+200*COLL_KEYS.length%1, w:1, h:1, coll:{grp, fx, secret:grp==='secret'}, text:Object.entries(fx).map(([a,v])=>FXN[a](v)).join(', ')+'.', unlock:{t:hint, ok:()=>{ try{ return !!ok(); }catch(e){ return false; } }}}; COLL_KEYS.push(k); UNLOCKS.push(k); });
+COLL_KEYS.forEach((k,i)=>{ FURN[k].cost=[150,400,800,1500,3000][Math.min(4,Math.floor(i/22))]; const P=EQ['coll_'+k.slice(2)].parts; const xs=P.map(p=>p[0]==='b'?Math.abs(p[4])+p[1]/2:Math.abs(p[3]||0)+.3); if(Math.max(...xs)>.6) FURN[k].w=2; });
+function collHas(k){ return !!(S.story&&S.story.unl&&S.story.unl[k]); }
+function collDone(g){ return COLL_KEYS.filter(k=>FURN[k].coll.grp===g).every(k=>collHas(k)); }
+function collFx(k, add){ let v=add?0:1; COLL_KEYS.forEach(c=>{ if(!collHas(c)) return; const fx=FURN[c].coll.fx; if(fx[k]==null) return; if(add) v+=fx[k]; else v*=fx[k]; }); return v; }
+function collGridHTML(){ const g=ui.cgrp||'story'; const all=UNLOCKS.filter(k=>FURN[k]); const got=all.filter(k=>isUnlocked(k)).length;
+  const old=UNLOCKS.filter(k=>!FURN[k].coll);
+  const groups=Object.assign({classic:['🔓','Classic']}, CGROUPS);
+  const list = g==='classic' ? old : COLL_KEYS.filter(k=>FURN[k].coll.grp===g);
+  return `<h5 class="unlh">🔓 Unlockables · ${got} of ${all.length}</h5><div class="dchips">${Object.entries(groups).map(([k,[ic,n]])=>{ const L=k==='classic'?old:COLL_KEYS.filter(x=>FURN[x].coll.grp===k); const d=L.filter(x=>isUnlocked(x)).length; return `<button class="${k===g?'on':''} ${d===L.length?'full':''}" data-cg="${k}">${ic} ${n} <small>${d}/${L.length}</small></button>`; }).join('')}</div>
+    <div class="pgrid">${list.map(k=>{ const d=FURN[k], ok=isUnlocked(k), sec=d.coll&&d.coll.secret&&!ok; return `<button class="pitem unl ${ok?'':'locked'}" data-f="${k}" ${ok?'':'disabled'}><img src="${ok?(ICONS[k]||decorIcon(k)):MB_ASSETS.logo}" alt="" ${ok?'':'style="filter:brightness(0) opacity(.45)"'}><div><div class="t">${sec?'???':d.name}</div><div class="c">${ok?money(d.cost):sec?'Secret':'Locked'}</div><div class="hint">${ok?d.text:sec?'🕵️ Keep playing to discover it.':'🔒 '+d.unlock.t}</div></div></button>`; }).join('')}</div>`; }
+[['coll','Collector','unlockables found',()=>Object.keys((S.story&&S.story.unl)||{}).length,[25,50,75,100,UNLOCKS.length]]].forEach(([k,n,what,fn,th])=>th.forEach((t,i)=>ACH.push({id:'t_'+k+'_'+i, ic:TIERI[i], n:n+' '+TIERN[i], d:t+' '+what, test:()=>fn()>=t, rew:i>=2?(i===4?'Legendary Crate':i===3?'Epic Pet Crate':'Rare Pet Crate'):null, crate:i>=2?['r','e','l'][i-2]:null})));
+(function(){
+  const _bm=buildFurnMesh; buildFurnMesh=function(kind){ if(FURN[kind]&&FURN[kind].coll){ const g=new THREE.Group(); buildEquipMesh('eq_coll_'+kind.slice(2),g); return g; } return _bm(kind); };
+  const _um=upgMul; upgMul=function(k){ return _um(k)*(S?collFx(k):1); };
+  const _ua=upgAdd; upgAdd=function(k){ return _ua(k)+(S?collFx(k,true):0); };
+  const _gx=gainXP; gainXP=function(n){ return _gx(n*(S?collFx('xp'):1)); };
+  const _cu=checkUnlocks; checkUnlocks=function(){ _cu(); if(!S||!S.story) return; S.collDone=S.collDone||{}; Object.keys(CGROUPS).forEach(g=>{ if(!S.collDone[g] && collDone(g) && S.story.unlInit){ S.collDone[g]=S.day; banner(CGROUPS[g][0], 'Collection complete: '+CGROUPS[g][1], 'Bonus: a Legendary Pet Crate', '#FBBF24'); giveCrate('l', CGROUPS[g][1]+' complete'); confetti(); } }); };
+  const _em=endMonth; endMonth=function(){ const mi=Math.floor((S.day-2)/30)%12; const r=_em(); S.seasons=S.seasons||{}; S.seasons[mi]=S.day; if(S.cash>0 && S.cash<1000) S.pocketChange=1; return r; };
+  const _dl=deliver; deliver=function(pr, auto){ if(!pr.own){ if(S.delDay!==S.day){ S.delDay=S.day; S.delN=0; } S.delN++; S.maxDelDay=Math.max(S.maxDelDay||0,S.delN); } return _dl(pr,auto); };
+  const _hu=hustle; hustle=function(pt, auto){ const r=_hu(pt,auto); S.maxCombo=Math.max(S.maxCombo||0, S.combo||0); return r; };
+  const _sd=storyTick; storyTick=function(){ const r=_sd(); if(S.team.some(p=>p.energy<=1)) S.hitZero=1; checkUnlocks(); return r; };
+  const _sp=showPalette; showPalette=function(){ const r=_sp(); const P=$('#palette'); const h=[...P.querySelectorAll('h5.unlh')].find(e=>/Unlockables/.test(e.textContent)); if(h){ const grid=h.nextElementSibling; const w=document.createElement('div'); w.className='collwrap'; w.innerHTML=collGridHTML(); h.replaceWith(w); if(grid && grid.classList.contains('pgrid')) grid.remove();
+      w.querySelectorAll('[data-cg]').forEach(b=>b.onclick=()=>{ ui.cgrp=b.dataset.cg; sfx('tick'); showPalette(); setTimeout(()=>{ const e=$('.collwrap'); e&&e.scrollIntoView({block:'start'}); },0); });
+      w.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ sfx('tick'); hidePalette(); ui.rot=0; setTool('place', b.dataset.f); }); }
+    return r; };
+})();
 
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
