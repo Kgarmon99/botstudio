@@ -136,6 +136,24 @@ body.reduce #modal .card{animation:none}
 #hLvl.pk{box-shadow:0 0 0 2px rgba(167,139,250,.7)}
 body.reduce #perkChip{animation:none}
 .chap.locked .hint i{color:var(--txt-2,#CBD5E1);font-style:italic}
+/* ---- round 31 · more to play ---- */
+.card2.war .row{align-items:center;gap:10px}.card2.war .wi{font-size:28px;line-height:1}
+.card2.war.won{border-color:rgba(0,230,118,.5);background:rgba(0,230,118,.06)}
+.boss{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:#7F1D1D;color:#FECACA;font:800 10px var(--mono);letter-spacing:.08em;vertical-align:2px}
+.stakebar{position:relative;height:8px;border-radius:6px;background:rgba(255,255,255,.07);margin:10px 0 6px;overflow:visible}.stakebar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#F97316,#FBBF24)}.stakebar u{position:absolute;top:-3px;width:2px;height:14px;background:#F8FAFC;opacity:.7}
+.city:has(.cmis){flex-wrap:wrap}.city>.cmis{flex:1 1 100%;order:10;margin-top:8px;padding-top:8px;border-top:1px solid var(--line-2,rgba(255,255,255,.1));display:grid;gap:4px;font-size:12.5px}.cmis > div{display:flex;align-items:center;gap:8px;color:var(--txt-2,#CBD5E1)}.cmis i{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line-2,rgba(255,255,255,.2));display:grid;place-items:center;font-style:normal;font-size:10px;flex:none}.cmis .ok i{background:var(--neon);border-color:var(--neon);color:#0A0A1A}.cmis .ok span{text-decoration:line-through;opacity:.6}.cmis em{margin-left:auto;font:600 11.5px var(--mono);font-style:normal;color:var(--txt-3,#94A3B8)}.cmis .mast{color:#FBBF24;font-size:12px}
+.modchips{display:flex;flex-wrap:wrap;gap:6px}.modchips button{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--line-2,rgba(255,255,255,.16));background:rgba(15,23,42,.6);color:var(--txt-1,#F8FAFC);font:600 13px var(--body,inherit);cursor:pointer}.modchips button.on{border-color:#F97316;background:rgba(249,115,22,.18)}
+#abil{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 11px;border-radius:var(--r-m,14px);cursor:pointer;color:var(--txt-1,#F8FAFC);border:1px solid var(--line-2,rgba(255,255,255,.14))!important;font:inherit}
+#abil .aic{font-size:22px}#abil b{display:block;font-size:13px}#abil small{display:block;font-size:11.5px;color:var(--txt-3,#94A3B8);line-height:1.3}
+#abil.ready{border-color:rgba(251,191,36,.7)!important;box-shadow:0 0 0 0 rgba(251,191,36,.5);animation:pkPulse 2.2s ease-in-out infinite}#abil.ready b{color:#FDE68A}
+.seasonchip{display:inline-block;margin:4px 0 6px;padding:5px 11px;border-radius:999px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);font-size:12.5px;color:#FDE68A}
+.rategrid{display:grid;gap:8px;margin-top:10px}.rategrid > div{display:grid;grid-template-columns:120px 1fr 34px;align-items:center;gap:10px;font-size:13px}.rategrid i{height:8px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}.rategrid u{display:block;height:100%;background:var(--neon)}.rategrid b{text-align:right;font-family:var(--mono)}
+#photoBar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;border-radius:999px;font-size:13px}
+body.photo #side,body.photo #sideBody,body.photo #nextUp,body.photo #hustle,body.photo #hustleBox,body.photo #banner,body.photo #paused,body.photo #crew,body.photo #abil,body.photo #pins,body.photo #gs,body.photo #undo,body.photo #recap,body.photo #sideTog,body.photo #elevator,body.photo #trendChip{display:none!important}
+body.photo #vig{opacity:.5}
+.hofrec{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}.hofrec > div{padding:10px 12px;border-radius:var(--r-m,14px);background:var(--bg-2,rgba(255,255,255,.04));border:1px solid var(--line-2,rgba(255,255,255,.12))}.hofrec label{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#FBBF24}.hofrec b{display:block;font-size:15px;margin-top:3px}.hofrec span{font-size:11.5px;color:var(--txt-3,#94A3B8)}
+.hofruns{display:grid;gap:6px}.hofrow{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line-2,rgba(255,255,255,.1))}.hofrow .hr{font:800 14px var(--mono);color:#FBBF24;width:22px;text-align:center}.hofrow > div{flex:1;min-width:0}.hofrow b{display:block}.hofrow span{display:block;font-size:12px;color:var(--txt-3,#94A3B8)}.hofrow em{font:700 13px var(--mono);font-style:normal;color:var(--neon)}
+.slot2.weekly{border-color:rgba(249,115,22,.5)}.slot2.weekly em{color:#FDBA74}
 </style></head><body>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -5909,6 +5927,220 @@ function playTxt(ms){ const m=Math.floor((ms||0)/60000); return m<60 ? m+' min p
 (function(){ const _hq=hqPanel; hqPanel=function(){ const r=_hq(); const eb=$('#modalCard .eyebrow'); if(eb && !eb.dataset.pt){ eb.dataset.pt=1; eb.insertAdjacentHTML('beforeend',' · '+playTxt(S.playMs)+' · chapter '+Math.min(CHAPTERS.length,(S.chapter||0)+1)+' of '+CHAPTERS.length); } return r; };
   const _sm=slotMeta; slotMeta=function(n){ const m=_sm(n); if(!m) return m; try{ const s=JSON.parse(localStorage.getItem(slotKey(n))||'null'); m.play=s&&s.playMs||0; m.ch=s&&s.chapter||0; }catch(e){} return m; };
   const _sr=slotsRender; slotsRender=function(){ _sr(); $$('#slots [data-slot]').forEach(b=>{ const m=slotMeta(+b.dataset.slot); const sp=b.querySelector('span'); if(m && sp && !sp.dataset.pt){ sp.dataset.pt=1; sp.textContent+=' · Ch. '+Math.min(CHAPTERS.length,m.ch+1)+' · '+playTxt(m.play); } }); }; })();
+
+/* =====================================================================
+   ROUND 31 · MORE TO PLAY — takeovers, city campaigns, New Game+, founder
+   abilities, weekly challenge, crises, seasons, employee stories, photo
+   mode + studio rating, Hall of Fame
+   ===================================================================== */
+const WEEK=Math.floor((Date.now()/864e5+3)/7);
+let WEEKLY=false; try{ if(localStorage.getItem('bs-slot')==='w'){ WEEKLY=true; SAVE_KEY='botstudio-weekly-'+WEEK; } }catch(e){}
+function addFx(map, k, add){ let v=add?0:1; for(const id in map){ const o=map[id]; if(o && o[k]!=null){ if(add) v+=o[k]; else v*=o[k]; } } return v; }
+const PLAYFX=[]; // [name, fn(k,add)]
+(function(){ const _um=upgMul; upgMul=function(k){ let m=_um(k); if(S) PLAYFX.forEach(([n,f])=>{ m*=f(k,false); }); return m; };
+  const _ua=upgAdd; upgAdd=function(k){ let a=_ua(k); if(S) PLAYFX.forEach(([n,f])=>{ a+=f(k,true); }); return a; };
+  const _bs=bonusSources; bonusSources=function(k){ const out=_bs(k), add=k in BK_ADD; PLAYFX.forEach(([n,f])=>{ const v=f(k,add); if(add?Math.abs(v)>1e-6:Math.abs(v-1)>1e-6) out.push([n,v]); }); return out; }; })();
+function sub(g, p, name, fn){ if(!GROUPS[g].includes(p)) GROUPS[g].push(p); if(!DRAWER.includes(p)) DRAWER.push(p); SUBN[p]=name; PANELS[p]=fn; }
+const PANELS={};
+(function(){ const _pb=panelBody; panelBody=function(p){ if(PANELS[p]) return PANELS[p](); return _pb(p); }; })();
+function close$(){ return '<button class="x" data-close aria-label="Close">×</button>'; }
+
+/* =================== 1 · RIVAL TAKEOVER WARS =================== */
+const TAKE_FX={pixel:{fans:1.05}, scrap:{speed:1.03}, nova:{prod:1.05}, byte:{score:.15}, lumen:{learn:1.08}, mega:{pay:1.08, prod:1.08}};
+const TAKE_TXT={pixel:'Fans +5%', scrap:'Work +3%', nova:'Product revenue +5%', byte:'Product scores +0.15', lumen:'Learning +8%', mega:'Contracts and product revenue +8%'};
+function stakes(){ return S.stakes||(S.stakes={}); }
+function owned(){ return S.owned||(S.owned={}); }
+PLAYFX.push(['Acquisitions',(k,add)=>{ const m={}; for(const id in owned()) m[id]=TAKE_FX[id]; return addFx(m,k,add); }]);
+function stakePrice(r){ const prem=1+.15*Math.floor((stakes()[r.id]||0)/10); return Math.round(r.v*.1*prem*(r.id==='mega'?1.2:1)/1000)*1000; }
+function megaReady(){ return (S.rivals||[]).filter(r=>r.id!=='mega').every(r=>!r.alive); }
+function buyStake(r){ const c=stakePrice(r); if(S.cash<c){ toast('You need '+fmt(c)+' for the next 10%.','warn'); return; } if(r.id==='mega' && !megaReady()){ toast('MegaCorp only takes calls once every other rival is gone.','warn'); return; }
+  S.cash-=c; S.month.other=(S.month.other||0)+c; stakes()[r.id]=(stakes()[r.id]||0)+10; cashPop(-c); sfx('build'); gainXP(20);
+  const pct=stakes()[r.id];
+  if(pct>=51){ takeover(r); return; }
+  const roll=Math.random(); let msg;
+  if(roll<.35){ r.v*=1.08; msg=r.ceo+' saw you coming. Their shares jumped 8%. The next 10% costs more.'; }
+  else if(roll<.6 && S.team.filter(p=>!p.founder&&!p.job).length>2){ const p=pick(S.team.filter(x=>!x.founder&&!x.job)); p.morale=clamp(p.morale-15,0,100); msg=r.ceo+' tried to poach '+p.name+' as payback. They stayed, but they\'re rattled (morale −15).'; }
+  else if(roll<.8){ msg=r.n+' rushed out a product to look strong. Their shareholders are nervous.'; r.v*=.97; }
+  else { msg=r.n+'\'s board is quietly asking what you\'d pay for the rest.'; }
+  banner(r.i,'You own '+pct+'% of '+r.n, msg, '#F97316'); openPanel('wars'); }
+function takeover(r){ r.alive=false; owned()[r.id]=S.day; stakes()[r.id]=100; const cashBack=Math.round(r.v*.05); S.cash+=cashBack; confetti(); sfx('fanfare'); gainXP(300);
+  journal&&journal('Took over '+r.n, r.ceo+' handed over the keys.');
+  queueModal(()=>{ openModal(`${close$()}<div class="eyebrow">Hostile takeover · ${dateStr()}</div><h2>${r.i} ${r.n} is yours</h2><div class="take"><img src="${PORT[r.id==='pixel'?'vera':r.id==='scrap'?'rusty':r.id==='mega'?'gray':'celebrate']||PORT.celebrate}" alt=""><p>${r.id==='mega'?'Mr. Gray signs the papers without a word, then slides you his old office key. "It was always going to be you, wasn\'t it?"':r.ceo+' signs the last page. Their team, their products and their customers now report to you.'}</p></div>
+    <table class="pl"><tr><td>Permanent bonus</td><td>${TAKE_TXT[r.id]}</td></tr><tr><td>Cash in their accounts</td><td>${money(cashBack)}</td></tr></table>${r.id==='mega'?'<div class="lesson">You just bought the company that fired you. Achievement unlocked for life.</div>':''}<div class="mactions"><button class="btn pri" data-close>Take the keys</button></div>`); });
+  if(r.id==='mega') F().megaBought=1; }
+function warsPanel(){ initRivals&&initRivals(); const L=(S.rivals||[]).filter(r=>r.id!=='mega'||true), my=studioValue();
+  openModal(`${close$()}<div class="eyebrow">Rival wars · ${Object.keys(owned()).length} of ${RIVAL_DEF.length} taken over</div><h2>Take over the competition</h2>
+    <p class="hint">Buy 10% of a rival at a time. At 51% it's yours, with a permanent bonus. Rivals fight back: their price jumps, they poach your people, or they panic. MegaCorp is the final boss: it only sells once every other rival is gone.</p>
+    <div class="cards">${L.map(r=>{ const own=owned()[r.id], pct=stakes()[r.id]||0, c=stakePrice(r), lock=r.id==='mega'&&!megaReady();
+      return `<div class="card2 war ${own?'won':''}"><div class="row"><span class="wi">${r.i}</span><div style="flex:1;min-width:0"><h4>${r.n}${r.id==='mega'?' <span class="boss">BOSS</span>':''}</h4><div class="hint">${r.ceo} · worth ${fmt(r.v)}${own?' · <b style="color:var(--neon)">Yours since '+dateStr(own)+'</b>':!r.alive?' · closed':''}</div></div></div>
+        <div class="stakebar"><i style="width:${Math.min(100,pct)}%"></i><u style="left:51%"></u></div>
+        <div class="row hint"><span>You own ${Math.min(100,pct)}%</span><span>Reward: ${TAKE_TXT[r.id]}</span></div>
+        ${own||!r.alive?'':`<div class="btnrow" style="margin-top:8px"><button class="btn ${S.cash>=c&&!lock?'pri':''}" data-stake="${r.id}" ${S.cash<c||lock?'disabled':''}>${lock?'🔒 Take over every other rival first':'Buy 10% · '+fmt(c)}</button></div>`}</div>`; }).join('')}</div>
+    <div class="lesson">A takeover is when one company buys enough shares to control another. Owning 51% means you win every vote.</div>`);
+  $$('#modalCard [data-stake]').forEach(b=>b.onclick=()=>{ const r=S.rivals.find(x=>x.id===b.dataset.stake); if(r) buyStake(r); }); }
+sub('company','wars','Rival wars', warsPanel);
+(function(){ const _v=valuation; valuation=function(){ let v=_v(); if(S && S.rivals) S.rivals.forEach(r=>{ if(owned()[r.id]) v+=r.v*.6; else if(stakes()[r.id]) v+=r.v*stakes()[r.id]/100*.8; }); return v; }; })();
+
+/* =================== 3 · CITY CAMPAIGNS =================== */
+const CITY_M={nyc:['Win a Wall Street bank as a client','Raise money while New York is open','Deliver 8 projects'], lon:['Pass the UK data audit (deliver a Security job)','Hire 6 people','Deliver 8 projects'], tok:['Launch a game that scores 8+','Win a Game Award','Deliver 6 projects'], seo:['Reach 2 million fans','Launch 2 products','Deliver 6 projects'], ber:['Get three 5-star reviews','Deliver a Design job','Deliver 6 projects'], blr:['Hire 10 people','Finish 10 research projects','Deliver 10 projects'], sgp:['Earn $15,000 a day from products','Launch an app','Deliver 6 projects'], lag:['Launch 2 products','Reach 1 million fans','Deliver 6 projects'], sao:['Launch a game','Add 500,000 fans','Deliver 6 projects'], tor:['Deliver 2 AI jobs','Finish 15 research projects','Deliver 6 projects'], syd:['Keep average morale above 75 at month end','Hire 5 people','Deliver 6 projects'], dxb:['Deliver a project worth $200,000+','Invoice $5,000,000','Deliver 6 projects'], moon:['Finish 3 more Moonshot research projects','Launch a product from orbit','Deliver 10 projects']};
+function cityBase(id){ S.cityM=S.cityM||{}; if(!S.cityM[id]) S.cityM[id]={d:S.stats.delivered, h:S.team.length, rd:Object.keys(S.rsch.done).length, f:S.fans||0, l:S.products.filter(p=>p.launched).length, five:S.stats.fiveStar, inv:S.stats.invoiced, cats:Object.assign({},S.stats.cats), r:S.funding.rounds.length, aw:(S.awards||[]).filter(a=>a.you).length, moon:TECH.filter(t=>t.br==='moon'&&S.rsch.done[t.id]).length, e8:S.products.filter(p=>p.launched&&p.score>=8).length, done:[], big:0}; return S.cityM[id]; }
+function cityTest(id, i){ const b=cityBase(id), t=CITY_M[id][i], dl=S.stats.delivered-b.d, hr=S.team.length-b.h, rd=Object.keys(S.rsch.done).length-b.rd, la=S.products.filter(p=>p.launched).length-b.l, cat=c=>(S.stats.cats[c]||0)-(b.cats[c]||0);
+  let m;
+  if((m=t.match(/^Deliver (\d+) projects/))) return [dl, +m[1]];
+  if((m=t.match(/^Hire (\d+)/))) return [hr, +m[1]];
+  if((m=t.match(/^Finish (\d+) research/))) return [rd, +m[1]];
+  if((m=t.match(/^Launch (\d+) products/))) return [la, +m[1]];
+  if(/^Launch (an app|a game|a product)/.test(t) && !/scores/.test(t)) return [la, 1];
+  if(/scores 8/.test(t)) return [S.products.filter(p=>p.launched&&p.score>=8).length-(b.e8||0), 1];
+  if(/Game Award/.test(t)) return [(S.awards||[]).filter(a=>a.you).length-b.aw, 1];
+  if((m=t.match(/Reach ([\d.]+) million fans/))) return [S.fans/1e6, +m[1]];
+  if(/Add 500,000 fans/.test(t)) return [(S.fans-b.f)/5e5, 1];
+  if(/three 5-star/.test(t)) return [S.stats.fiveStar-b.five, 3];
+  if(/Design job/.test(t)) return [cat('Design'), 1];
+  if(/Security job/.test(t)) return [cat('Security'), 1];
+  if(/2 AI jobs/.test(t)) return [cat('AI'), 2];
+  if(/Wall Street/.test(t)) return [dl>=1?1:0, 1];
+  if(/Raise money/.test(t)) return [S.funding.rounds.length-b.r, 1];
+  if(/\$15,000 a day/.test(t)) return [S.products.reduce((a,p)=>a+(p.launched?p.rate||0:0),0)/15000, 1];
+  if(/morale above 75/.test(t)) return [b.mor||0, 1];
+  if(/\$200,000/.test(t)) return [b.big||0, 1];
+  if(/Invoice \$5,000,000/.test(t)) return [(S.stats.invoiced-b.inv)/5e6, 1];
+  if(/Moonshot/.test(t)) return [TECH.filter(x=>x.br==='moon'&&S.rsch.done[x.id]).length-b.moon, 3];
+  return [0,1]; }
+function cityMastered(id){ return S.cityM && S.cityM[id] && S.cityM[id].done.length>=3; }
+PLAYFX.push(['City mastery',(k,add)=>{ const m={}; CITIES.forEach(c=>{ if(cityMastered(c.id)) m[c.id]=c.fx; }); return addFx(m,k,add); }]);
+function cityCheck(){ if(!S.cities) return; CITIES.forEach(c=>{ if(!cityOpen(c.id)) return; const b=cityBase(c.id); [0,1,2].forEach(i=>{ if(b.done.includes(i)) return; const [v,n]=cityTest(c.id,i); if(v>=n){ b.done.push(i); const cash=Math.round(c.cost*.12/1000)*1000; S.cash+=cash; gainXP(60); banner(c.f, c.n+' mission complete', CITY_M[c.id][i]+' · +'+fmt(cash)+(b.done.length>=3?' · City mastered: its bonus is doubled!':''), '#38BDF8'); } }); }); }
+(function(){ const _dl=deliver; deliver=function(pr, auto){ const pay=pr.pay; const r=_dl(pr, auto); if(!pr.own && S.cityM) for(const id in S.cityM) if(pay>=200000) S.cityM[id].big=1; return r; }; })();
+(function(){ const _op=openPanel; openPanel=function(p){ const r=_op(p); if(p==='world') setTimeout(()=>{ $$('#modalCard .city').forEach(el=>{ const b=el.querySelector('[data-city]'); const id=b?b.dataset.city:null; const c=id?CITIES.find(x=>x.id===id):CITIES.find(x=>el.textContent.includes(x.n)); if(!c||!cityOpen(c.id)||el.querySelector('.cmis')) return; const B=cityBase(c.id);
+  el.insertAdjacentHTML('beforeend', `<div class="cmis">${CITY_M[c.id].map((t,i)=>{ const [v,n]=cityTest(c.id,i), ok=B.done.includes(i); return `<div class="${ok?'ok':''}"><i>${ok?'✓':''}</i><span>${t}</span><em>${ok?'Done':Math.min(n,Math.floor(v*10)/10)+'/'+n}</em></div>`; }).join('')}${cityMastered(c.id)?'<b class="mast">★ Mastered · bonus doubled</b>':''}</div>`); }); },0); return r; }; })();
+
+/* =================== 4 · NEW GAME+ MODIFIERS =================== */
+const MODS={recession:{n:'Recession',ic:'📉',d:'Client contracts pay 20% less.'}, aiwinter:{n:'AI Winter',ic:'❄️',d:'AI work pays 40% less.'}, gamesonly:{n:'Games Only',ic:'🎮',d:'Clients only offer game projects.'}, noinvest:{n:'Bootstrapped',ic:'🥾',d:'No investors. You can\'t raise money.'}, broke:{n:'Broke',ic:'🪙',d:'Start with $2,000 instead of $5,000.'}};
+function modOn(k){ return !!(S && S.mods && S.mods[k]); }
+(function(){ const _sp=storyPay; storyPay=function(t){ let m=_sp(t); if(modOn('recession')) m*=.8; if(modOn('aiwinter') && t.cat==='AI') m*=.6; if(WEEKLY && S.weeklyMod==='boom') m*=1.1; return m; };
+  const _mo=makeOffer; makeOffer=function(){ let o=_mo(); if(modOn('gamesonly')){ for(let i=0;i<25 && PTYPES[o.type].cat!=='Games';i++) o=_mo(); } return o; };
+  ROUNDS.forEach(r=>{ const ok=r.ok; r.ok=function(){ if(modOn('noinvest')) return false; return ok.apply(this,arguments); }; });
+  const _ng=newGame; newGame=function(name, founder){ const sel=Object.assign({}, window.PENDING_MODS||{}); if(WEEKLY) sel[weeklyMod()]=1; _ng(name, founder); S.mods=sel; if(sel.broke){ S.cash=Math.min(S.cash,2000); } if(WEEKLY){ S.weekly=WEEK; S.weeklyMod=weeklyMod(); } if(Object.keys(sel).length) banner('🎲', 'Modifiers on', Object.keys(sel).map(k=>MODS[k]?MODS[k].ic+' '+MODS[k].n:'').join(' · '), '#F97316'); save(); };
+  const _ss=showSetup; showSetup=function(){ _ss(); if($('#modPick')) return; window.PENDING_MODS={}; const el=document.createElement('div'); el.id='modPick'; el.innerHTML=`<div class="eyebrow" style="margin:14px 0 6px">${WEEKLY?'Weekly challenge modifier':'Challenge modifiers · optional'}</div>${WEEKLY?`<p class="hint">This week everyone plays with <b>${MODS[weeklyMod()].ic} ${MODS[weeklyMod()].n}</b>: ${MODS[weeklyMod()].d}</p>`:`<div class="modchips">${Object.entries(MODS).map(([k,m])=>`<button data-mod="${k}" title="${m.d}"><span>${m.ic}</span>${m.n}</button>`).join('')}</div><p class="hint">Each modifier you beat chapter 5 with earns a trophy.</p>`}`; const fl=$('#founderList'); fl.before(el);
+    el.querySelectorAll('[data-mod]').forEach(b=>b.onclick=()=>{ const k=b.dataset.mod; if(window.PENDING_MODS[k]) delete window.PENDING_MODS[k]; else window.PENDING_MODS[k]=1; b.classList.toggle('on', !!window.PENDING_MODS[k]); sfx('tick'); }); }; })();
+Object.entries(MODS).forEach(([k,m])=>ACH.push({id:'mod_'+k, ic:m.ic, n:m.n+' Survivor', d:'Finish chapter 5 with the '+m.n+' modifier', test:()=>modOn(k) && S.chapter>=5}));
+
+/* =================== 5 · FOUNDER ABILITIES =================== */
+const FABIL={coder:{n:'All-nighter', ic:'🌙', d:'Instantly finish 25% of every active project.', cd:30, fx:{speed:1.04, bug:.95}, pass:'Work +4%, 5% fewer bugs',
+    run:()=>{ S.projects.forEach(p=>{ if(p.done<p.pts){ p.done=Math.min(p.pts, p.done+p.pts*.25); p.qSum+=60*p.pts*.25; p.qPts+=p.pts*.25; } }); return 'You pulled an all-nighter. Every active project jumped 25%.'; }},
+  designer:{n:'Polish pass', ic:'✨', d:'+12 quality on every active project and remove half their bugs.', cd:30, fx:{qual:2, score:.1}, pass:'Quality +2, product scores +0.1',
+    run:()=>{ S.projects.forEach(p=>{ p.polish=(p.polish||0)+12; p.bugs*=.5; }); return 'A late-night polish pass. Everything looks sharper.'; }},
+  ai:{n:'Breakthrough', ic:'🧠', d:'Finish half of every research project in progress.', cd:40, fx:{learn:1.1}, pass:'Learning +10%, research 15% faster',
+    run:()=>{ (S.rsch.q||[]).forEach(s=>{ const t=TECH.find(x=>x.id===s.id); if(t) s.prog=Math.max(s.prog, t.days*.5+s.prog*.5); }); return 'Your model found a shortcut. Research jumped ahead.'; }},
+  hacker:{n:'Bug bounty', ic:'🛡️', d:'Remove every bug from active projects and earn a security bonus.', cd:30, fx:{pay:1.03}, pass:'Contracts +3%, reputation grows a little daily',
+    run:()=>{ let n=0; S.projects.forEach(p=>{ n+=p.bugs; p.bugs=0; }); const c=Math.round((2000+S.stats.invoiced*.002)/100)*100; S.cash+=c; return 'Squashed '+Math.round(n)+' bugs and collected a '+money(c)+' bounty.'; }}};
+PLAYFX.push(['Founder strength',(k,add)=>{ const a=S&&FABIL[S.founder]; if(!a) return add?0:1; const fx=Object.assign({}, a.fx, S.founder==='hacker'?{rep:.003}:{}); const v=fx[k]; return v==null?(add?0:1):v; }]);
+(function(){ const _rr=researchRate; researchRate=function(){ return _rr()*(S&&S.founder==='ai'?1.15:1); }; })();
+function abilityReady(){ const a=FABIL[S.founder]; return a && (S.day-(S.abilT||-999))>=a.cd; }
+function useAbility(){ const a=FABIL[S.founder]; if(!a) return; if(!abilityReady()){ toast(a.n+' is recharging: '+(a.cd-(S.day-S.abilT))+' days left.','info'); return; } if(a!==FABIL.ai && !S.projects.length){ toast('Start a project first.','info'); return; } if(a===FABIL.ai && !(S.rsch.q||[]).length){ toast('Start some research first.','info'); return; } S.abilT=S.day; const msg=a.run(); sfx('fanfare'); banner(a.ic, a.n+'!', msg, '#FBBF24'); gainXP(15); abilRender(true); refreshHUD(); }
+function abilRender(force){ const b=$('#sideBody'); if(!b||!S||titleMode||!FABIL[S.founder]) return; const a=FABIL[S.founder], ready=abilityReady(), left=ready?0:a.cd-(S.day-S.abilT); let el=$('#abil'); const k=ready+'|'+left; if(el && !force && el.dataset.k===k) return;
+  if(!el){ el=document.createElement('button'); el.id='abil'; el.className='glass'; el.onclick=useAbility; b.appendChild(el); } el.dataset.k=k; el.classList.toggle('ready', ready);
+  el.innerHTML=`<span class="aic">${a.ic}</span><span><b>${a.n}</b><small>${ready?'Ready · '+a.d:'Recharging · '+left+' day'+(left===1?'':'s')}</small></span>`; }
+const FOUNDER_BEATS={coder:{title:'The open-source fork', lines:[['n','A famous open-source project you used for years is dying. The maintainer just quit.'],['mb','Partner, you\'re a coder. You could adopt it. Or fork it into our own tool.','point']], choices:[{t:'Adopt it for the community',s:'Reputation +6, fans +20,000',f:()=>{ S.rep=clamp(S.rep+6,0,100); S.fans+=20000; }},{t:'Fork it into an internal tool',s:'Work +3% forever',f:()=>{ F().fork=1; }}]},
+  designer:{title:'The redesign', lines:[['n','A huge brand calls. They hate their logo and they love yours.'],['mb','They want you personally. Not the studio. You.','point']], choices:[{t:'Do it yourself this weekend',s:'+$25,000, morale −5 for you',f:()=>{ S.cash+=25000; const me=S.team.find(p=>p.founder); if(me) me.morale=clamp(me.morale-5,0,100); }},{t:'Send your best designer',s:'Quality +1 forever',f:()=>{ F().redesign=1; }}]},
+  ai:{title:'The paper', lines:[['n','Your old university lab wants you to co-author a research paper.'],['mb','A paper means fame in AI circles. It also means weeks of writing.','point']], choices:[{t:'Publish it',s:'Learning +5% forever, reputation +4',f:()=>{ F().paper=1; S.rep=clamp(S.rep+4,0,100); }},{t:'Keep the idea secret',s:'+1 product score on your next launch',f:()=>{ F().secret=1; }}]},
+  hacker:{title:'The disclosure', lines:[['n','You found a huge security hole in MegaCorp\'s app. At 2 AM. On a Tuesday.'],['mb','Responsible disclosure gets a bounty. Going public gets headlines.','point']], choices:[{t:'Report it privately',s:'+$30,000 bounty',f:()=>{ S.cash+=30000; }},{t:'Go public',s:'Fans +40,000, MegaCorp hates you',f:()=>{ S.fans+=40000; F().leak=1; }}]}};
+PLAYFX.push(['Founder story',(k,add)=>{ const f=S.story?S.story.flags:{}; const m={fork:f.fork?{speed:1.03}:null, redesign:f.redesign?{qual:1}:null, paper:f.paper?{learn:1.05}:null}; return addFx(m,k,add); }]);
+Object.keys(FOUNDER_BEATS).forEach(k=>{ SCENES['f_'+k]=()=>FOUNDER_BEATS[k]; BEATS.push(['f_'+k, ()=>S.founder===k && S.day>=55 && S.stats.delivered>=4]); });
+
+/* =================== 6 · WEEKLY CHALLENGE =================== */
+const WMODS=['recession','aiwinter','gamesonly','noinvest','broke'];
+function weeklyMod(){ return WMODS[WEEK%WMODS.length]; }
+function weeklyBest(){ try{ const o=JSON.parse(localStorage.getItem('bs-weekly')||'{}'); return o.week===WEEK?o:{week:WEEK, best:0}; }catch(e){ return {week:WEEK,best:0}; } }
+if(WEEKLY){ let seed=WEEK*9301+49297; const prng=()=>{ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; Math.random=prng; }
+function weeklyCheck(){ if(!WEEKLY||!S||S.weeklyDone||S.day<360) return; S.weeklyDone=1; const score=Math.round(studioValue()); const B=weeklyBest(), better=score>B.best; if(better) try{ localStorage.setItem('bs-weekly', JSON.stringify({week:WEEK, best:score, name:S.name})); }catch(e){}
+  queueModal(()=>{ openModal(`${close$()}<div class="eyebrow">Weekly challenge · week ${WEEK}</div><h2>Your score: ${fmt(score)}</h2><p>Studio value after one year with <b>${MODS[weeklyMod()].ic} ${MODS[weeklyMod()].n}</b>.${better?' <b style="color:var(--neon)">New personal best!</b>':' Your best this week: '+fmt(B.best)+'.'}</p><p class="hint">Everyone gets the same starting clients and candidates this week. Send a screenshot to a friend and see who builds the bigger studio. A new challenge starts every Monday.</p><div class="mactions"><button class="btn pri" data-close>Keep playing</button></div>`); }); }
+(function(){ const _sr=slotsRender; slotsRender=function(){ _sr(); const s=$('#slots'); if(!s||$('#weeklyCard')) return; const B=weeklyBest(), m=MODS[weeklyMod()]; const el=document.createElement('button'); el.id='weeklyCard'; el.className='slot2 weekly'+(WEEKLY?' cur':''); el.innerHTML=`<div class="noth">🏁</div><div><b>Weekly challenge · ${m.ic} ${m.n}</b><span>${m.d} Score = studio value after year 1.${B.best?' Your best: '+fmt(B.best)+'.':''}</span><em>${WEEKLY?'Continue':'Play this week\'s run'}</em></div>`;
+  el.onclick=()=>{ initAudio(); if(WEEKLY){ startGame(false); return; } let has=false; try{ has=!!localStorage.getItem('botstudio-weekly-'+WEEK); }catch(e){} try{ localStorage.setItem('bs-slot','w'); if(!has) sessionStorage.setItem('bs-fresh','1'); }catch(e){} location.reload(); };
+  const g=s.querySelector('.slotgrid'); if(g) g.appendChild(el); else { s.innerHTML='<div class="eyebrow" style="margin:6px 0 8px">Your studios</div><div class="slotgrid"></div>'; s.querySelector('.slotgrid').appendChild(el); } if(WEEKLY){ $$('#slots [data-slot]').forEach(x=>{ x.classList.remove('cur'); const em=x.querySelector('em'); if(em) em.textContent='Switch to this studio'; x.onclick=()=>slotGo(+x.dataset.slot); }); } }; })();
+
+/* =================== 7 · CRISES & OPPORTUNITIES =================== */
+const nonF=()=>S.team.filter(p=>!p.founder);
+EVENTS.push(
+  {id:'viral', cond:()=>S.products.some(p=>p.launched), run:()=>{ const p=pick(S.products.filter(x=>x.launched)); eventModal('You went viral', `A streamer with 4 million followers just played ${p.name} live for six hours. Chat is going wild.`, 'Viral moments are short. What you do in the next 48 hours decides if it sticks.', [{t:'Ship a free update tonight', s:'Fans +'+Math.round(30000+S.fans*.05).toLocaleString()+', team morale −5', f:()=>{ S.fans+=Math.round(30000+S.fans*.05); S.team.forEach(x=>x.morale=clamp(x.morale-5,0,100)); p.boost=1.8; }}, {t:'Run a launch sale', s:'+'+money(Math.round(5000+(p.rate||0)*7))+' now', f:()=>{ S.cash+=Math.round(5000+(p.rate||0)*7); }}]); }},
+  {id:'outage', cond:()=>S.products.some(p=>p.launched) && S.stage>=1, run:()=>{ const p=pick(S.products.filter(x=>x.launched)); eventModal('Servers are down', `${p.name} has been offline for two hours. Angry posts are piling up.`, 'Outages happen to every company. How you handle the next hour matters more than the outage.', [{t:'Pay for emergency servers', s:'−'+money(8000+S.stage*6000)+', no damage', f:()=>{ S.cash-=8000+S.stage*6000; }}, {t:'Post an honest apology and fix it', s:'Reputation +2, product loses some users', f:()=>{ S.rep=clamp(S.rep+2,0,100); p.users=Math.round((p.users||0)*.95); }}, {t:'Say nothing', s:'Reputation −4', f:()=>{ S.rep=clamp(S.rep-4,0,100); }}]); }},
+  {id:'lawsuit', cond:()=>S.stage>=2 && S.products.some(p=>p.launched), run:()=>{ const c=Math.round((40000+valuation()*.002)/1000)*1000; eventModal('Patent troll', `A company that makes nothing says your app infringes their patent on "a button that does things". They want ${fmt(c)}.`, 'Patent trolls own patents just to sue. Settling is often cheaper than fighting, but it encourages them.', [{t:'Settle', s:'−'+fmt(c), f:()=>{ S.cash-=c; }}, {t:'Fight it in court', s:'60% you win and get fans, 40% you pay double', f:()=>{ if(Math.random()<.6){ S.fans+=25000; S.rep=clamp(S.rep+3,0,100); toast('You won! The internet loves you.',''); } else { S.cash-=c*2; toast('You lost. Expensive lesson.','bad'); } }}]); }},
+  {id:'acqoffer', cond:()=>S.stage>=2 && !S.ipo, run:()=>{ const v=Math.round(valuation()*1.4/1000)*1000; eventModal('A quiet offer', `A big tech company wants to buy ${S.name} for ${fmt(v)}. Their CEO says "no pressure" three times in one email.`, 'Most startup founders get an offer like this at least once. Saying no can be the right call, but the number will haunt you.', [{t:'Politely decline', s:'Team morale +6 (they wanted to stay)', f:()=>{ S.team.forEach(x=>x.morale=clamp(x.morale+6,0,100)); }}, {t:'Use it to raise your valuation', s:'Your next funding round values you 10% higher', f:()=>{ F().offerLever=1; }}]); }},
+  {id:'collab', cond:()=>S.fans>=50000, run:()=>{ eventModal('Celebrity collab', 'A famous musician wants their face in your next product. Their manager wants a big fee.', 'Celebrity deals can bring huge attention, but you are paying for their fans, not yours.', [{t:'Sign the deal', s:'−'+money(30000+S.stage*20000)+', next launch fans ×2', f:()=>{ S.cash-=30000+S.stage*20000; F().collab=1; }}, {t:'Pass', f:()=>{}}]); }},
+  {id:'hackathon', cond:()=>S.team.length>=4, run:()=>{ eventModal('Hackathon weekend', 'Your team wants to run a 48-hour hackathon. Pizza, sleeping bags, wild ideas.', 'Hackathons are where many famous products started, including Gmail\'s "like" button idea at other companies.', [{t:'Sponsor it', s:'−$3,000, everyone gains +3 in a skill', f:()=>{ S.cash-=3000; S.team.forEach(p=>{ const k=pick(SK); p.skills[k]=Math.min(100,p.skills[k]+3); }); }}, {t:'Not this time', s:'Morale −3', f:()=>{ S.team.forEach(p=>p.morale=clamp(p.morale-3,0,100)); }}]); }},
+  {id:'grant', cond:()=>S.stage<=2, run:()=>{ eventModal('Innovation grant', 'The city of Bot City is giving grants to local tech studios. The form is 40 pages long.', 'Grants are free money, but they cost time. Someone has to write the application.', [{t:'Apply (you lose a few work days)', s:'70% chance of '+money(15000+S.stage*15000), f:()=>{ if(Math.random()<.7){ const g=15000+S.stage*15000; S.cash+=g; toast('Grant approved: '+money(g)+'!',''); } else toast('Not this year. The form was very long.','info'); }}, {t:'Skip it', f:()=>{}}]); }},
+  {id:'competitor', cond:()=>(S.rivals||[]).some(r=>r.alive), run:()=>{ const r=pick(S.rivals.filter(x=>x.alive)); eventModal('Copycat', `${r.n} just launched a product that looks exactly like yours. Same colors. Same name, but with an X.`, 'Copycats are a sign you built something good. The best answer is usually to ship faster.', [{t:'Ship faster', s:'Your active projects get +10% progress, team tires', f:()=>{ S.projects.forEach(p=>p.done=Math.min(p.pts,p.done+p.pts*.1)); S.team.forEach(p=>p.energy=Math.max(10,p.energy-15)); }}, {t:'Send a cease-and-desist', s:'−$5,000, '+r.n+' loses 5% value', f:()=>{ S.cash-=5000; r.v*=.95; }}]); }}
+);
+
+/* =================== 8 · SEASONS =================== */
+const SEASONS=[
+  {n:'New Year Resolutions', ic:'🎆', fx:{learn:1.1}, t:'Everyone wants to learn something new. Learning +10% this month.'},
+  {n:'Love Your Users', ic:'💘', fx:{fans:1.1}, t:'Fans +10% this month.'},
+  {n:'Spring Hackathons', ic:'🌱', fx:{speed:1.04}, t:'Work +4% this month.'},
+  {n:'Tax Season', ic:'🧾', fx:{pay:.97}, t:'Clients are tight with money. Contracts −3% this month.'},
+  {n:'Game Dev Conference', ic:'🎤', fx:{score:.15}, t:'Products score +0.15 this month.'},
+  {n:'Summer Interns', ic:'☀️', fx:{learn:1.08, speed:1.02}, t:'Learning +8% and work +2% this month.'},
+  {n:'Summer Sale', ic:'🏷️', fx:{prod:1.15}, t:'Product revenue +15% this month.'},
+  {n:'Back to School', ic:'🎒', fx:{fans:1.08}, t:'Fans +8% this month.'},
+  {n:'Launch Season', ic:'🚀', fx:{fans:1.05, prod:1.05}, t:'Fans and product revenue +5% this month.'},
+  {n:'Spooky Jam', ic:'🎃', fx:{score:.1, pay:1.05}, t:'Products +0.1 score, contracts +5% this month.'},
+  {n:'Black Friday', ic:'🛍️', fx:{prod:1.25}, t:'Product revenue +25% this month.'},
+  {n:'Holiday Break', ic:'🎄', fx:{morale:4, speed:.97}, t:'Morale +4, work −3% this month.'}];
+function seasonNow(){ return S?SEASONS[Math.floor((S.day-1)/30)%12]:null; }
+PLAYFX.push(['Season',(k,add)=>{ const s=seasonNow(); if(!s||s.fx[k]==null) return add?0:1; return s.fx[k]; }]);
+const SEASON_ITEMS=[[0,'fireworks','Firework Crate',['b',.6,.4,.6,0,0,0,'#7F1D1D'],{xp:1.02}],[1,'heartlamp','Heart Lamp',['s',.25,.22,.12,0,.6,0,'#F43F5E','#F43F5E'],{fans:1.02}],[4,'stagekit','Mini Stage',['b',1.6,.2,.8,0,0,0,'#1F2937'],{score:.03}],[6,'beachbar','Beach Bar',['b',.9,1,.5,0,0,0,'#FDE68A'],{morale:1}],[9,'pumpkin','Giant Pumpkin',['s',.35,.28,.35,0,.28,0,'#F97316'],{morale:1}],[10,'cartstack','Shopping Cart Stack',['b',.7,.6,.5,0,0,0,'#94A3B8'],{prod:1.02}],[11,'xmastree','Holiday Tree',['k',.45,1.5,0,0,0,'#166534'],{morale:2}]];
+SEASON_ITEMS.forEach(([mo,id,name,part,fx])=>{ EQ['ess_ss_'+id]={parts:[part,['c',.04,.15,0,0,0,'#1F2937']]}; FURN['es_ss_'+id]={name, w:id==='stagekit'?2:1, h:1, cost:900+mo*120, ess:{cat:'Seasonal', fx, season:mo}, text:'Seasonal: buy it in '+MONTHS[mo]+' only, keep it forever. '+Object.entries(fx).map(([k,v])=>FXN[k](v)).join(', ')+'.'}; });
+(function(){ const _fa=furnAv; furnAv=function(k){ const d=FURN[k]; if(d&&d.ess&&d.ess.season!=null){ const now=Math.floor((S.day-1)/30)%12; return now===d.ess.season?{ok:true,why:''}:{ok:false, why:'Only in '+MONTHS[d.ess.season]}; } return _fa(k); };
+  const _sp=showPalette; showPalette=function(){ const r=_sp(); $$('#palette .pitem[data-f^="es_ss_"]').forEach(b=>{ const a=furnAv(b.dataset.f); if(!a.ok){ b.disabled=true; b.classList.add('locked'); const h=b.querySelector('.hint'); if(h) h.textContent='🗓️ '+a.why; } }); return r; }; })();
+let lastSeasonM=null;
+function seasonCheck(){ const m=Math.floor((S.day-1)/30)%12; if(lastSeasonM===null){ lastSeasonM=m; return; } if(m!==lastSeasonM){ lastSeasonM=m; const s=SEASONS[m]; banner(s.ic, s.n, s.t+(SEASON_ITEMS.some(x=>x[0]===m)?' Limited-time item in the Build catalog!':''), '#FBBF24', {dur:4200}); } }
+
+/* =================== 9 · EMPLOYEE STORYLINES =================== */
+const ARCS=[
+  {id:'poach', ok:p=>S.day-(p.hired||0)>45 && SK.some(k=>p.skills[k]>=45), run:p=>{ const raise=Math.round(p.salary*.25/50)*50; eventModal(p.name+' got an offer', `${(S.rivals||[]).filter(r=>r.alive).length?pick(S.rivals.filter(r=>r.alive)).n:'A rival'} offered ${firstName(p)} 25% more money. They came to you first.`, 'Counter-offers keep good people, but they reset what everyone else expects to be paid.', [{t:'Match it (+'+money(raise)+'/mo)', s:firstName(p)+' stays, morale +15', f:()=>{ p.salary+=raise; p.morale=clamp(p.morale+15,0,100); }}, {t:'Promote them instead', s:'Title change, morale +8, 50% chance they stay anyway', f:()=>{ if(Math.random()<.5){ p.morale=clamp(p.morale+8,0,100); p.trait=p.trait; toast(firstName(p)+' stayed for the title!',''); } else fire(p,true); }}, {t:'Wish them luck', s:firstName(p)+' leaves', f:()=>{ fire(p,true); }}]); }},
+  {id:'side', ok:p=>S.day-(p.hired||0)>70, run:p=>{ eventModal(firstName(p)+'\'s side project', `${p.name} has been building a little game on weekends. It's actually good.`, 'Lots of famous products started as side projects. Supporting them builds loyalty.', [{t:'Back it as a studio product', s:'Fans +15,000, '+firstName(p)+' morale +20', f:()=>{ S.fans+=15000; p.morale=clamp(p.morale+20,0,100); }}, {t:'Ask them to focus on client work', s:firstName(p)+' morale −10, work stays on track', f:()=>{ p.morale=clamp(p.morale-10,0,100); }}]); }},
+  {id:'mentor', ok:p=>SK.some(k=>p.skills[k]>=60) && S.team.length>=5, run:p=>{ eventModal(firstName(p)+' wants to mentor', `${p.name} wants to spend Fridays teaching the juniors.`, 'Mentoring slows down your best person a little, but makes everyone else better.', [{t:'Yes, start Mentor Fridays', s:'Everyone else +2 in their best skill', f:()=>{ S.team.forEach(q=>{ if(q!==p){ const k=SK.reduce((a,b)=>q.skills[a]>q.skills[b]?a:b); q.skills[k]=Math.min(100,q.skills[k]+2); } }); p.morale=clamp(p.morale+10,0,100); }}, {t:'Keep them shipping', f:()=>{}}]); }},
+  {id:'life', ok:p=>S.day-(p.hired||0)>100, run:p=>{ const e=pick(['is getting married','just had a baby','is running a marathon','adopted a dog']); eventModal('Big news', `${p.name} ${e}! The team wants to celebrate.`, 'Small moments of celebration are a big part of company culture.', [{t:'Throw a party', s:'−$1,500, everyone\'s morale +5', f:()=>{ S.cash-=1500; S.team.forEach(q=>q.morale=clamp(q.morale+5,0,100)); }}, {t:'Send a card', s:firstName(p)+' morale +5', f:()=>{ p.morale=clamp(p.morale+5,0,100); }}]); }},
+  {id:'sabbatical', ok:p=>p.energy<30 && S.day-(p.hired||0)>60, run:p=>{ eventModal(firstName(p)+' is running on empty', `${p.name} asks for two weeks off. They look exhausted.`, 'Burnout is the most expensive thing in a tech company. It just doesn\'t show up on the books.', [{t:'Paid time off', s:firstName(p)+' rests, comes back at full energy and morale +15', f:()=>{ p.breakT=600; p.energy=100; p.morale=clamp(p.morale+15,0,100); }}, {t:'Ask them to push through', s:'Morale −15', f:()=>{ p.morale=clamp(p.morale-15,0,100); }}]); }}];
+EVENTS.push({id:'arc', cond:()=>nonF().some(p=>ARCS.some(a=>!(p.arcs||[]).includes(a.id)&&a.ok(p))), run:()=>{ const opts=[]; nonF().forEach(p=>ARCS.forEach(a=>{ if(!(p.arcs||[]).includes(a.id)&&a.ok(p)) opts.push([p,a]); })); const [p,a]=pick(opts); p.arcs=(p.arcs||[]).concat(a.id); a.run(p); }});
+EVENTS.push({id:'arc2', cond:()=>nonF().some(p=>ARCS.some(a=>!(p.arcs||[]).includes(a.id)&&a.ok(p))), run:()=>{ EVENTS.find(e=>e.id==='arc').run(); }});
+
+/* =================== 10 · PHOTO MODE + STUDIO RATING =================== */
+function studioRating(){ const fl=curFloor(), F2=S.furn.filter(f=>floorOf(f)===fl), kinds=new Set(F2.map(f=>f.kind)); const st=stageDef(), area=st.w*st.h;
+  const decor=F2.filter(f=>FURN[f.kind]&&FURN[f.kind].decor).length, plants=F2.filter(f=>/plant/.test(f.kind)).length, equip=F2.filter(f=>FURN[f.kind]&&FURN[f.kind].equip).length, desks=F2.filter(f=>f.kind==='desk').length, fun=F2.filter(f=>isHang(f)).length, density=F2.reduce((a,f)=>a+f.w*f.h,0)/area;
+  const parts=[['Variety', Math.min(25, kinds.size*1.6)],['Greenery', Math.min(15, plants*3)],['Decor', Math.min(20, decor*2)],['Equipment', Math.min(15, equip*1.5)],['Fun & comfort', Math.min(15, fun*2.5)],['Layout', density<.12?4:density>.55?6:10]];
+  const total=Math.round(parts.reduce((a,p)=>a+p[1],0)); const stars=total>=85?5:total>=65?4:total>=45?3:total>=25?2:1; const tag=['Bare walls','Getting cozy','Nice place','Magazine-ready','Iconic'][stars-1]; return {parts, total, stars, tag, desks}; }
+ACH.push({id:'rate4', ic:'📸', n:'Magazine-Ready', d:'Get a 4-star studio rating', test:()=>S._rate>=65}, {id:'rate5', ic:'🏛️', n:'Iconic Office', d:'Get a 5-star studio rating', test:()=>S._rate>=85});
+function ratePanel(){ const R=studioRating(); S._rate=Math.max(S._rate||0,R.total);
+  openModal(`${close$()}<div class="eyebrow">Studio rating · floor ${curFloor()+1}</div><h2>${'★'.repeat(R.stars)}<span style="opacity:.25">${'★'.repeat(5-R.stars)}</span> ${R.tag}</h2><p class="hint">Score ${R.total}/100. Juno rates every studio in Bot City. Variety, plants, decor, equipment and places to hang out all count.</p>
+    <div class="rategrid">${R.parts.map(([n,v])=>`<div><span>${n}</span><i><u style="width:${Math.min(100,v/({Variety:25,Greenery:15,Decor:20,Equipment:15,'Fun & comfort':15,Layout:10})[n]*100)}%"></u></i><b>${Math.round(v)}</b></div>`).join('')}</div>
+    <div class="btnrow" style="margin-top:12px"><button class="btn pri" id="goPhoto">📸 Photo mode</button><button class="btn" id="goDecor">Decorate</button></div>`);
+  $('#goPhoto').onclick=()=>{ closeModal(); photoMode(true); }; $('#goDecor').onclick=()=>openPanel('decor'); }
+sub('office','rating','Rating', ratePanel);
+function photoMode(on){ document.body.classList.toggle('photo', on); let bar=$('#photoBar'); if(on){ if(!bar){ bar=document.createElement('div'); bar.id='photoBar'; bar.className='glass'; bar.innerHTML=`<span>📸 Photo mode · drag to frame your shot</span><button class="btn pri" id="pbSave">Save photo</button><button class="btn" id="pbExit">Exit</button>`; document.body.appendChild(bar); $('#pbExit').onclick=()=>photoMode(false); $('#pbSave').onclick=savePhoto; } bar.hidden=false; closeInspect(); hidePalette(); } else if(bar) bar.hidden=true; }
+function savePhoto(){ try{ renderer.render(scene,camera); const url=renderer.domElement.toDataURL('image/png'); const a=document.createElement('a'); a.href=url; a.download=(S.name||'studio').replace(/\W+/g,'-')+'-'+dateStr().replace(/\W+/g,'-')+'.png'; document.body.appendChild(a); a.click(); a.remove(); toast('Photo saved.',''); }catch(e){ toast('Your browser blocked the download. Try a screenshot instead.','warn'); } }
+window.addEventListener('keydown', e=>{ if(!S||titleMode) return; const tg=e.target.tagName; if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT') return; if(document.body.classList.contains('photo') && e.key==='Escape'){ photoMode(false); e.stopImmediatePropagation(); } else if(!modalOpen && (e.key==='k'||e.key==='K') && !e.ctrlKey && !e.metaKey){ photoMode(!document.body.classList.contains('photo')); } }, true);
+
+/* =================== 11 · HALL OF FAME =================== */
+function hofSave(){ if(!S||WEEKLY) return; const L=legacy(); L.hof=L.hof||{runs:{}, rec:{}}; const id=S.runId||(S.runId=Date.now().toString(36)); const best=S.products.filter(p=>p.launched).sort((a,b)=>(b.score||0)-(a.score||0))[0];
+  L.hof.runs[id]={name:S.name, founder:S.founder, v:Math.round(studioValue()), ch:S.chapter||0, day:S.day, team:S.team.length, best:best?{n:best.name, s:+(+best.score).toFixed(1)}:null, end:(S.story&&S.story.flags.ending)||'', mods:Object.keys(S.mods||{}), t:Date.now()};
+  const R=L.hof.rec, rec=(k,v,txt)=>{ if(!R[k]||v>R[k].v) R[k]={v, txt, who:S.name}; }; rec('value', studioValue(), fmt(studioValue())); rec('team', S.team.length, S.team.length+' people'); if(best) rec('score', +best.score, best.name+' · '+(+best.score).toFixed(1)); rec('chapter', S.chapter||0, 'Chapter '+Math.min(CHAPTERS.length,(S.chapter||0)+1)); if(S.ipo&&S.ipo.status==='listed'&&S.ipo.day) rec('ipo', -S.ipo.day, 'IPO on day '+S.ipo.day);
+  try{ localStorage.setItem('botstudio-legacy', JSON.stringify(L)); }catch(e){} }
+function hofPanel(){ hofSave(); const L=legacy(), H=L.hof||{runs:{},rec:{}}, runs=Object.values(H.runs).sort((a,b)=>b.v-a.v).slice(0,12), R=H.rec;
+  const RECN={value:'Most valuable studio', team:'Biggest team', score:'Best product ever', chapter:'Furthest in the story', ipo:'Fastest IPO'};
+  openModal(`${close$()}<div class="eyebrow">Hall of Fame · every studio you've built</div><h2>Legends</h2>
+    <div class="hofrec">${Object.entries(RECN).filter(([k])=>R[k]).map(([k,n])=>`<div><label>${n}</label><b>${R[k].txt}</b><span>${R[k].who}</span></div>`).join('')||'<p class="hint">Records appear as you play.</p>'}</div>
+    <h5 class="sech">Founders</h5><div class="hofruns">${runs.map((r,i)=>`<div class="hofrow"><span class="hr">${i+1}</span><div><b>${r.name}</b><span>${(FOUNDERS[r.founder]||{name:'Founder'}).name} · Chapter ${Math.min(CHAPTERS.length,r.ch+1)} · ${r.team} people${r.best?' · best: '+r.best.n+' ('+r.best.s+')':''}${r.mods&&r.mods.length?' · '+r.mods.map(m=>MODS[m]?MODS[m].ic:'').join(''):''}${r.end?' · '+({sold:'Sold to MegaCorp',ipo:'Went public',indie:'Stayed independent'})[r.end]:''}</span></div><em>${fmt(r.v)}</em></div>`).join('')||'<p class="hint">Your studios show up here.</p>'}</div>`); }
+sub('story','hof','Hall of Fame', hofPanel);
+(function(){ const _boot=boot; boot=async function(){ await _boot(); const acts=$('#title .acts'); if(acts && !$('#btnHof')){ const b=document.createElement('button'); b.className='btn'; b.id='btnHof'; b.textContent='🏆 Hall of Fame'; b.onclick=()=>{ initAudio(); hofPanel(); }; acts.appendChild(b); } }; })();
+
+/* =================== wiring =================== */
+(function(){ const _em=endMonth; endMonth=function(){ const r=_em.apply(this,arguments); try{ hofSave(); }catch(e){} try{ if(S.team.length && S.cityM){ const avg=S.team.reduce((a,p)=>a+p.morale,0)/S.team.length; if(avg>75) for(const id in S.cityM) S.cityM[id].mor=1; } }catch(e){} return r; };
+  const _ed=endDay; endDay=function(){ const r=_ed.apply(this,arguments); try{ cityCheck(); seasonCheck(); weeklyCheck(); }catch(e){ console.error(e); } return r; };
+  const _rh=refreshHUD; refreshHUD=function(){ const r=_rh(); if(S && !titleMode) abilRender(); return r; };
+  const _ci=cmdIndex; cmdIndex=function(){ const R=_ci(); const a=FABIL[S.founder]; if(a) R.unshift({g:'Action', n:'Founder ability: '+a.n, kw:'ability power skill founder', meta:abilityReady()?'Ready':'Recharging', run:useAbility}); R.push({g:'Go to', n:'Rival wars', kw:'takeover acquire rivals shares', run:()=>openPanel('wars')},{g:'Go to', n:'Studio rating', kw:'rate office photo', run:()=>openPanel('rating')},{g:'Go to', n:'Hall of Fame', kw:'records legends history', run:()=>openPanel('hof')},{g:'Action', n:'Photo mode', kw:'screenshot camera picture', run:()=>photoMode(true)}); return R; };
+  const _hq=hqPanel; hqPanel=function(){ const r=_hq(); const s=seasonNow(); const eb=$('#modalCard h2'); if(s && eb && !$('#modalCard .seasonchip')) eb.insertAdjacentHTML('afterend', `<div class="seasonchip">${s.ic} <b>${s.n}</b> · ${s.t}</div>`); return r; };
+  const _kp=keysPanel; keysPanel=function(){ _kp(); const K=$('#modalCard .keys'); if(K) K.insertAdjacentHTML('beforeend', `<div><kbd>K</kbd><span>Photo mode</span></div>`); }; })();
 
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
