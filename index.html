@@ -1406,7 +1406,7 @@ function deliver(pr, auto){
   S.recv.push({amt:owed, due:S.day+Math.max(3,pr.net-(jobN('cfo')?5:0)), client:pr.client});
   S.month.invoiced+=pay; S.month.delivered++; S.stats.invoiced+=pay; S.stats.delivered++; S.stats.cats[t.cat]=(S.stats.cats[t.cat]||0)+1; S.stats.types[pr.type]=(S.stats.types[pr.type]||0)+1;
   if(st===5) S.stats.fiveStar++; if(late) S.stats.late++;
-  let drep=(st>=3?(st-2.2)*2.8:(st-2.8)*2)*(1+pr.pts/300) - late*1.5; drep*= drep>0 ? (S.stage===0?1.8:S.stage===1?1.3:1) : (S.stage===0?.5:S.stage===1?.75:1); S.rep=clamp(S.rep+drep,0,100);
+  let drep=(st>=3?(st-2.2)*2.8:(st-2.8)*2)*(1+pr.pts/300) - late*1.5; drep*= drep>0 ? (S.stage===0?1.8:S.stage===1?1.3:1) : (S.stage===0?.5:S.stage===1?.75:1); if(drep>0 && S.rep>60) drep*=Math.max(.15, 1-(S.rep-60)/45); S.rep=clamp(S.rep+drep,0,100);
   const _crew=teamOf(pr); _crew.forEach(p=>{ p.proj=0; p.morale=clamp(p.morale+(st>=4?8:st<=2?-6:2),0,100); }); celebrate(_crew, st); gainXP(15+Math.round(pr.pts/5)+st*6); clientDelivered(pr, st); questDone(pr, st, pay); storyRecord('pay', pay, '💰', 'Biggest contract yet', money(pay)+' from '+pr.client);
   S.projects=S.projects.filter(x=>x!==pr);
   sfx(st>=4?'fanfare':'coin'); if(st>=4) confetti();
