@@ -702,6 +702,26 @@ button.perk:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 16px 40px 
 .lrow .tag.priv{color:#C4B5FD;border-color:rgba(196,181,253,.45)}
 .lrow .tag.pub{color:#5EEAD4;border-color:rgba(94,234,212,.45)}
 @media (max-width:640px){ .saas{grid-template-columns:1fr 1fr} }
+
+/* ===== living studio · recap cards · phone first hour ===== */
+.recap{border:2px solid var(--neon);border-radius:22px;padding:18px 18px 14px;background:linear-gradient(160deg,rgba(0,230,118,.14),rgba(10,10,26,.96));box-shadow:0 0 40px rgba(0,230,118,.12)}
+.recap .studio{font:800 11px var(--mono);letter-spacing:.22em;color:var(--muted)}
+.recap h2{margin:8px 0 12px;font-size:28px;line-height:1.1}
+.rstats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px;margin:8px 0 12px}
+.rstats label{display:block;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.rstats b{font-family:var(--display);font-size:22px;color:var(--gold);line-height:1.15}
+.recap .rq{margin:0;font-size:14.5px;color:#E2E8F0;line-height:1.45}
+.quote{margin:8px 0 0;padding:8px 10px;border-left:3px solid var(--gold);font-size:13px;color:#E2E8F0}
+.beat{margin:8px 0 0;padding:8px 10px;border-radius:12px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);font-size:13px;color:#D1FAE5}
+.shelfico{font-size:28px;line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
+@media (max-width:640px){
+  #nextUp{padding:12px;gap:12px;border-width:2px}
+  #nextUp .btn{padding:12px 16px;font-size:16px;min-height:44px}
+  .nui{font-size:28px}
+  .nut{font-size:14px}
+  .dtabs button{padding:10px 8px;font-size:14px;min-height:40px}
+  .recap h2{font-size:24px}
+}
 </style>
 <canvas id="gl" tabindex="0"></canvas>
 <script>document.body.classList.add("titling")</script>
@@ -880,11 +900,11 @@ function tone(f,dur,type,vol,when,slide){ if(!AC||muted) return; const t=AC.curr
 function musicStart(){ if(!AC||!MUSIC.on||MUSIC.timer) return; MUSIC.next=AC.currentTime+.15; MUSIC.timer=setInterval(musicTick,90); }
 function musicStop(){ clearInterval(MUSIC.timer); MUSIC.timer=null; }
 function musicTick(){ if(!AC) return; if(muted||!MUSIC.on){ musicStop(); return; } const spb=60/100/2;
-  while(MUSIC.next < AC.currentTime+.35){ const st=MUSIC.step, bar=Math.floor(st/16)%4, ch=PROG[bar], w=MUSIC.next-AC.currentTime, nt=S&&!titleMode?night(viewMin()):0, v=.55-nt*.25;
-    if(st%8===0) tone(ch[0]/2,spb*3.6,'triangle',.05*v,w);
-    if(st%8===4) tone(ch[2]/2,spb*1.8,'triangle',.035*v,w);
-    const arp=[0,1,2,3,2,1,2,3][st%8]; if(st%2===0 || Math.random()<.35) tone(ch[arp]*(st%32>=16?2:1),spb*.9,'square',.008*v,w);
-    if(st%16===14 && Math.random()<.6) tone(ch[3]*2,spb*1.5,'sine',.012*v,w);
+  while(MUSIC.next < AC.currentTime+.35){ const st=MUSIC.step, bar=Math.floor(st/16)%4, ch=PROG[bar], w=MUSIC.next-AC.currentTime, nt=S&&!titleMode?night(viewMin()):0, stage=S&&!titleMode?Math.min(3,S.stage||0):0, mul=[0.82,1,1.12,1.28][stage], v=(.55-nt*.25)*(stage?1:.85);
+    if(st%8===0) tone(ch[0]/2*mul,spb*3.6,'triangle',.05*v,w);
+    if(st%8===4) tone(ch[2]/2*mul,spb*1.8,'triangle',.035*v,w);
+    const arp=[0,1,2,3,2,1,2,3][st%8]; if(st%2===0 || Math.random()<.35) tone(ch[arp]*mul*(st%32>=16?2:1),spb*.9,stage>=2?'sine':'square',.008*v,w);
+    if(st%16===14 && Math.random()<.6) tone(ch[3]*2*mul,spb*1.5,'sine',.012*v,w);
     MUSIC.step++; MUSIC.next+=spb; } }
 let AMB=null;
 function ambStart(){ if(!AC||AMB) return; try{ const len=AC.sampleRate*2, buf=AC.createBuffer(1,len,AC.sampleRate), d=buf.getChannelData(0); for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
@@ -998,7 +1018,14 @@ const CHAPTERS = [
     {id:'seriesA', text:'Raise a Series A', test:()=>S.funding.rounds.some(r=>r.id==='a')},
     {id:'team20', text:'Grow the team to 20', test:()=>S.team.length>=20, prog:()=>S.team.length/20},
     {id:'big', text:'Deliver an Enterprise Platform', test:()=>S.stats.types.platform>=1},
-    {id:'inv2m', text:'Invoice $2,000,000 in total', test:()=>S.stats.invoiced>=2000000, prog:()=>S.stats.invoiced/2000000}]}
+    {id:'inv2m', text:'Invoice $2,000,000 in total', test:()=>S.stats.invoiced>=2000000, prog:()=>S.stats.invoiced/2000000},
+    {id:'demo', text:'Finish Demo Day', test:()=>S.accel&&S.accel.status==='done'},
+    {id:'ltv', text:'Make LTV bigger than CAC', test:()=>{ const u=unitEcon(); return u.ltv>0 && u.cac>0 && u.ltv>u.cac; }}]},
+  {name:'Public', goals:[
+    {id:'ipo', text:'List on the Bot City Exchange', test:()=>S.ipo&&S.ipo.status==='listed'},
+    {id:'earn', text:'Report your first earnings', test:()=>S.ipo&&(S.ipo.reports||0)>=1},
+    {id:'buy', text:'Acquire a studio', test:()=>!!(S.story&&(S.story.flags.boughtStudio||S.story.flags.boughtScrap))}
+  ]}
 ];
 const STORY = {
   accept:'Your first client! Notice the contract tells you the <b>size</b> of the work, the <b>deadline</b> and the <b>pay</b>. Pricing work is about guessing how long it takes. Guess low and you work for free.',
@@ -1013,7 +1040,12 @@ const STORY = {
   studio:'The loft. You\'re a real studio now. Bigger contracts need bigger teams, and bigger teams need a plan.',
   raise:'Investors bought a piece of us. Remember: raised money is not revenue. It\'s fuel, and it comes with a board that expects growth.',
   floors4:'Four floors, four departments. Specialized teams in the right space get more done. That\'s why big companies have departments.',
-  tower:'Our own tower. From garage to skyline. Build floors upward with the elevator on the left, one department at a time. Every month this office costs more than your first year of revenue. That\'s scale.'
+  tower:'Our own tower. From garage to skyline. Build floors upward with the elevator on the left, one department at a time. Every month this office costs more than your first year of revenue. That\'s scale.',
+  demo:'Demo Day is theater with a term sheet in the hallway. The stipend is nice. The check is the point.',
+  ltv:'When LTV beats CAC, ads print money. When they don\'t, every campaign is a hole.',
+  ipo:'You are a public company. The ticker is a sport now: guidance, earnings, and a board that reads the Byte.',
+  earn:'First print. Public markets punish a miss faster than a board meeting does.',
+  buy:'You bought a studio. People and a product, not another floor. That is how late game grows.'
 };
 
 /* ---------------- products ---------------- */
@@ -1205,7 +1237,7 @@ function endDay(){
   if(S.day>=S.nextCands){ refreshCands(3); refreshSpecs(); S.nextCands=S.day+7; }
   // events
   if(--S.eventT<=0){ S.eventT=ri(5,9); rollEvent(); }
-  productsDay(); trendDay(); researchDay(); boardDay(); headsDay(); questTick(); accelDay(); ipoDay();
+  productsDay(); trendDay(); researchDay(); boardDay(); headsDay(); questTick(); accelDay(); ipoDay(); cityDay(); peopleChatter();
   { const pi=S.products.reduce((a,p)=>a+(p.launched?(p.rate||0):0),0); if(pi>0) coinRain(Math.min(4,1+Math.floor(pi/2500))); }
   if(S.day%30===1) endMonth();
   setTimeout(refreshDrawer,0);
@@ -1224,7 +1256,16 @@ function endMonth(){
   if(S.cash<0) S.negMonths++; else S.negMonths=0;
   S.month = blankMonth();
   queueModal(()=>monthReport(rec));
+  if(Math.floor((S.day-2)/30)%12===11 && S.day>40) queueModal(()=>yearRecap());
   if(S.negMonths>=2) queueModal(gameOver);
+}
+function yearRecap(){
+  const y=Math.floor((S.day-2)/360)+1;
+  const hit=S.products.filter(p=>p.launched).sort((a,b)=>b.score-a.score)[0];
+  const star=S.team.filter(p=>!p.founder).sort((a,b)=>b.morale-a.morale)[0];
+  openModal(`<div class="eyebrow">Year in review · Y${y}</div>
+    ${recapHTML(S.name, [['Cash', fmt(S.cash)],[G('MRR','mrr'), fmt(saasNow().mrr)],['You own', myShare().toFixed(1)+'%'],['People', String(S.team.length)]], (hit?prodIcon(hit)+' '+hit.name+' · '+(hit.quote||('score '+hit.score.toFixed(1))):'No product yet.')+(star?' · '+firstName(star)+' still believes.':''))}
+    <div class="mactions"><button class="btn pri" data-close>Screenshot this</button></div>`);
 }
 function burn(){ const h=S.history.slice(-3); if(!h.length) return null; const net=h.reduce((a,r)=>a+(r.collected-r.expenses),0)/h.length; return net; }
 function runway(){ const fixed=S.team.reduce((a,p)=>a+p.salary,0)+rentNow()+stageDef().util+45*S.team.length+S.loan*.015; const b=burn(); const out = b==null ? -fixed : b; if(out>=0) return Infinity; return Math.max(0,num(S.cash))/Math.max(.01,-out); }
@@ -1274,7 +1315,35 @@ function hire(c){
   sfx('build'); toast(`Hired <b>${c.name}</b>, ${role(c)}. Signing costs ${money(fee)}.`+(c.desk?'':' They need a desk.'),c.desk?'':'warn');
   spawnWalker(c); hireArrive(c); gainXP(12); checkGoals(); refreshHUD();
 }
-function fire(p, quit){ if(p.founder) return; S.team=S.team.filter(x=>x!==p); const w=walkers.get(p.id); if(w){ scene.remove(w.rig.root); scene.remove(w.bar); scene.remove(w.ico); walkers.delete(p.id); } if(!quit){ const sev=Math.round(p.salary*.5); S.cash-=sev; S.month.other+=sev; S.team.forEach(q=>q.morale=clamp(q.morale-4,0,100)); toast(p.name+' was let go. Severance: '+money(sev)+'. The team is a little shaken.','warn'); } assignDesks(); refreshHUD(); }
+function fire(p, quit){ if(p.founder) return; S.team=S.team.filter(x=>x!==p); const w=walkers.get(p.id); if(w){ scene.remove(w.rig.root); scene.remove(w.bar); scene.remove(w.ico); walkers.delete(p.id); } journal(quit?p.name+' quit':p.name+' was let go', quit?'Morale was too low. The empty desk is the story.':'Severance paid. The room got quieter.'); if(!quit){ const sev=Math.round(p.salary*.5); S.cash-=sev; S.month.other+=sev; S.team.forEach(q=>q.morale=clamp(q.morale-4,0,100)); toast(p.name+' was let go. Severance: '+money(sev)+'. The team is a little shaken.','warn'); } assignDesks(); refreshHUD(); }
+function journal(t, c){ if(!S||!S.story) return; S.story.log.push({d:S.day, t, c:c||''}); }
+function say(p, line){ if(!p||!line) return line; const w=walkers.get(p.id); if(w && w.rig.root && w.rig.root.visible){ const pos=w.pos.clone(); pos.y=1.28; fxText(pos, line.length>22?line.slice(0,20)+'…':line, p.morale<35?'#FCA5A5':p.morale>75?'#A7F3D0':'#F8FAFC', .18); } return line; }
+function chatterLine(p){
+  if(!p) return '';
+  const pr=S.projects.find(q=>q.id===p.proj);
+  const prod=S.products.filter(x=>x.launched).slice(-1)[0];
+  if(p.training) return 'Learning '+SKN[p.trainSkill]+'.';
+  if(p.breakT>0) return pick(['Coffee first.','Five minutes.','Brain reboot.']);
+  if(pr&&pr.crunch) return pick(['Still here.','This deadline is a person.','I see bugs when I close my eyes.']);
+  if(pr&&pr.own){ const pd=S.products.find(x=>x.id===pr.prod); return pick(['This one is ours.','If '+((pd&&pd.name)||'it')+' ships, I want my name on the shelf.','Don\'t let Rusty copy this.']); }
+  if(pr) return pick(['Stuck on bugs.','Almost.','Chip would like this.','The diner work is honest work.']);
+  if(p.morale<32) return pick(['Is this the job?','I could freelance.','Rusty texted.']);
+  if(prod) return pick(['Proud of '+prod.name+'.','Users still opening '+prod.name+'?','Ship the update.']);
+  const tr={fast:'Put me on the slow one.', careful:'I will find the bug.', mentor:'Pair me with the new kid.', owl:'I like the late shift.', hothead:'Just tell me the deadline.', loyal:'I\'m not going anywhere.', learner:'Show me the hard thing.'};
+  return tr[p.trait]||pick(['Ready.','What\'s next?','I can take a contract.']);
+}
+function peopleChatter(){ const pool=S.team.filter(p=>!p.founder); if(!pool.length) return; const n=Math.min(pool.length, S.team.length>=6?2:1); const sh=pool.slice().sort(()=>Math.random()-.5); for(let i=0;i<n;i++) say(sh[i], chatterLine(sh[i])); }
+function prodIcon(p){ const m={Action:'💥',Puzzle:'🧩',RPG:'🗡️',Racing:'🏎️',Simulation:'🏢',Strategy:'♟️',Platformer:'👾',Horror:'👻',Productivity:'✅',Finance:'💰',Social:'💬',Health:'❤️',Education:'📚','AI Assistant':'🤖',Security:'🔒','Creative Tools':'🎨'}; return p.icon||m[p.a]||(p.kind==='game'?'🎮':'📱'); }
+function recapHTML(title, rows, foot){ return `<div class="recap"><div class="studio">${(S.name||'BotStudio').toUpperCase()} · ${dateStr()}</div><h2>${title}</h2><div class="rstats">${rows.map(r=>`<div><label>${r[0]}</label><b>${r[1]}</b></div>`).join('')}</div>${foot?`<p class="rq">${foot}</p>`:''}</div>`; }
+function rivalMul(p){ let m=1; const C=S.city||{}, f=S.story&&S.story.flags||{}; if(C.clone && C.clone.until>S.day && C.clone.a===p.a && !(num(p.boost,1)>1.25)) m*=.72; if(C.mega && C.mega.until>S.day && C.mega.a===p.a) m*=.78; if(f.platform==='stores' && p.kind!=='game') m*=.85; return m; }
+function cityDay(){
+  S.city=S.city||{}; const C=S.city, f=F();
+  if(f.rusty==='rival' && S.products.some(p=>p.launched) && S.day%18===0 && Math.random()<.5){ const p=pick(S.products.filter(x=>x.launched)); C.clone={a:p.a, until:S.day+21, name:p.name}; news('ScrapCo shipped a cheap '+p.a+' clone of '+p.name+'. Ours will sell slower until we update.','warn'); journal('ScrapCo cloned '+p.name, 'Rusty undercut the category.'); }
+  if(C.clone && C.clone.until<=S.day){ news('The ScrapCo clone faded. Players came back.','good'); C.clone=null; }
+  if(seen('studio') && !C.mega && S.products.some(p=>p.launched) && S.day%24===0 && Math.random()<.45){ const p=pick(S.products.filter(x=>x.launched)); C.mega={a:p.a, until:S.day+50, name:'MegaBot '+p.a}; news('MegaCorp launched MegaBot '+p.a+'. It is stealing users in that category.','warn'); journal('MegaBot copies '+p.a, 'Update or lose the category.'); }
+  if(C.mega && C.mega.until<=S.day){ news('MegaBot '+C.mega.a+' faded. The clone didn\'t stick.','good'); C.mega=null; }
+  if(seen('launch1') && S.day%16===0){ const live=S.products.filter(p=>p.launched); if(live.length){ const p=live.slice().sort((a,b)=>b.score-a.score)[0]; if(p.score>=7.2){ S.fans+=80; S.rep=clamp(S.rep+2,0,100); S.trend={a:p.a,b:p.b,until:S.day+40}; p.boost=Math.max(num(p.boost,1),1.35); news('Juno in the Byte: "'+p.name+' is the one to beat." Trend locked.','good'); journal('Byte loves '+p.name, p.quote||'A hit.'); } else if(p.score<5){ p.boost=Math.min(num(p.boost,1),.82); S.rep=clamp(S.rep-1,0,100); news('Juno: "'+p.name+' needed more time in the oven."','warn'); journal('Byte buries '+p.name, 'A flop on the front page.'); } } }
+}
 
 /* events */
 const EVENTS = [
@@ -1286,7 +1355,23 @@ const EVENTS = [
     eventModal('Rush job', `${pr.client} needs their ${PTYPES[pr.type].name} 4 days sooner. They\'ll pay a ${money(bonus)} rush fee.`, 'Rush fees are real money, but your team will need to crunch to hit it.', [{t:'Take the rush fee', s:'+'+money(bonus)+', deadline 4 days sooner', f:()=>{ pr.pay+=bonus; pr.due-=4; }}, {t:'No thanks', f:()=>{}}]); }},
   {id:'viral', cond:()=>S.stats.delivered>=2, run:()=>{ S.rep=clamp(S.rep+5,0,100); eventModal('Your portfolio went viral', 'A post about one of your projects blew up online. Reputation +5.', 'Great work is the best marketing. Happy clients bring new clients.', [{t:'Let\'s go!', f:()=>{ for(let i=0;i<2;i++) if(S.offers.length<6) S.offers.push(makeOffer()); }}]); }},
   {id:'referral', cond:()=>S.team.length>=2, run:()=>{ const c=makeCand(18); c.salary=Math.round(c.salary*.92/50)*50; S.cands.unshift(c); eventModal('A referral', `${S.team[ri(1,S.team.length-1)].name} knows someone great: ${c.name}, a ${role(c)} asking ${money(c.salary)} a month. They're on your hiring list now.`, 'Referrals from your team are often the best hires. They come pre-vetted.', [{t:'Take a look', f:()=>openPanel('hire')}, {t:'Later', f:()=>{}}]); }},
-  {id:'laptop', cond:()=>S.day>12, run:()=>{ eventModal('Laptop died', 'One of the team\'s laptops just died. A replacement is $1,400.', 'Surprise costs happen every month. Keeping a cash buffer is how you survive them.', [{t:'Buy a new one', s:'−$1,400', f:()=>{ S.cash-=1400; S.month.other+=1400; }}, {t:'Make do with an old one', s:'Team morale −6', f:()=>{ S.team.forEach(p=>p.morale=clamp(p.morale-6,0,100)); }}]); }}
+  {id:'laptop', cond:()=>S.day>12, run:()=>{ eventModal('Laptop died', 'One of the team\'s laptops just died. A replacement is $1,400.', 'Surprise costs happen every month. Keeping a cash buffer is how you survive them.', [{t:'Buy a new one', s:'−$1,400', f:()=>{ S.cash-=1400; S.month.other+=1400; }}, {t:'Make do with an old one', s:'Team morale −6', f:()=>{ S.team.forEach(p=>p.morale=clamp(p.morale-6,0,100)); }}]); }},
+  {id:'raise', cond:()=>S.team.filter(p=>!p.founder && S.day-(p.hired||1)>20 && p.morale<70).length>0, run:()=>{ const p=pick(S.team.filter(x=>!x.founder && S.day-(x.hired||1)>20 && x.morale<70)); const bump=Math.round(p.salary*.12/50)*50; eventModal(p.name+' wants a raise', `${firstName(p)} has been here ${S.day-(p.hired||1)} days. ${TRAITS[p.trait]?TRAITS[p.trait].name+'. ':''}They want ${money(bump)} more a month or they start looking.`, 'People you keep cheap leave. People you overpay stay, and burn climbs.', [{t:'Give the raise', s:'+'+money(bump)+'/mo · morale +18', f:()=>{ p.salary+=bump; p.ask=p.salary; p.morale=clamp(p.morale+18,0,100); journal(p.name+' got a raise', money(bump)+' more a month. They stayed.'); say(p,'Thanks. I needed that.'); }}, {t:'Not this month', s:'Morale −12 · they might quit later', f:()=>{ p.morale=clamp(p.morale-12,0,100); journal(p.name+' was told no', 'The raise can wait. Maybe they can\'t.'); say(p,'Okay. I heard you.'); }}]); }},
+  {id:'wantlead', cond:()=>S.team.filter(p=>!p.founder&&(p.trait==='learner'||p.trait==='mentor')).length && S.products.filter(p=>p.launched).length, run:()=>{ const p=pick(S.team.filter(x=>!x.founder&&(x.trait==='learner'||x.trait==='mentor')))||pick(S.team.filter(x=>!x.founder)); const prod=S.products.filter(x=>x.launched).slice(-1)[0]; eventModal(firstName(p)+' wants to lead '+prod.name, `${p.name} wants to own the next update. They\'ll work faster on it, and they want their name on the shelf.`, 'Stars stay if the work feels like theirs.', [{t:'Make them lead', s:prod.name+' updates 20% faster while they\'re on it', f:()=>{ prod.lead=p.id; p.morale=clamp(p.morale+10,0,100); journal(p.name+' leads '+prod.name, 'A product with a person on it.'); say(p,'I won\'t waste it.'); }}, {t:'Keep it a studio product', s:'They shrug. Morale −4', f:()=>{ p.morale=clamp(p.morale-4,0,100); }}]); }},
+  {id:'crunchback', cond:()=>S.projects.some(p=>p.crunch && p.done<p.pts), run:()=>{ const pr=pick(S.projects.filter(p=>p.crunch)); const crew=teamOf(pr).filter(x=>!x.founder); eventModal('Crunch backlash', `${crew.length?crew.map(x=>firstName(x)).join(', '):'The team'} ${crew.length===1?'is':'are'} fried from crunch on the ${PTYPES[pr.type].name}. Bugs are stacking.`, 'Crunch buys days. It spends people.', [{t:'End crunch, order pizza', s:'−$180 · morale +8 · crunch off', f:()=>{ pr.crunch=false; S.cash-=180; S.month.other+=180; S.team.forEach(p=>p.morale=clamp(p.morale+8,0,100)); journal('Crunch ended', PTYPES[pr.type].name+' got pizza instead.'); }}, {t:'Push through', s:'Morale −10 · more bugs', f:()=>{ S.team.forEach(p=>p.morale=clamp(p.morale-10,0,100)); pr.bugs=(pr.bugs||0)+8; journal('Crunch continued', 'The room stayed late. The story will remember.'); }}]); }},
+  {id:'chipfan', cond:()=>S.stats.delivered>=3 && S.stage===0, run:()=>{ eventModal('Chip brought leftovers', 'Chip from the diner dropped a stack of boxes and a handwritten five-star on a napkin.', 'Neighborhood love is a marketing budget you cannot buy.', [{t:'Put the napkin on the wall', s:'+2 reputation · team morale +6', f:()=>{ S.rep=clamp(S.rep+2,0,100); S.team.forEach(p=>p.morale=clamp(p.morale+6,0,100)); journal('Chip\'s napkin', 'Five stars, grease included.'); }}, {t:'Send him a free update', s:'Chip becomes a returning client', f:()=>{ addOffers(1,{client:'Chip\'s Diner'}); F().chipFan=1; }}]); }},
+  {id:'serverbill', cond:()=>S.products.some(p=>p.launched && p.kind!=='game' && (p.users||0)>40), run:()=>{ const bill=Math.max(400, Math.round(S.products.reduce((a,p)=>a+(p.kind!=='game'?num(p.srv,0)*12:0),0)/50)*50); eventModal('The cloud bill spiked', `Servers for your apps just invoiced ${money(bill)}. Scale has a receipt.`, 'Users are revenue and cost at the same time.', [{t:'Pay it', s:'−'+money(bill), f:()=>{ S.cash-=bill; S.month.servers+=bill; }}, {t:'Throttle the apps for a week', s:'Product income −30% for 7 days', f:()=>{ S.city=S.city||{}; S.city.throttle=S.day+7; journal('Throttled the apps', 'Saved the bill. Lost the users.'); }}]); }},
+  {id:'conference', cond:()=>S.stage>=1 && S.cash>4000, run:()=>{ eventModal('Bot City Dev Days', 'A booth at Dev Days is $3,200. You meet clients, or you keep the cash.', 'Conferences are marketing you can shake hands with.', [{t:'Take a booth', s:'−$3,200 · +3 reputation · two contracts', f:()=>{ S.cash-=3200; S.month.marketing+=3200; S.stats.mktSpend=num(S.stats.mktSpend,0)+3200; S.rep=clamp(S.rep+3,0,100); addOffers(2); journal('Dev Days booth', 'Handshakes, stickers, two new leads.'); }}, {t:'Skip it', f:()=>{}}]); }},
+  {id:'award', cond:()=>S.products.some(p=>p.launched && p.score>=8), run:()=>{ const p=S.products.filter(x=>x.launched && x.score>=8).sort((a,b)=>b.score-a.score)[0]; eventModal('Pixel Gazette award', `${p.name} is up for Best ${p.a}. Showing up costs $900 in tickets and a speech.`, 'Awards are press you can put on the shelf.', [{t:'Go, and thank the team', s:'−$900 · fans +120 · morale +10', f:()=>{ S.cash-=900; S.month.other+=900; S.fans+=120; S.team.forEach(x=>x.morale=clamp(x.morale+10,0,100)); p.boost=Math.max(num(p.boost,1),1.25); journal(p.name+' won a Gazette nod', 'The shelf looks less empty.'); }}, {t:'Skip the party', f:()=>{}}]); }},
+  {id:'bugreport', cond:()=>S.products.some(p=>p.launched && p.score<6.5), run:()=>{ const p=pick(S.products.filter(x=>x.launched && x.score<6.5)); eventModal('One-star pile-on', `The Byte comments on ${p.name} are mean and specific. An update would help. Ignoring it will not.`, 'A flop in public is still a product. Patch notes are how you answer.', [{t:'Start an update now', s:'Opens an update project', f:()=>{ if(!S.projects.some(q=>q.prod===p.id)){ registerProd(p); const pr={id:S.seq++, type:prodTypeKey(p,true), client:'Your studio', own:true, update:true, prod:p.id, pts:PTYPES[prodTypeKey(p,true)].pts, done:0, qSum:0, qPts:0, bugs:0, polish:0, pay:0, due:S.day+99999, start:S.day, crunch:false, net:0, deposit:0}; S.projects.push(pr); } journal('Patching '+p.name, 'The comments were right.'); }}, {t:'Let it fade', s:p.name+' boost drops', f:()=>{ p.boost=Math.min(num(p.boost,1),.75); }}]); }},
+  {id:'influencer', cond:()=>S.products.some(p=>p.launched), run:()=>{ const p=pick(S.products.filter(x=>x.launched)); const c=Math.round(1200*SIZES[p.size].mult/50)*50; eventModal('A streamer wants '+p.name, `They will play or review ${p.name} for ${money(c)}. Hits get a spike. Flops get quotes you cannot un-read.`, 'Paid press is still press.', [{t:'Pay the streamer', s:'−'+money(c)+' · 2-week boost', f:()=>{ S.cash-=c; S.month.marketing+=c; S.stats.mktSpend=num(S.stats.mktSpend,0)+c; p.promoT=Math.max(p.promoT||0,14); p.promoLvl=Math.max(p.promoLvl||1,2); journal('Streamer deal', p.name+' on a Thursday night.'); }}, {t:'Pass', f:()=>{}}]); }},
+  {id:'talentwar', cond:()=>S.team.filter(p=>!p.founder).length>=3 && seen('rusty1'), run:()=>{ const p=bestEmployee(); if(!p) return; const bump=Math.round(p.salary*.15/50)*50; eventModal('ScrapCo is hiring again', `Rusty posted a role that looks a lot like ${firstName(p)}'s. Matching +${money(bump)}/mo keeps them. Doing nothing is a story.`, 'Rivals poach. Pay and a product to believe in are the defense.', [{t:'Match the market', s:'+'+money(bump)+'/mo', f:()=>{ p.salary+=bump; p.ask=p.salary; p.morale=clamp(p.morale+10,0,100); journal('Kept '+p.name, 'Rusty did not get this one.'); }}, {t:'Let the market talk', s:'Morale −8', f:()=>{ p.morale=clamp(p.morale-8,0,100); }}]); }},
+  {id:'boardcall', cond:()=>S.funding.rounds.length>=1, run:()=>{ eventModal('Ada wants numbers', 'Ada emailed: burn, runway, and whether the last product is a hit. She will wait. The Byte will not.', 'Boards ask the questions you should already know.', [{t:'Send the real numbers', s:'Ada is calmer · reputation +1', f:()=>{ S.rep=clamp(S.rep+1,0,100); F().adaImp=1; journal('Told Ada the truth', 'Runway '+ (runway()===Infinity?'profitable':runway().toFixed(1)+' months') +'.'); }}, {t:'Send a slide with fireworks', s:'She notices. Reputation −2', f:()=>{ S.rep=clamp(S.rep-2,0,100); }}]); }},
+  {id:'storecut', cond:()=>S.products.filter(p=>p.launched).length>=2 && S.stage>=2 && !(S.story&&S.story.flags.platform), run:()=>{ platformPrompt(); }},
+  {id:'intern', cond:()=>S.stage>=1 && S.team.length>=3, run:()=>{ const c=makeCand(8); c.salary=Math.round(c.salary*.55/50)*50; c.trait='learner'; S.cands.unshift(c); eventModal('An intern at the door', `${c.name} will work cheap (${money(c.salary)}/mo) and learn fast. Cheap labor is still a salary.`, 'Interns are a bet on next year.', [{t:'Put them on the list', f:()=>openPanel('hire')}, {t:'Not today', f:()=>{ S.cands=S.cands.filter(x=>x!==c); }}]); }},
+  {id:'junotrend', cond:()=>S.products.some(p=>p.launched) && seen('launch1'), run:()=>{ const p=pick(S.products.filter(x=>x.launched)); eventModal('Juno is starting a trend', `The Byte is about to declare ${p.a} the category of the month. If you ride it, ${p.name} pops. If a rival rides it, they pop.`, 'Press that names a category moves the market.', [{t:'Leak a quote. Ride it.', s:'Trend locks to '+p.a, f:()=>{ S.trend={a:p.a,b:p.b,until:S.day+35}; p.boost=Math.max(num(p.boost,1),1.2); journal('Juno started a trend', p.a+' is the word of the month.'); }}, {t:'Stay quiet', f:()=>{ S.trend={a:pick(Object.keys(p.kind==='game'?GENRES:APPCATS)), b:p.b, until:S.day+30}; }}]); }},
+  {id:'hostile', cond:()=>S.ipo&&S.ipo.status==='listed', run:()=>{ const I=S.ipo; eventModal('MegaCorp rumor', `Mr. Gray told the Byte he might "take ${I.ticker} private." The ticker jumped, then the board called.`, 'A hostile rumor is a price and a story. You can ignore it, or you can raise a secondary and look expensive.', [{t:'File a secondary. Dilute 6% more.', s:'Cash in, ownership down', f:()=>{ const amt=Math.round(studioValue()*.06/1000)*1000; S.cash+=amt; S.month.funding=(S.month.funding||0)+amt; S.funding.cap.forEach(c=>c.pct*=.94); const pub=S.funding.cap.find(c=>c.name==='Public shareholders'); if(pub) pub.pct+=6; else S.funding.cap.push({name:'Public shareholders', pct:6}); I.bump=num(I.bump,0)+amt*.08; journal('Secondary offering', fmt(amt)+' in. You own '+myShare().toFixed(1)+'% now.'); news('Secondary closed. '+fmt(amt)+' in the bank. You own less.','info'); }}, {t:'Tell Gray to buy on the open market', s:'Reputation +2 · activist noise +1', f:()=>{ S.rep=clamp(S.rep+2,0,100); I.activist=(I.activist||0)+1; journal('Told MegaCorp no', 'The rumor is now a feature.'); }}]); }},
+  {id:'guidance', cond:()=>S.ipo&&S.ipo.status==='listed'&&(S.ipo.reports||0)>=1, run:()=>{ const I=S.ipo, g=num(I.guide, avgRev()); eventModal('Raise guidance?', `Next earnings, the street expects ${fmt(g)} a month. You can raise the number and look brave, or sandbag and look boring.`, 'Guidance is a promise you have to print.', [{t:'Raise it 12%', s:'The ticker likes courage', f:()=>{ I.guide=g*1.12; I.bump=num(I.bump,0)+g*.4; journal('Raised guidance', fmt(I.guide)+' a month. Now earn it.'); }}, {t:'Hold the line', f:()=>{}}]); }}
 ];
 function rollEvent(){ const pool=EVENTS.filter(e=>e.cond()); if(pool.length) pick(pool).run(); }
 function eventModal(title, text, lesson, choices){
@@ -1300,7 +1385,7 @@ function _checkGoals(){
   if(!S) return;
   for(let c=0;c<CHAPTERS.length;c++){ for(const g of CHAPTERS[c].goals){ if(!S.goals[g.id] && c<=S.chapter && g.test()){ S.goals[g.id]=S.day; banner('🎯','Goal complete',g.text,'#00E676'); gainXP(25); if(STORY[g.id]) advise(STORY[g.id],{mood:'point', dur:14000}); } } }
   const ch=CHAPTERS[S.chapter]; if(ch && ch.goals.every(g=>S.goals[g.id])){ const done=S.chapter; S.chapter++; confetti(); sfx('fanfare');
-    queueModal(()=>openModal(`<div class="eyebrow">Chapter ${done+1} complete</div><h2>${ch.name}</h2><div class="take"><img src="${PORT.celebrate}" alt=""><p>${done===0?'You proved the idea works. Time to get a real office.':done===1?'You\'re a company now, not a side project.':done===2?'The studio is known across Bot City.':'From a garage to a tower. You did it.'}</p></div>${CHAPTERS[S.chapter]?`<p>Next: <b>Chapter ${S.chapter+1} · ${CHAPTERS[S.chapter].name}</b>.${STAGES[S.chapter]?' You can now move to the '+STAGES[S.chapter].name+' from the Office menu.':''}</p>`:''}<div class="mactions"><button class="btn pri" data-close>Onward</button></div>`)); }
+    queueModal(()=>openModal(`<div class="eyebrow">Chapter ${done+1} complete</div><h2>${ch.name}</h2><div class="take"><img src="${PORT.celebrate}" alt=""><p>${done===0?'You proved the idea works. Time to get a real office.':done===1?'You\'re a company now, not a side project.':done===2?'The studio is known across Bot City.':done===3?'From a garage to a tower. You did it.':"The ticker is live. This is a different job."}</p></div>${CHAPTERS[S.chapter]?`<p>Next: <b>Chapter ${S.chapter+1} · ${CHAPTERS[S.chapter].name}</b>.${STAGES[S.chapter]?' You can now move to the '+STAGES[S.chapter].name+' from the Office menu.':''}</p>`:''}<div class="mactions"><button class="btn pri" data-close>Onward</button></div>`)); }
 }
 function goalNext(){ const ch=CHAPTERS[S.chapter]; if(!ch) return null; return ch.goals.find(g=>!S.goals[g.id]); }
 
@@ -1311,6 +1396,9 @@ function tutCheck(){
   if(S.tut===1){ if(ui.drawer && ui.panel==='contracts'){ if(coachSel!=='.card2.best [data-acc]') coach('.card2.best [data-acc]','This one fits your skills best. <b>Accept it.</b>','acc'); } else if(!S.stats.accepted && coachSel!=='#dockInner [data-g="work"]') coach('#dockInner [data-g="work"]','Start here. Open <b>Work</b> to see client contracts.','tab'); if(S.stats.accepted){ S.tut=2; clearCoach(); coach('#hustleBox','Your project is running. <b>Click to work</b> to speed it up, or just watch the bar fill.','hustle',10000); } }
   else if(S.tut===2){ const d=S.projects.find(p=>p.done>=p.pts); if(d && coachSel!=='#nuBtn'){ coach('#nuBtn','Done! <b>Deliver it</b> to send the client an invoice.','dl'); } if(S.stats.delivered){ S.tut=3; clearCoach(); } }
   else if(S.tut===3 && S.stats.delivered>=2 && S.team.length<2){ S.tut=4; advise('We can\'t do it all alone. Open <b>Team → Hire</b> and pick someone whose skills cover what we\'re weak at. Salaries are paid every month, so hire when there\'s more work than people.',{mood:'point', acts:[{t:'Open Hire', f:()=>openPanel('hire')}, {t:'Later', f:()=>{}}]}); }
+  else if(S.tut===4 && S.team.length>=2){ S.tut=5; advise('Time to ship something of our own. Open <b>Work → Products</b>. The first product is a guess. Updates are the real game.',{mood:'point', acts:[{t:'Open Products', f:()=>openPanel('products')}, {t:'Later', f:()=>{}}]}); }
+  else if(S.tut===5 && S.products.some(p=>p.launched)){ S.tut=6; advise('It is live. Users come slowly. If cash gets tight, raise from Ada — <b>Company → Funding</b>. The Next up card will keep pointing.',{mood:'wave', acts:[{t:'Got it', f:()=>{}}]}); }
+  else if(S.tut===6 && S.cash<monthlyFixed()*3 && S.day>25 && !S.funding.rounds.length){ S.tut=7; advise('Runway is the plot now. Either cut costs or pitch Ada. Next up will say which.',{mood:'concerned', acts:[{t:'Check money', f:()=>openPanel('finance')}, {t:'Later', f:()=>{}}]}); }
 }
 
 /* ---------------- hustle (clicker) ---------------- */
@@ -1391,7 +1479,8 @@ function registerProd(prod){
   PTYPES[prodTypeKey(prod,true)]={name:prod.name+' update', cat, w, pts:Math.round(SIZES[prod.size].pts*.3), rate:0, rep:999, desc:'An update.', own:true};
 }
 function newProductModal(){
-  const st={kind:'game', a:pick(Object.keys(GENRES)), b:pick(TOPICS), size:'S', sl:{a:5,b:3,c:2}};
+  const hint=F().prodHint && !S.products.length ? F().prodHint : null;
+  const st={kind:hint?hint.kind:'game', a:hint?hint.a:pick(Object.keys(GENRES)), b:hint?hint.b:pick(TOPICS), size:'S', sl:{a:5,b:3,c:2}};
   const render=()=>{
     const A = st.kind==='game'?Object.keys(GENRES):Object.keys(APPCATS), B = st.kind==='game'?TOPICS:AUDIENCES;
     if(!A.includes(st.a)) st.a=A[0]; if(!B.includes(st.b)) st.b=B[0];
@@ -1401,6 +1490,7 @@ function newProductModal(){
     const nm=st.name||defaultName(st);
     openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">New product</div><h2>Make something of your own</h2>
       <div class="seg" id="npKind"><button data-k="game" class="${st.kind==='game'?'on':''}">🎮 Game</button><button data-k="app" class="${st.kind==='app'?'on':''}">📱 App</button></div>
+      ${hint?`<p class="beat">Ada's hint for a ${FOUNDERS[S.founder||'coder'].name}: start with <b>${hint.a}</b> × <b>${hint.b}</b>. You can ignore her.</p>`:''}
       <p class="hint">${st.kind==='game'?'Games sell copies. A hit sells big at launch, then sales fade unless you ship updates. Stores keep 30% of every sale.':'Apps charge a monthly subscription. Users pile up, some cancel every month (that\'s churn), and every user costs a little in servers.'}</p>
       <div class="np2"><label>${st.kind==='game'?'Genre':'Category'}<select id="npA">${A.map(x=>`<option ${x===st.a?'selected':''}>${x}</option>`).join('')}</select></label><label>${st.kind==='game'?'Topic':'Audience'}<select id="npB">${B.map(x=>`<option ${x===st.b?'selected':''}>${x}</option>`).join('')}</select></label></div>
       <p class="hint">${known!=null?'You\'ve made this before: <b>'+comboWord(known)+'</b>.':'You haven\'t tried this combination yet. Launch it to find out how well it fits.'}${trend?' <b style="color:var(--gold)">🔥 Trending right now!</b>':''}</p>
@@ -1430,7 +1520,7 @@ function defaultName(st){ const n1={Space:'Star',Robots:'Robo',Money:'Coin',Pets
 function launch(pr){
   const prod=S.products.find(p=>p.id===pr.prod); const _crew=teamOf(pr); _crew.forEach(p=>{ p.proj=0; }); celebrate(_crew, pr.update?4:5); gainXP(pr.update?25:60);
   S.projects=S.projects.filter(x=>x!==pr);
-  if(pr.update){ prod.updates++; prod.score=Math.min(10, prod.score+.5+projQuality(pr)/200); prod.age=Math.max(0,(prod.age||0)-18); prod.boost=1.6; sfx('chime'); toast('<b>'+prod.name+'</b> update shipped! Score now '+prod.score.toFixed(1)+'. Sales and signups are up.','info'); checkGoals(); return; }
+  if(pr.update){ prod.updates++; prod.score=Math.min(10, prod.score+.5+projQuality(pr)/200); prod.age=Math.max(0,(prod.age||0)-18); prod.boost=1.6; const note=pick(['Fixed the thing reviewers yelled about.','Faster load. Fewer crashes. One secret mode.','The recipe is closer. We listened.','New coat of paint. Same heart.','Churn killers: onboarding, search, a nicer empty state.']); prod.patch=note; journal(prod.name+' v'+(prod.updates+1)+'.0', note); sfx('chime'); patchShow(prod, note); checkGoals(); world.roomDirty=true; return; }
   const q=projQuality(pr), ideal=(prod.kind==='game'?GENRES:APPCATS)[prod.a].i, sl=prod.sliders;
   const fit=1-(Math.abs(sl.a-ideal.a)+Math.abs(sl.b-ideal.b)+Math.abs(sl.c-ideal.c))/2;
   const combo=comboMult(prod.a,prod.b), trend=S.trend&&(S.trend.a===prod.a||S.trend.b===prod.b)?1.15:1;
@@ -1440,6 +1530,9 @@ function launch(pr){
   base+=(hasF('gong')?.3:0)+upgAdd('score'); base=clamp(base,1,10);
   const revs=REVIEWERS.map(r=>({r, s:clamp(Math.round((base+rand(-.8,.8))*2)/2,1,10)}));
   prod.score=revs.reduce((a,x)=>a+x.s,0)/4; prod.launched=S.day; prod.age=0; prod.boost=1; prod.fit=fit; prod.combo=combo;
+  prod.icon=prodIcon(prod); prod.reviewer=pick(REVIEWERS);
+  prod.quote=pick(['Finally, a '+prod.a+' that gets '+prod.b+'.','I showed this to my roommate. They installed it.','Not pretty. Works.',S.name+' might be onto something.','Delete after five minutes? I didn\'t.']);
+  journal(prod.name+' launched', (prod.score>=8?'A hit. ':'')+'“'+prod.quote+'” — '+prod.reviewer);
   prod.users=num(prod.users,0); prod.rev=num(prod.rev,0); prod.units=num(prod.units,0); prod.rate=0; prod.srv=0;
   S.known[prod.a+'|'+prod.b]=combo; S.known['recipe|'+prod.a]=fit;
   const z=SIZES[prod.size]||SIZES.S;
@@ -1448,6 +1541,8 @@ function launch(pr){
   S.fans+=Math.round(Math.pow(prod.score,2)*z.mult*6*upgMul('fans')*(jobN('mkt')?1.25:1)*(S.story&&S.story.flags.mission==='world'?1.25:1)); storyRecord('score', prod.score, '⭐', 'Best reviews yet', prod.name+' scored '+prod.score.toFixed(1));
   productsDay(true);
   launchShow(prod, revs, fit, combo, trend>1);
+  world.roomDirty=true;
+  if(S.products.filter(p=>p.launched).length===2) platformPrompt();
   checkGoals();
 }
 function productsDay(onlyRates){
@@ -1462,7 +1557,7 @@ function productsDay(onlyRates){
       p.peak=num(p.peak,40);
       const decay=18+p.score*4, units=p.peak*Math.exp(-p.age/Math.max(1,decay))*promo*g + p.score*.4;
       p.unitsDay=num(units,0); if(!onlyRates) p.units=num(p.units,0)+p.unitsDay;
-      p.rate=num(p.unitsDay*p.price*.7*ad*accelProdMul(),0); p.srv=0;
+      p.rate=num(p.unitsDay*p.price*.7*ad*accelProdMul()*rivalMul(p)*(S.city&&S.city.throttle>S.day?.7:1),0); p.srv=0;
     } else {
       p.grow=num(p.grow,8); p.churn=clamp(num(p.churn,.1),.02,.4); p.users=num(p.users,0);
       if(!onlyRates){
@@ -1470,7 +1565,7 @@ function productsDay(onlyRates){
         p.users=Math.max(0, p.users + add - p.users*p.churn/30);
         if(add>0){ S.stats=S.stats||{}; S.stats.acqUsers=num(S.stats.acqUsers,0)+add; }
       }
-      p.rate=num(p.users*p.price/30*ad*accelProdMul(),0);
+      p.rate=num(p.users*p.price/30*ad*accelProdMul()*rivalMul(p)*(S.city&&S.city.throttle>S.day?.7:1),0);
       p.srv=num(p.users*.35/30*srvC*((S.floors||[]).some(f=>f.dept==='servers')?.6:1),0);
     }
     p.rev=num(p.rev,0); p.rate=num(p.rate,0); p.srv=num(p.srv,0);
@@ -1478,13 +1573,35 @@ function productsDay(onlyRates){
 }
 function launchShow(prod, revs, fit, combo, trend){
   const first = prod.kind==='game' ? Math.round(prod.unitsDay||0) : Math.round(prod.grow||0);
-  openModal(`<div class="eyebrow">Launch day · ${dateStr()}</div><h2>${prod.name}</h2><div class="hint">${prod.kind==='game'?prod.a+' game about '+prod.b:prod.a+' app for '+prod.b} · ${SIZES[prod.size].name}</div>
+  const ada=S.funding.cap.find(c=>!c.you);
+  openModal(`<div class="eyebrow">Launch day · ${dateStr()}</div>
+    ${recapHTML(prodIcon(prod)+' '+prod.name, [['Score', prod.score.toFixed(1)+'/10'],[prod.kind==='game'?'Sold today':'Signups today', String(first)],['You own', myShare().toFixed(1)+'%'],[G('MRR','mrr'), fmt(saasNow().mrr)]], '“'+(prod.quote||'')+'” — '+(prod.reviewer||'The Byte'))}
+    <div class="hint">${prod.kind==='game'?prod.a+' game about '+prod.b:prod.a+' app for '+prod.b} · ${SIZES[prod.size].name}</div>
     <div class="launchctr"><b id="lcN">0</b><span>${prod.kind==='game'?'copies sold today':'signups today'}</span></div>
     <div class="revs">${revs.map((r,i)=>`<div class="rev" style="animation-delay:${.6+i*.45}s"><span>${r.r}</span><b style="color:${r.s>=8?'var(--neon)':r.s>=6?'var(--gold)':'var(--red)'}">${r.s.toFixed(1)}</b></div>`).join('')}</div>
-    <div class="lscore" style="animation-delay:2s">Score <b>${prod.score.toFixed(1)}</b>/10</div>
-    <div class="take" style="animation:fadein .4s 2.3s both"><img src="${PORT[prod.score>=7?'celebrate':prod.score>=5?'happy':'concerned']}" alt=""><p>${comboWord(combo)}: ${prod.a} + ${prod.b}. ${fit>=.85?'The team nailed the recipe.':fit>=.65?'The recipe was close. Reviewers wanted a different balance.':'Reviewers felt the effort went to the wrong places for a '+prod.a+'.'}${trend?' Riding the trend helped!':''} ${prod.score>=8?'This could be a hit!':prod.score<5?'Not every launch works. Learn and ship the next one.':''}</p></div>
+    <div class="take" style="animation:fadein .4s 2.3s both"><img src="${PORT[prod.score>=7?'celebrate':prod.score>=5?'happy':'concerned']}" alt=""><p>${comboWord(combo)}: ${prod.a} + ${prod.b}. ${fit>=.85?'The team nailed the recipe.':fit>=.65?'The recipe was close. Reviewers wanted a different balance.':'Reviewers felt the effort went to the wrong places for a '+prod.a+'.'}${trend?' Riding the trend helped!':''} ${prod.score>=8?'This could be a hit!':prod.score<5?'Not every launch works. Learn and ship the next one.':''}${ada?' '+ada.name.split(' ')[0]+' owns '+(100-myShare()).toFixed(0)+'%.':''}</p></div>
     <div class="mactions"><button class="btn pri" data-close>Back to work</button></div>`);
   const el=$('#lcN'), t0=performance.now(); const tick=()=>{ const k=Math.min(1,(performance.now()-t0)/2200); el.textContent=Math.round(first*(1-Math.pow(1-k,3))).toLocaleString(); if(k<1 && document.body.contains(el)) requestAnimationFrame(tick); else { sfx(prod.score>=7?'fanfare':'chime'); if(prod.score>=8) confetti(); } }; requestAnimationFrame(tick);
+}
+function patchShow(prod, note){
+  queueModal(()=>openModal(`<div class="eyebrow">Patch notes · v${(prod.updates||1)+1}.0 · ${dateStr()}</div><h2>${prodIcon(prod)} ${prod.name}</h2>
+    <pre class="quote" style="white-space:pre-wrap;font-family:var(--mono)">• ${note}\n• Score now ${prod.score.toFixed(1)} / 10\n• ${prod.kind==='game'?'Sales':'Signups'} spike for two weeks</pre>
+    <div class="lesson">Updates are how a product stays a product. A launch is a day. A live game is a habit.</div>
+    <div class="mactions"><button class="btn pri" data-close>Ship it</button></div>`));
+  toast('<b>'+prod.name+'</b> v'+(prod.updates+1)+'.0 — '+note,'info');
+}
+function platformPrompt(){
+  if(!S || (S.story&&S.story.flags.platform) || S.products.filter(p=>p.launched).length<2) return;
+  F().platform='ask';
+  queueModal(()=>openModal(`<div class="eyebrow">Platform · ${dateStr()}</div><h2>Whose store?</h2>
+    <div class="take"><img src="${PORT.point}" alt=""><p>The stores take 30% of games already. Apps are next. You can stay on their rails, or start building a store with your name on it.</p></div>
+    <div class="lesson">Platforms are a fork. Audience vs. the cut. There are winners and losers in both rooms.</div>
+    <div class="choices"><button class="btn pri" id="plStores">Stay on the stores<small>Huge audience. They keep a slice of apps too.</small></button><button class="btn" id="plOwn">Build our own store<small>Research App Store. Keep the cut when it ships.</small></button></div>`));
+  setTimeout(()=>{
+    const a=$('#plStores'), b=$('#plOwn'); if(!a) return;
+    a.onclick=()=>{ F().platform='stores'; closeModal(); news('We stay on the stores. Audience now, a slice later.','info'); journal('Stayed on the stores', 'The cut is the price of the crowd.'); };
+    b.onclick=()=>{ F().platform='own'; closeModal(); news('We will build our own store. Research App Store when you can.','good'); journal('Building our own store', 'Keep the cut. Earn the audience.'); };
+  }, 0);
 }
 function trendDay(){
   if(!S.trend || S.day>=S.trend.until){ const game=Math.random()<.5; S.trend={a:game?pick(Object.keys(GENRES)):pick(Object.keys(APPCATS)), b:game?pick(TOPICS):pick(AUDIENCES), until:S.day+ri(40,70)}; if(S.day>3) news('New trend: '+S.trend.a+' and '+S.trend.b+' are hot right now.','info'); }
@@ -1494,7 +1611,7 @@ function productsPanel(){
   const inc=live.reduce((a,p)=>a+(p.rate||0)-(p.srv||0),0);
   openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Products · ${fmt(inc)} a day</div><h2>Your products</h2>
     ${S.trend?`<p class="hint">🔥 Trending until ${dateStr(S.trend.until)}: <b>${S.trend.a}</b> and <b>${S.trend.b}</b>. Products that match sell better.</p>`:''}
-    <div class="cards">${live.map(p=>`<div class="card2"><div class="row"><span class="cat" style="background:${p.kind==='game'?CATC.Games:CATC.Apps}">${p.kind==='game'?'Game':'App'}</span><b style="color:${num(p.score)>=8?'var(--neon)':num(p.score)>=6?'var(--gold)':'var(--red)'}">${num(p.score,0).toFixed(1)}/10</b></div><h4>${p.name}</h4><div class="hint">${p.a} · ${p.b} · ${(SIZES[p.size]||SIZES.S).name}${p.updates?' · v'+(p.updates+1)+'.0':''}${p.kind!=='game'?' · churn '+(num(p.churn,.1)*100).toFixed(1)+'%':''}</div>
+    <div class="cards">${live.map(p=>`<div class="card2"><div class="row"><span class="shelfico">${prodIcon(p)}</span><span class="cat" style="background:${p.kind==='game'?CATC.Games:CATC.Apps}">${p.kind==='game'?'Game':'App'}</span><b style="color:${num(p.score)>=8?'var(--neon)':num(p.score)>=6?'var(--gold)':'var(--red)'}">${num(p.score,0).toFixed(1)}/10</b></div><h4>${p.name}</h4><div class="hint">${p.a} · ${p.b} · ${(SIZES[p.size]||SIZES.S).name}${p.updates?' · v'+(p.updates+1)+'.0':''}${p.kind!=='game'?' · churn '+(num(p.churn,.1)*100).toFixed(1)+'%':''}${p.lead?' · led by '+(S.team.find(x=>x.id===p.lead)||{name:'?'}).name:''}</div>${p.quote?`<p class="quote">“${p.quote}” · ${p.reviewer||'The Byte'}</p>`:''}${p.patch?`<p class="hint">Latest patch: ${p.patch}</p>`:''}
       <div class="kv"><div><label>${p.kind==='game'?'Sold/day':'Users'}</label><b>${p.kind==='game'?Math.round(num(p.unitsDay,0)).toLocaleString():Math.round(num(p.users,0)).toLocaleString()}</b></div><div><label>Per day</label><b class="pos">${fmt(num(p.rate,0)-num(p.srv,0))}</b></div><div><label>Lifetime</label><b>${fmt(p.rev)}</b></div><div><label>${p.kind==='game'?'Price':G('LTV','ltv')}</label><b>${p.kind==='game'?money(p.price):money(Math.round(num(p.price,0)/Math.max(.02,num(p.churn,.1))))}</b></div></div>
       <div class="btnrow"><button class="btn" data-upd="${p.id}" ${S.projects.some(q=>q.prod===p.id)?'disabled':''}>${S.projects.some(q=>q.prod===p.id)?'Update in progress':'Build an update'}</button><button class="btn" data-promo="${p.id}" ${p.promoT>0?'disabled':''}>${p.promoT>0?'Campaign running':'Ad campaign · '+fmt(promoCost(p))}</button></div></div>`).join('')}
       ${dev.map(p=>`<div class="card2"><div class="row"><span class="cat" style="background:#64748B">In development</span></div><h4>${p.name}</h4><div class="hint">${p.a} · ${p.b} · ${SIZES[p.size].name}. Check progress in Projects.</div></div>`).join('')}</div>
@@ -1509,8 +1626,10 @@ function promoCost(p){ return Math.round(800*Math.pow(1.7,p.promo||0)*SIZES[p.si
 function valuation(){ if(!S) return 0; const h=S.history.slice(-3), rev=h.length?h.reduce((a,r)=>a+num(r.revenue,0),0)/h.length*12:0; const prodY=S.products.reduce((a,p)=>a+(p.launched?(num(p.rate,0)-num(p.srv,0))*365:0),0); return Math.max(0, num(S.cash)-num(S.loan) + rev*1.5 + prodY*3 + num(S.rep)*1000 + (S.accel&&S.accel.bump||0) + (S.ipo&&S.ipo.bump||0)); }
 function exitPanel(){
   const v=Math.max(valuation(), ...S.funding.rounds.map(r=>r.pre+r.amt)), mine=v*myShare()/100, pts=Math.floor(Math.sqrt(mine/100000)), L=legacy();
-  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Exit</div><h2>Sell ${S.name}?</h2>
-    <p>A buyer values the company at <b class="pos">${fmt(v)}</b>, based on your cash, your yearly revenue and your products' income${S.funding.rounds.length?', and what investors last paid':''}. You own <b>${myShare().toFixed(1)}%</b>, so your share is <b class="pos">${fmt(mine)}</b>.</p>
+  const hit=S.products.filter(p=>p.launched).sort((a,b)=>b.score-a.score)[0];
+  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Exit · ${dateStr()}</div>
+    ${recapHTML('Sell '+S.name+'?', [['Studio value', fmt(v)],['Your share', fmt(mine)],['You own', myShare().toFixed(1)+'%'],['Legacy pts', String(pts)]], (hit?hit.name+' · '+(hit.quote||''):'No product on the shelf.')+' Ada owns '+(100-myShare()).toFixed(0)+'%.')}
+    <p>A buyer values the company at <b class="pos">${fmt(v)}</b>, based on your cash, your yearly revenue and your products' income${S.funding.rounds.length?', and what investors last paid':''}.</p>
     <table class="pl"><tr><td>Legacy points you'd earn</td><td>${pts}</td></tr><tr><td>Legacy points you have now</td><td>${L.points}</td></tr><tr class="tot"><td>Your next studio starts with</td><td>+${(L.points+pts)*5}% to everything</td></tr></table>
     <div class="lesson">Serial entrepreneurs start faster each time: they know more, they know more people, and investors trust them. Legacy points make every future studio 5% faster, richer and more productive per point.</div>
     <div class="mactions"><button class="btn" data-close>Keep building</button><button class="btn pri" id="doExit" ${pts?'':'disabled'}>${pts?'Sell and start over':'Worth at least $100K to sell'}</button></div>`);
@@ -1567,10 +1686,13 @@ function fundingPanel(){
     <div class="sec"><h5>Funding ladder</h5>${ROUNDS.map(r=>{ const done=F.rounds.find(x=>x.id===r.id); return `<div class="goal ${done?'done':''}"><i>${done?'✓':''}</i><span><b>${r.name}</b> · ${fmt(r.raise[0])}–${fmt(r.raise[1])}${done?' · raised '+fmt(done.amt)+' at '+fmt(done.pre)+' valuation':' · '+r.need}</span></div>`; }).join('')}${F.rounds.find(x=>x.id==='demo')?`<div class="goal done"><i>✓</i><span><b>Demo Day round</b> · raised ${fmt(F.rounds.find(x=>x.id==='demo').amt)} at ${fmt(F.rounds.find(x=>x.id==='demo').pre)} valuation</span></div>`:''}${S.ipo&&S.ipo.status==='listed'?`<div class="goal done"><i>✓</i><span><b>IPO · ${S.ipo.ticker}</b> · raised ${fmt(S.ipo.raise)} at ${fmt(S.ipo.pre)} valuation</span></div>`:''}</div>
     ${nr?`<div class="mactions"><button class="btn pri" id="pitchBtn" ${nr.ok()?'':'disabled'}>${nr.ok()?'Pitch for the '+nr.name:'Not ready for the '+nr.name+' yet'}</button></div>`:''}
     ${ipoHTML()}
+    ${buyHTML()}
     <div class="lesson">Selling part of your company is called equity funding. You get cash now and give up a slice of the future. Each round shrinks your slice, which is called dilution. A smaller slice of a much bigger company can still be worth far more.</div>`);
   const b=$('#pitchBtn'); if(b) b.onclick=()=>{ closeModal(); pitch(nr); };
   const f=$('#ipoFile'); if(f) f.onclick=()=>{ closeModal(); ipoFile(); };
   const r=$('#ipoRoad'); if(r) r.onclick=()=>{ closeModal(); ipoRoadshow(); };
+  const bt=$('#buyTiny'); if(bt) bt.onclick=()=>{ closeModal(); buyStudio('tiny'); };
+  const bs=$('#buyScrap'); if(bs) bs.onclick=()=>{ closeModal(); buyStudio('scrap'); };
 }
 function avgRev(){ const h=S.history.slice(-3); return h.length?h.reduce((a,r)=>a+r.revenue,0)/h.length:0; }
 function pitch(r){
@@ -1615,11 +1737,44 @@ function ipoCost(){ return Math.max(25000, Math.round(studioValue()*.002/1000)*1
 function ipoEligible(){ return !!(S && !S.ipo && S.funding.rounds.some(r=>r.id==='a') && S.stage>=3 && S.team.length>=10 && studioValue()>=2e7); }
 function ipoHTML(){
   const I=S.ipo;
-  if(I&&I.status==='listed') return `<div class="sec"><h5>${G('IPO','ipo')} · ${I.ticker}</h5><p>Listed ${dateStr(I.day)} on the Bot City Exchange. You sold ${(I.sold||12).toFixed(1)}% to the public and raised <b class="pos">${fmt(I.raise)}</b>.</p><p class="hint">Next earnings: ${dateStr(I.nextEarn)}. The market watches ${G('MRR','mrr')}, ${G('burn','burn')}, and ${G('LTV','ltv')} / ${G('CAC','cac')}.</p></div>`;
+  if(I&&I.status==='listed') return `<div class="sec"><h5>${G('IPO','ipo')} · ${I.ticker}</h5><p>Listed ${dateStr(I.day)} on the Bot City Exchange. You sold ${(I.sold||12).toFixed(1)}% to the public and raised <b class="pos">${fmt(I.raise)}</b>.</p><p class="hint">Next earnings: ${dateStr(I.nextEarn)}. Guidance ${fmt(num(I.guide,0))}. The market watches ${G('MRR','mrr')}, ${G('burn','burn')}, and ${G('LTV','ltv')} / ${G('CAC','cac')}.${I.activist?' Activist level '+I.activist+'.':''}</p></div>`;
   if(I&&I.status==='filed'){ const left=Math.max(0,I.roadDay-S.day); return `<div class="sec"><h5>${G('IPO','ipo')} · ${G('S-1','s1')} filed</h5><p>Roadshow in ${left} day${left===1?'':'s'} (${dateStr(I.roadDay)}). Ticker reserved: <b>${I.ticker}</b>.</p></div>`; }
   if(I&&I.status==='road') return `<div class="sec"><h5>${G('IPO','ipo')} · roadshow</h5><p>The book is open. Walk the street, then list.</p><div class="mactions"><button class="btn pri" id="ipoRoad">Start the roadshow</button></div></div>`;
   const ok=ipoEligible(), c=ipoCost();
   return `<div class="sec"><h5>${G('IPO','ipo')}</h5><p>Listing on the Bot City Exchange lets anyone buy shares. You raise a large check, early investors get a public mark, and every quarter the numbers go on the wall.</p><p class="hint">Need: Series A, the MoneyBot Tower, 10 people, and a ${fmt(2e7)} valuation. ${ok?'You qualify.':'Not yet.'}</p><div class="mactions"><button class="btn ${ok?'pri':''}" id="ipoFile" ${ok?'':'disabled'}>${ok?'File the S-1 · '+fmt(c):'Not ready to file'}</button></div></div>`;
+}
+function buyTinyCost(){ return Math.round(Math.max(28000, studioValue()*.02)/1000)*1000; }
+function buyScrapCost(){ return Math.round(Math.max(90000, studioValue()*.07)/1000)*1000; }
+function buyHTML(){
+  const tiny=buyTinyCost(), scrap=buyScrapCost(), f=F(), got=!!f.boughtStudio, scrapGone=!!(f.scrap||f.boughtScrap);
+  return `<div class="sec"><h5>Acquisitions</h5><p>Buy a smaller studio for people and a product. This is how late game grows when hiring is slow.</p>
+    <div class="mactions"><button class="btn" id="buyTiny" ${got||S.cash<tiny?'disabled':''}>${got?'Pixel Forge bought':'Buy Pixel Forge · '+fmt(tiny)}</button>
+    <button class="btn" id="buyScrap" ${scrapGone||!seen('rusty1')||S.cash<scrap?'disabled':''}>${scrapGone?'ScrapCo is gone':seen('rusty1')?'Buy ScrapCo · '+fmt(scrap):'Meet Rusty first'}</button></div></div>`;
+}
+function buyStudio(kind){
+  const cost=kind==='scrap'?buyScrapCost():buyTinyCost();
+  if(S.cash<cost){ toast('Need '+fmt(cost)+'.','bad'); sfx('err'); return; }
+  S.cash-=cost; S.month.other+=cost;
+  if(kind==='scrap'){
+    F().boughtScrap=1; F().scrap='bought'; F().rusty='friend';
+    const rust=newPerson({name:'Rusty Gears', skills:{code:42,design:28,ai:18,sec:22}, salary:Math.round(4200*Math.pow(1.12,S.stage)/50)*50, trait:'hothead', tint:3});
+    joinTeam(rust); rust.morale=55;
+    const prod={id:S.seq++, kind:'app', a:'Productivity', b:'Small Business', size:'S', sliders:{a:.5,b:.25,c:.25}, name:'ScrapPad', feats:[], launched:S.day, score:6.2, age:12, boost:1, users:180, rev:0, units:0, updates:0, promo:0, quote:'It works if you squint.', reviewer:'Circuit Review', icon:'🔧'};
+    S.products.push(prod); registerProd(prod); productsDay(true);
+    journal('Bought ScrapCo', 'Rusty sits two desks over. ScrapPad is on the shelf.');
+    news('You bought ScrapCo. Rusty is on the team. ScrapPad is ours.','good');
+    advise('We bought the rival. The diner still remembers who undercut whom.',{mood:'celebrate', dur:10000});
+  } else {
+    F().boughtStudio=1;
+    const a=newPerson({name:pick(FIRST)+' '+pick(LAST), skills:{code:38,design:44,ai:12,sec:10}, salary:Math.round(2800*Math.pow(1.12,S.stage)/50)*50, trait:'fast', tint:2});
+    const b=newPerson({name:pick(FIRST)+' '+pick(LAST), skills:{code:46,design:18,ai:22,sec:14}, salary:Math.round(3000*Math.pow(1.12,S.stage)/50)*50, trait:'careful', tint:5});
+    joinTeam(a); joinTeam(b);
+    const prod={id:S.seq++, kind:'game', a:'Puzzle', b:'Pets', size:'S', sliders:{a:.6,b:.25,c:.15}, name:'Pixel Paws', feats:[], launched:S.day, score:7.1, age:8, boost:1.1, users:0, rev:0, units:400, updates:0, promo:0, quote:'My niece will not put it down.', reviewer:'Pixel Gazette', icon:'🧩', peak:60, price:SIZES.S.price.game};
+    S.products.push(prod); registerProd(prod); productsDay(true);
+    journal('Bought Pixel Forge', 'Two people and Pixel Paws. The shelf got louder.');
+    news('You bought Pixel Forge. Two people and Pixel Paws joined the studio.','good');
+  }
+  world.roomDirty=true; confetti(); sfx('fanfare'); checkGoals(); refreshHUD();
 }
 function ipoFile(){
   const c=ipoCost();
@@ -1670,27 +1825,33 @@ function ipoList(pre, amt, sold){
   S.funding.cap.forEach(c=>c.pct*=k); S.funding.cap.push({name:'Public shareholders', pct:amt/post*100});
   S.funding.rounds.push({id:'ipo', amt, pre, day:S.day});
   S.cash+=amt; S.month.funding=(S.month.funding||0)+amt; S.stats.raised=(S.stats.raised||0)+amt;
-  Object.assign(I,{status:'listed', day:S.day, raise:amt, pre, sold, bump:amt*.15, nextEarn:S.day+90, lastRev:avgRev()});
+  Object.assign(I,{status:'listed', day:S.day, raise:amt, pre, sold, bump:amt*.15, nextEarn:S.day+90, lastRev:avgRev(), reports:0, guide:avgRev()});
   if(S.story&&S.story.flags){ S.story.flags.ending=S.story.flags.ending||'ipo'; S.story.flags.endV=post; }
   confetti(); sfx('fanfare');
   news(S.name+' listed on the Bot City Exchange as '+I.ticker+'. Raised '+fmt(amt)+'.','good');
   advise('We rang the bell. '+I.ticker+' is live. Spend the raise on things that show up in next quarter\'s numbers.',{mood:'celebrate', dur:14000});
-  openModal(`<div class="eyebrow">${I.ticker} · ${dateStr()}</div><h2>You are a public company</h2>
+  journal('IPO · '+I.ticker, 'Raised '+fmt(amt)+'. You still own '+myShare().toFixed(1)+'%.');
+  openModal(`<div class="eyebrow">${I.ticker} · ${dateStr()}</div>
+    ${recapHTML(S.name+' is public', [['Ticker', I.ticker],['Raised', fmt(amt)],['You own', myShare().toFixed(1)+'%'],[G('MRR','mrr'), fmt(saasNow().mrr)]], 'Ada still has a slice. The Byte will print whatever we report.')}
     <div class="take"><img src="${PORT.celebrate}" alt=""><p>The opening print is in. ${S.name} is on the board next to the giants. Keep playing. The market is watching.</p></div>
-    <table class="pl"><tr><td>Ticker</td><td>${I.ticker}</td></tr><tr><td>Raised</td><td class="pos">${fmt(amt)}</td></tr><tr><td>You still own</td><td>${myShare().toFixed(1)}%</td></tr><tr><td>Next earnings</td><td>${dateStr(I.nextEarn)}</td></tr></table>
     <div class="lesson">Public companies do not get to hide a bad month. Ship, collect, and keep ${G('gross margin','gm')} honest.</div>
     <div class="mactions"><button class="btn pri" data-close>Back to work</button></div>`);
-  checkGoals(); refreshHUD();
+  world.roomDirty=true; checkGoals(); refreshHUD();
 }
 function ipoEarnings(){
-  const I=S.ipo, m=saasNow(), u=unitEcon(), rev=avgRev(), prev=num(I.lastRev, rev), up=rev>=prev*.95;
-  I.lastRev=rev; I.nextEarn=S.day+90; I.bump=num(I.bump,0)+(up?Math.max(0,rev)*2:-Math.max(1000,rev));
-  queueModal(()=>openModal(`<div class="eyebrow">Earnings · ${I.ticker} · ${dateStr()}</div><h2>${up?'In line':'Missed'}</h2>
-    <div class="take"><img src="${PORT[up?'wave':'concerned']}" alt=""><p>${up?'The print held. Analysts wanted the numbers you already had.':'The print slipped. Public markets punish a miss faster than a board meeting does.'}</p></div>
-    <table class="pl"><tr><td>${G('MRR','mrr')}</td><td>${fmt(m.mrr)}</td></tr><tr><td>Avg monthly revenue</td><td>${fmt(rev)}</td></tr><tr><td>${G('Gross margin','gm')}</td><td>${u.mrr?Math.round(u.gm*100)+'%':'—'}</td></tr><tr><td>Cash</td><td>${fmt(S.cash)}</td></tr></table>
-    <div class="lesson">Quarterly earnings are a habit. The story you tell has to match the books.</div>
+  const I=S.ipo, m=saasNow(), u=unitEcon(), rev=avgRev(), guide=num(I.guide, I.lastRev||rev), beat=rev>=guide*.98;
+  I.lastRev=rev; I.nextEarn=S.day+90; I.reports=(I.reports||0)+1;
+  I.bump=num(I.bump,0)+(beat?Math.max(0,rev)*2.2:-Math.max(1500,rev)*1.4);
+  I.guide=rev*(beat?1.08:.96);
+  if(!beat && Math.random()<.35){ I.activist=(I.activist||0)+1; news('An activist desk is circling '+I.ticker+'. They want a buyback or a sale.','warn'); }
+  queueModal(()=>openModal(`<div class="eyebrow">Earnings · ${I.ticker} · ${dateStr()}</div>
+    ${recapHTML(beat?'Beat guidance':'Missed guidance', [[G('MRR','mrr'), fmt(m.mrr)],['Actual', fmt(rev)],['Guidance', fmt(guide)],['You own', myShare().toFixed(1)+'%']], beat?'The print held. Analysts wanted the numbers you already had.':'The print slipped. Public markets punish a miss faster than a board meeting does.')}
+    <table class="pl"><tr><td>${G('Gross margin','gm')}</td><td>${u.mrr?Math.round(u.gm*100)+'%':'—'}</td></tr><tr><td>Next guidance</td><td>${fmt(I.guide)}</td></tr><tr><td>Cash</td><td>${fmt(S.cash)}</td></tr>${I.activist?`<tr><td>Activist noise</td><td>Level ${I.activist}</td></tr>`:''}</table>
+    <div class="lesson">Quarterly earnings are a habit. Guidance is a promise. The story you tell has to match the books.</div>
     <div class="mactions"><button class="btn pri" data-close>OK</button></div>`));
-  news(I.ticker+' reported earnings. '+(up?'In line.':'The stock took a hit.'), up?'good':'warn');
+  news(I.ticker+' reported earnings. '+(beat?'Beat.':'Missed. The ticker took a hit.'), beat?'good':'warn');
+  journal('Earnings · '+I.ticker, beat?'Beat guidance.':'Missed. The board will have a mood.');
+  checkGoals();
 }
 
 /* ---------------- MoneyBot Tower ---------------- */
@@ -1719,6 +1880,9 @@ function buildTowerExterior(){
   const W=6.6, D=4.6, FH=1.55; const glass=new THREE.MeshStandardMaterial({color:'#0A1628', roughness:.08, metalness:.85, transparent:true, opacity:.72});
   bx(towerG,W+.8,1.7,D+.8,0,0,0,mat('#0F172A',{metalness:.45,roughness:.32}));
   signPlane(towerG,(S.name||'BotStudio').toUpperCase(),'#0A0A1A','#00E676',4.6,.7,0,.95,D/2+.42,.95);
+  if(S.ipo&&S.ipo.status==='listed') signPlane(towerG, S.ipo.ticker+' · '+bigFmt(studioValue()), '#03140C','#FBBF24', 4.2, .38, 0, .42, D/2+.44, 1);
+  const live=S.products.filter(p=>p.launched).slice(-4);
+  live.forEach((p,i)=>signPlane(towerG, (prodIcon(p)+' '+p.name).slice(0,16), '#0B1220', p.score>=8?'#FBBF24':'#00E676', 1.35, .22, -2.4+i*1.6, 1.35, D/2+.44, .7));
   S.floors.forEach((f,i)=>{ const y=1.7+i*FH, c=DEPTS[f.dept].color;
     bx(towerG,W,FH-.08,D,0,y,0,glass);
     for(let k=0;k<8;k++) bx(towerG,.045,FH-.12,D+.05,-W/2+.45+k*((W-.9)/7),y,0,mat('#94A3B8',{metalness:.7,roughness:.25}),false);
@@ -1798,7 +1962,12 @@ function nextUp(){
   if(accelEligible() && !S.accel) return {ic:'🚀', t:'You can apply to the <b>Bot City Accelerator</b>', b:'Apply', f:()=>openPanel('accel'), g:'company'};
   const nr=nextRound(); if(nr && nr.ok() && !(S.funding.cool>S.day)) return {ic:'💰', t:'Investors are ready for your <b>'+nr.name+'</b>', b:'Pitch', f:()=>openPanel('funding'), g:'company'};
   const free=S.projects.length < Math.max(2, Math.ceil(S.team.filter(x=>!x.job).length/2)+1); if(free && S.offers.length && idle.length) return {ic:'📋', t:'You have room for another contract', b:'See contracts', f:()=>openPanel('contracts'), g:'work'};
-  if(S.stats.delivered>=3 && !S.products.length) return {ic:'🎮', t:'Try making your own game or app', b:'New product', f:()=>{ openPanel('products'); }, g:'work'};
+  if(S.stats.delivered>=2 && !S.products.length) return {ic:'🎮', t:F().prodHint?'Your first product: a <b>'+F().prodHint.a+'</b> for <b>'+F().prodHint.b+'</b>':'Try making your own game or app', b:'New product', f:()=>{ openPanel('products'); }, g:'work'};
+  if(S.products.length && !S.products.some(p=>p.launched) && S.projects.some(p=>p.own)) return {ic:'🚀', t:'Finish <b>'+(S.products.find(p=>!p.launched)||{}).name+'</b> so it can earn while you sleep', b:'Open project', f:()=>openPanel('projects'), g:'work'};
+  if(S.products.some(p=>p.launched) && !S.funding.rounds.length && S.stage>=1 && nextRound() && nextRound().ok()) return {ic:'🤝', t:'Ada is ready. Pitch the <b>'+nextRound().name+'</b>', b:'Pitch', f:()=>openPanel('funding'), g:'company'};
+  if(S.city && S.city.mega && S.city.mega.until>S.day){ const hit=S.products.find(p=>p.launched && p.a===S.city.mega.a); if(hit && !S.projects.some(q=>q.prod===hit.id)) return {ic:'🏢', t:'<b>MegaBot</b> is stealing '+hit.a+' users. Update <b>'+hit.name+'</b>', b:'Patch it', f:()=>openPanel('products'), g:'work'}; }
+  if(S.city && S.city.clone && S.city.clone.until>S.day){ const hit=S.products.find(p=>p.launched && p.a===S.city.clone.a); if(hit && !S.projects.some(q=>q.prod===hit.id)) return {ic:'🔧', t:'<b>ScrapCo</b> cloned '+hit.name+'. An update fights back', b:'Patch it', f:()=>openPanel('products'), g:'work'}; }
+  if(S.ipo && S.ipo.status==='listed' && S.ipo.nextEarn && S.ipo.nextEarn-S.day<=10) return {ic:'📣', t:'Earnings in <b>'+(S.ipo.nextEarn-S.day)+'</b> days. Beat guidance', b:'Numbers', f:()=>openPanel('finance'), g:'company'};
   if(S.stage>=1 && !S.rsch.cur && S.cash>8000) return {ic:'🧪', t:'A research slot is free', b:'Research', f:()=>openPanel('research'), g:'company'};
   { const sl=S.team.find(p=>p.job && !p.promo && promoReady(p) && S.cash>=promoCost(p)*3 && (p.job==='sales'||p.job==='pm'||p.job==='res')); if(sl) return {ic:'⭐', t:'Promote '+sl.name+' to '+PROMO[sl.job].name, b:'Promote', f:()=>inspectPerson(sl.id), g:'team'}; }
   const g=goalNext(); if(g) return {ic:'⭐', t:'Goal: '+g.text, b:'Story', f:()=>openPanel('story'), g:'story'};
@@ -2024,7 +2193,10 @@ function initInput(){
   cv.addEventListener('pointerdown', e=>{ initAudio(); down={x:e.clientX,y:e.clientY,b:e.button}; if(e.button===2 && ui.tool!=='select'){ setTool('select'); } });
   cv.addEventListener('pointermove', e=>{ ui.mx=e.clientX; ui.my=e.clientY; ui.hover=groundTile(e.clientX,e.clientY);
     if(ui.tool==='select' && S && !titleMode && e.pointerType!=='touch'){ let best=null, bd=36; const v=new THREE.Vector3(); for(const [id,w] of walkers){ if(!w.rig.root.visible) continue; v.copy(w.rig.root.position); v.y+=.3; v.project(camera); const d=Math.hypot((v.x+1)/2*innerWidth-e.clientX,(1-v.y)/2*innerHeight-e.clientY); if(d<bd){ bd=d; best=id; } }
-      ui.hoverBot=best; const tag=$('#cursorTag'); if(best){ const p=S.team.find(x=>x.id===best), pr=p&&S.projects.find(q=>q.id===p.proj); tag.hidden=false; tag.innerHTML='<b>'+(p.founder?'You':p.name)+'</b> · '+role(p)+'<br>'+(p.training?'In training':p.breakT>0?'On a break':pr?'Working on '+PTYPES[pr.type].name:'Free · click to assign'); tag.style.left=e.clientX+'px'; tag.style.top=(e.clientY-22)+'px'; cv.style.cursor='pointer'; } else { tag.hidden=true; cv.style.cursor=''; } } });
+      ui.hoverBot=best; const tag=$('#cursorTag'); if(best){ const p=S.team.find(x=>x.id===best), pr=p&&S.projects.find(q=>q.id===p.proj); tag.hidden=false; tag.innerHTML='<b>'+(p.founder?'You':p.name)+'</b> · '+role(p)+(p.trait?' · '+TRAITS[p.trait].name:'')+'<br>'+(p.training?'In training':p.breakT>0?'On a break':pr?(pr.crunch?'Crunching · ':'')+'Working on '+PTYPES[pr.type].name:chatterLine(p)+' · drag onto a teammate'); tag.style.left=e.clientX+'px'; tag.style.top=(e.clientY-22)+'px'; cv.style.cursor='pointer'; } else { tag.hidden=true; cv.style.cursor=''; } } });
+  cv.addEventListener('pointerdown', e=>{ if(!S || titleMode || ui.tool!=='select' || e.button!==0 || ui.fl===-1 || modalOpen || ui.drag) return; const id=personAt(e.clientX,e.clientY); if(!id) return; const p=S.team.find(x=>x.id===id); if(!p || p.job || p.training) return; ui.pdrag={p, x:e.clientX, y:e.clientY, live:false}; }, true);
+  cv.addEventListener('pointermove', e=>{ const D=ui.pdrag; if(!D) return; if(!D.live && Math.hypot(e.clientX-D.x,e.clientY-D.y)>10){ D.live=true; controls.enabled=false; } if(D.live){ const tag=$('#cursorTag'); tag.hidden=false; tag.innerHTML='<b>Assign '+D.p.name+'</b><br>Drop on a teammate\'s project'; tag.style.left=e.clientX+'px'; tag.style.top=(e.clientY-22)+'px'; } }, true);
+  window.addEventListener('pointerup', e=>{ const D=ui.pdrag; if(!D) return; ui.pdrag=null; controls.enabled=true; if(!D.live) return; const onto=personAt(e.clientX,e.clientY); if(onto && onto!==D.p.id){ const t=S.team.find(x=>x.id===onto); if(t && t.proj){ D.p.proj=t.proj; const pr=S.projects.find(q=>q.id===t.proj); toast(D.p.name+' joined '+(pr?PTYPES[pr.type].name:'the project')+'.',''); say(D.p, chatterLine(D.p)); sfx('tick'); } } else { const open=S.projects.filter(q=>q.done<q.pts); if(open.length===1){ D.p.proj=open[0].id; toast(D.p.name+' assigned to '+PTYPES[open[0].type].name+'.',''); say(D.p, chatterLine(D.p)); } } });
   cv.addEventListener('pointerup', e=>{ if(!down) return; const moved=Math.hypot(e.clientX-down.x,e.clientY-down.y)>6; const b=down.b; down=null; if(moved||b!==0) return; ui.hover=groundTile(e.clientX,e.clientY); clickAt(e.clientX,e.clientY); });
   cv.addEventListener('contextmenu', e=>e.preventDefault());
   $('#camIn').onclick=()=>camZoom(.8); $('#camOut').onclick=()=>camZoom(1.25); $('#camL').onclick=()=>camRotate(.4); $('#camR').onclick=()=>camRotate(-.4); $('#camHome').onclick=setCam;
@@ -2046,16 +2218,32 @@ function initInput(){
 }
 function camZoom(f){ const o=camera.position.clone().sub(controls.target); const L=clamp(o.length()*f, controls.minDistance, controls.maxDistance); camera.position.copy(controls.target).add(o.setLength(L)); }
 function camRotate(a){ const o=camera.position.clone().sub(controls.target); o.applyAxisAngle(new THREE.Vector3(0,1,0),a); camera.position.copy(controls.target).add(o); }
-function clickAt(cx,cy){
-  if(ui.tool==='place'){ placeHere(); return; }
-  // people first
+function personAt(cx,cy){
   let best=null, bd=40; const v=new THREE.Vector3();
   for(const [id,w] of walkers){ if(!w.rig.root.visible) continue; v.copy(w.rig.root.position); v.y+=.3; v.project(camera); const x=(v.x+1)/2*innerWidth, y=(1-v.y)/2*innerHeight; const d=Math.hypot(x-cx,y-cy); if(d<bd){ bd=d; best=id; } }
-  if(best){ inspectPerson(best); return; }
+  return best;
+}
+function clickAt(cx,cy){
+  if(ui.tool==='place'){ placeHere(); return; }
+  const best=personAt(cx,cy);
+  if(best){ inspectPerson(best); const p=S.team.find(x=>x.id===best); if(p) say(p, chatterLine(p)); return; }
   ndc.set(cx/innerWidth*2-1, -(cy/innerHeight)*2+1); ray.setFromCamera(ndc,camera);
+  const prodHits=ray.intersectObjects(roomG.children, true);
+  for(const h of prodHits){ let o=h.object; while(o && !o.userData.prodId) o=o.parent; if(o && o.userData.prodId){ inspectProduct(o.userData.prodId); return; } }
   const hits=ray.intersectObjects([...furnMeshes.values()], true);
   for(const h of hits){ const id=h.object.userData.furnId; if(id){ inspectFurn(id); return; } }
   closeInspect();
+}
+function inspectProduct(id){
+  const p=S.products.find(x=>x.id===id); if(!p) return; ui.sel={k:'prod',id}; const I=$('#inspect');
+  const lead=p.lead && S.team.find(x=>x.id===p.lead);
+  I.innerHTML=`<button class="x" data-a="close" aria-label="Close">×</button><div class="person"><span class="shelfico">${prodIcon(p)}</span><div><h3>${p.name}</h3><div class="sub">${p.kind==='game'?'Game':'App'} · ${p.a} · ${num(p.score,0).toFixed(1)}/10</div></div></div>
+    ${p.quote?`<p class="quote">“${p.quote}” · ${p.reviewer||'The Byte'}</p>`:''}
+    ${p.patch?`<p class="hint">v${(p.updates||0)+1}.0 · ${p.patch}</p>`:''}
+    ${lead?`<p class="hint">Led by ${lead.name}</p>`:''}
+    <div class="kv"><div><label>${p.kind==='game'?'Sold/day':'Users'}</label><b>${p.kind==='game'?Math.round(num(p.unitsDay,0)).toLocaleString():Math.round(num(p.users,0)).toLocaleString()}</b></div><div><label>Per day</label><b class="pos">${fmt(num(p.rate,0)-num(p.srv,0))}</b></div></div>
+    <div class="sec btnrow"><button class="btn pri" data-a="produpd" ${S.projects.some(q=>q.prod===p.id)?'disabled':''}>${S.projects.some(q=>q.prod===p.id)?'Update in progress':'Build an update'}</button></div>`;
+  I.hidden=false;
 }
 
 /* ---------------- UI ---------------- */
@@ -2069,7 +2257,7 @@ function refreshHUD(){
   $('#hStars').querySelector('i').style.width=(S.rep)+'%'; $('#hStars').title=(S.rep/20).toFixed(1)+' stars';
   $$('#speed button').forEach(b=>b.classList.toggle('on', +b.dataset.sp===S.speed));
   const g=goalNext(); $('#goalTxt').textContent = g ? 'Ch. '+(S.chapter+1)+' · '+g.text : 'All chapters complete'; const ch=CHAPTERS[S.chapter]; $('#goalBar').style.width=(ch?(ch.goals.filter(x=>S.goals[x.id]).length + (g&&g.prog?clamp(g.prog(),0,.99):0))/ch.goals.length*100:100)+'%';
-  const tr=$('#trendChip'); if(S.trend){ tr.hidden=false; tr.innerHTML='🔥 Trending: <b>'+S.trend.a+'</b> · <b>'+S.trend.b+'</b>'; } else tr.hidden=true;
+  const tr=$('#trendChip'); const bits=[]; if(S.ipo&&S.ipo.status==='listed') bits.push('📈 <b>'+S.ipo.ticker+'</b> · '+bigFmt(studioValue())); if(S.trend) bits.push('🔥 Trending: <b>'+S.trend.a+'</b> · <b>'+S.trend.b+'</b>'); if(bits.length){ tr.hidden=false; tr.innerHTML=bits.join(' · '); } else tr.hidden=true;
   $('#hudName').textContent=(S.name||'BotStudio').toUpperCase(); refreshLvl();
   if(ui.panel==='projects' && (modalOpen||ui.drawer)) refreshProjectsLive();
   renderNextUp(); refreshBadges(); refreshPaused(); tutCheck();
@@ -2081,7 +2269,9 @@ function avatar(p){ return p.founder ? PORT.happy : (AVATAR[p.tint%8]||PORT.happ
 function inspectPerson(id){
   const p=S.team.find(x=>x.id===id); if(!p) return; ui.sel={k:'p',id}; const I=$('#inspect');
   const pr=S.projects.find(q=>q.id===p.proj);
+  const beat=chatterLine(p);
   I.innerHTML=`<button class="x" data-a="close" aria-label="Close">×</button><div class="person"><img src="${avatar(p)}" alt=""><div><h3>${p.founder?'You':p.name}</h3><div class="sub">${role(p)}${p.trait?' · '+TRAITS[p.trait].name:''}</div></div></div>
+  ${beat?`<p class="beat">“${beat}”</p>`:''}
   ${floorBtns('p', personFloor(p), 'data-pfl')}${p.job?`<p class="hint">${JOBS[p.job].ic} ${JOBS[p.job].text}</p>`:''}${p.trait?`<p class="hint">${TRAITS[p.trait].text}</p>`:''}
   <div class="sec">${skillBars(p)}</div>
   <div class="sec ratings"><span>Energy</span><div class="meter"><i data-k="en" style="background:#3B82F6"></i></div><b data-k="enb"></b><span>Morale</span><div class="meter"><i data-k="mo"></i></div><b data-k="mob"></b></div>
@@ -2112,11 +2302,13 @@ $('#inspect').addEventListener('click', e=>{
   if(a==='close'){ closeInspect(); return; }
   if(ui.sel && ui.sel.k==='p'){ const p=S.team.find(x=>x.id===ui.sel.id); if(!p) return;
     if(a==='rest'){ p.breakT=80; toast((p.founder?'You take':p.name+' takes')+' a break to recharge.',''); inspectPerson(p.id); }
-    if(a==='raise'){ p.salary=Math.round(p.salary*1.1/50)*50; p.morale=clamp(p.morale+15,0,100); toast(p.name+' got a raise. Morale up, burn rate up.',''); inspectPerson(p.id); }
+    if(a==='raise'){ p.salary=Math.round(p.salary*1.1/50)*50; p.morale=clamp(p.morale+15,0,100); journal(p.name+' got a raise', money(p.salary)+' a month now.'); toast(p.name+' got a raise. Morale up, burn rate up.',''); inspectPerson(p.id); }
     if(a==='train'){ trainModal(p); }
     if(a==='promote'){ promote(p); inspectPerson(p.id); return; }
     if(a==='autotog'){ S.auto=S.auto||{}; S.auto[p.job]=!autoOn(p.job); inspectPerson(p.id); return; }
-    if(a==='fire'){ if(!b.dataset.c){ b.dataset.c=1; b.textContent='Click again · severance '+money(Math.round(p.salary*.5)); return; } fire(p); closeInspect(); } }
+    if(a==='fire'){ if(!b.dataset.c){ b.dataset.c=1; b.textContent='Click again · severance '+money(Math.round(p.salary*.5)); return; } fire(p); closeInspect(); }
+    if(a==='produpd' && ui.sel.k==='prod'){ /* handled below */ } }
+  if(ui.sel && ui.sel.k==='prod'){ const prod=S.products.find(x=>x.id===ui.sel.id); if(prod && a==='produpd' && !S.projects.some(q=>q.prod===prod.id)){ registerProd(prod); const pr={id:S.seq++, type:prodTypeKey(prod,true), client:'Your studio', own:true, update:true, prod:prod.id, pts:PTYPES[prodTypeKey(prod,true)].pts, done:0, qSum:0, qPts:0, bugs:0, polish:0, pay:0, due:S.day+99999, start:S.day, crunch:false, net:0, deposit:0}; S.projects.push(pr); closeInspect(); openPanel('projects'); } }
   if(ui.sel && ui.sel.k==='f'){ const f=S.furn.find(x=>x.id===ui.sel.id); if(!f) return;
     if(a==='frot'){ const nr=(f.rot+1)%4, fp=footOf(f.kind,nr); S.furn=S.furn.filter(x=>x!==f); let ok=canPlace(f.kind,f.x,f.y,nr,floorOf(f)); let nx=f.x, ny=f.y;
       if(!ok){ for(const [dx,dy] of [[-1,0],[0,-1],[-1,-1],[1,0],[0,1]]) if(canPlace(f.kind,f.x+dx,f.y+dy,nr,floorOf(f))){ ok=true; nx=f.x+dx; ny=f.y+dy; break; } }
@@ -2247,7 +2439,7 @@ function renderProjects(){
   L.querySelectorAll('[data-as]').forEach(b=>{ b.draggable=true; b.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain', b.dataset.as)); });
   L.querySelectorAll('[data-prj]').forEach(c=>{ c.addEventListener('dragover',e=>{ e.preventDefault(); c.classList.add('drop'); }); c.addEventListener('dragleave',()=>c.classList.remove('drop')); c.addEventListener('drop',e=>{ e.preventDefault(); c.classList.remove('drop'); const x=S.team.find(q=>q.id===e.dataTransfer.getData('text/plain')); if(x && !x.training){ x.proj=+c.dataset.prj; sfx('pop'); renderProjects(); } }); });
   L.querySelectorAll('[data-as]').forEach(b=>b.onclick=()=>{ const prj=+b.closest('[data-prj]').dataset.prj, x=S.team.find(q=>q.id===b.dataset.as); if(!x) return; x.proj = x.proj===prj?0:prj; sfx('tick'); renderProjects(); });
-  L.querySelectorAll('[data-cr]').forEach(b=>b.onclick=()=>{ const pr=S.projects.find(q=>q.id===+b.dataset.cr); pr.crunch=!pr.crunch; sfx('tick'); renderProjects(); });
+  L.querySelectorAll('[data-cr]').forEach(b=>b.onclick=()=>{ const pr=S.projects.find(q=>q.id===+b.dataset.cr); pr.crunch=!pr.crunch; sfx('tick'); if(pr.crunch){ const names=teamOf(pr).filter(p=>!p.founder).map(p=>firstName(p)).join(', '); journal('Crunch on '+PTYPES[pr.type].name, (names||'The team')+' staying late.'); news('Crunch is on. Faster, buggier, worse moods.','warn'); teamOf(pr).forEach(p=>say(p, chatterLine(p))); } renderProjects(); });
   L.querySelectorAll('[data-auto]').forEach(b=>b.onclick=()=>{ const pr=S.projects.find(q=>q.id===+b.dataset.auto), t=PTYPES[pr.type]; const free=S.team.filter(x=>!x.job && !x.training && (!x.proj||x.proj===pr.id)).sort((a,c)=>eff(c,t.w)-eff(a,t.w)); free.forEach((x,i)=>x.proj = i<Math.max(1,Math.ceil(pr.pts/70))?pr.id:(x.proj===pr.id?0:x.proj)); sfx('tick'); renderProjects(); });
   L.querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>{ const pr=S.projects.find(q=>q.id===+b.dataset.dl); closeModal(); deliver(pr); });
   L.querySelectorAll('.chip[data-as]').forEach(b=>{ const x=S.team.find(q=>q.id===b.dataset.as); if(x) b.title=(x.founder?'You':x.name)+' · fit '+fitWord(eff(x,PTYPES[S.projects.find(q=>q.id===+b.closest('[data-prj]').dataset.prj).type].w))+(x.proj&&x.proj!==+b.closest('[data-prj]').dataset.prj?' · on another project (click to move here)':''); });
@@ -2416,7 +2608,7 @@ const CAST = {
   juno:{name:'Juno Reyes', role:'Reporter, Bot City Byte', c:'#F472B6'},
   gray:{name:'Mr. Gray', role:'CEO, MegaCorp', c:'#94A3B8'}
 };
-const CHQ = ['Day one. A laptop, a garage and a robot.', 'Real desks. Real rent. Real stakes.', 'Bigger team. Bigger bets. Bigger mistakes.', 'Your name on the skyline.'];
+const CHQ = ['Day one. A laptop, a garage and a robot.', 'Real desks. Real rent. Real stakes.', 'Bigger team. Bigger bets. Bigger mistakes.', 'Your name on the skyline.', 'The ticker is the job now.'];
 function freshStory(){ return {seen:{}, flags:{}, log:[], ch:0, rec:{}}; }
 function F(){ return S.story.flags; }
 function seen(id){ return (S.story && S.story.seen[id]) || 0; }
@@ -2465,7 +2657,7 @@ intro:()=>({title:'Day one', kicker:'Prologue · Bot City', lines:[
     {t:'Build a company that makes real money', s:'Hustle · client contracts pay 6% more', f:()=>{ F().mission='money'; }, then:[['mb',`Hustle! A company that can't pay its bills can't do anything else either. Let's get paid.`,'celebrate']]},
     {t:'Build things that help people', s:'Heart · your launches win 25% more fans', f:()=>{ F().mission='world'; }, then:[['mb',`Heart. People can feel it when you mean it. That's how fans are made.`,'wave']]}],
   post:[['mb',`First job: find a client. Open <b>Work</b> at the bottom of the screen and we'll pick one together.`,'point']],
-  after:()=>{ S.tut=Math.max(S.tut,1); setTimeout(tutCheck,300); }}),
+  after:()=>{ S.tut=Math.max(S.tut,1); founderStart(); setTimeout(tutCheck,300); }}),
 
 chip:()=>{ const fc=F().firstClient||'a client', his=fc==='Chip\'s Diner'; return {title:'The first fan', lines:[
   ['n',`A knock on the garage door. Somebody is holding three pizza boxes.`],
@@ -2524,7 +2716,7 @@ office:()=>({title:'Garage to glory', lines:[
 ada:()=>{ const rw=runway(); return {title:'Ada Vault', lines:[
   ['n',`A woman in a purple coat is reading your finances. Off your screen. Over your shoulder.`],
   ['ada',`Ada Vault. I invest in startups. Mostly, I say no.`],
-  ['ada',`I've been watching ${S.name}. ${money(Math.round(S.stats.invoiced))} invoiced, ${S.team.length} people. Not bad for a company that started next to a lawnmower.`],
+  ['ada', F().adaLine || `I've been watching ${S.name}. ${money(Math.round(S.stats.invoiced))} invoiced, ${S.team.length} people. Not bad for a company that started next to a lawnmower.`],
   ['ada',`I don't invest in ideas. I invest in founders who know their numbers. So: what's your runway?`]],
   choices:[
     {t: rw===Infinity ? 'We\'re profitable. Here\'s the plan to stay that way.' : `About ${Math.max(1,Math.round(rw))} months. Here's how we stretch it.`, s:'Ada is impressed · her offer will be 15% bigger', f:()=>{ F().adaImp=1; }, then:[['ada',`Good answer. Most founders guess.`]]},
@@ -2667,7 +2859,7 @@ function playCut(sc){
   const lines=sc.lines.filter(Boolean).concat(sc.choices?[]:(sc.post||[]));
   CUT={sc, lines, i:-1, typing:null, chose:false, choosing:false, after:sc.after};
   S.story.log.push({d:S.day, t:sc.title||'', c:''}); CUT.log=S.story.log[S.story.log.length-1];
-  openModal(`<div class="cutTop"><span class="eyebrow">${sc.kicker||(CHAPTERS[Math.min(S.chapter,3)]?'Chapter '+(Math.min(S.chapter,3)+1)+' · '+dateStr():dateStr())}</span><button class="cutSkip" id="cutSkip" title="Skip (Esc)">Skip ⏭</button></div><div class="cutStage" id="cutStage"><img id="cutPort" alt=""><div class="cutBox"><div class="cutWho" id="cutWho"></div><div class="cutTxt" id="cutTxt" aria-live="polite"></div><div class="cutCh" id="cutCh"></div><div class="cutNext" id="cutNext" hidden>▼</div></div></div>`,
+  openModal(`<div class="cutTop"><span class="eyebrow">${sc.kicker||(CHAPTERS[Math.min(S.chapter,CHAPTERS.length-1)]?'Chapter '+(Math.min(S.chapter,CHAPTERS.length-1)+1)+' · '+dateStr():dateStr())}</span><button class="cutSkip" id="cutSkip" title="Skip (Esc)">Skip ⏭</button></div><div class="cutStage" id="cutStage"><img id="cutPort" alt=""><div class="cutBox"><div class="cutWho" id="cutWho"></div><div class="cutTxt" id="cutTxt" aria-live="polite"></div><div class="cutCh" id="cutCh"></div><div class="cutNext" id="cutNext" hidden>▼</div></div></div>`,
     ()=>{ $('#modal').classList.remove('cut'); document.body.classList.remove('cine'); const C=CUT; CUT=null; if(C && C.typing) clearInterval(C.typing.id); if(C && C.after) C.after(); });
   $('#modal').classList.add('cut'); document.body.classList.add('cine');
   if(sc.onStart) sc.onStart();
@@ -2715,11 +2907,23 @@ function pickChoice(i){
 }
 function titleCard(kick, title, quote){
   queueModal(()=>{
-    openModal(`<div class="tc" id="tc"><div class="tcN">${kick}</div><div class="tcLine"></div><div class="tcT">${title}</div><div class="tcQ">${quote||''}</div><div class="tcHint">Click to continue</div></div>`, ()=>{ $('#modal').classList.remove('tcard'); document.body.classList.remove('cine'); TCdone=null; });
+    openModal(`<div class="tc" id="tc"><div class="tcN">${kick}</div><div class="tcLine"></div><div class="tcT">${title}</div><div class="tcQ">${quote||''}</div><div class="tcHint">Click to skip</div></div>`, ()=>{ $('#modal').classList.remove('tcard'); document.body.classList.remove('cine'); TCdone=null; });
     $('#modal').classList.add('tcard'); document.body.classList.add('cine'); sfx('title');
     const el=$('#tc'); let gone=false; const done=()=>{ if(gone || !el.isConnected) return; gone=true; closeModal(); };
-    TCdone=done; el.onclick=done; requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(done, ui.reduce?2400:4200)));
+    TCdone=done; el.onclick=done; requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(done, ui.reduce?1600:2800)));
   });
+}
+function founderStart(){
+  const f=S.founder||'coder';
+  const pack={
+    coder:{hint:{kind:'game',a:'Simulation',b:'Money'}, ada:`A coder who ships. ${money(Math.round(S.stats.invoiced))} invoiced already. If you build a Money Simulation, I'll read the reviews.`},
+    designer:{hint:{kind:'app',a:'Creative Tools',b:'Creators'}, ada:`Taste is a moat. ${S.team.length} people and a garage. Creative Tools for Creators — I'll know it when I see it.`},
+    ai:{hint:{kind:'app',a:'AI Assistant',b:'Small Business'}, ada:`Everyone is pitching models. ${money(Math.round(S.stats.invoiced))} invoiced. An AI Assistant small businesses actually pay for? Call me.`},
+    hacker:{hint:{kind:'app',a:'Security',b:'Enterprises'}, ada:`Security for Enterprises. Boring. Expensive. I like boring. ${S.team.length} people is enough to start.`}
+  }[f];
+  if(pack){ F().prodHint=pack.hint; F().adaLine=pack.ada; }
+  const extra={coder:'Chip asked for a diner site. You already know the stack.', designer:'Chip wants the diner to look like a place people photograph.', ai:'Chip heard you talk to models. He wants a bot that takes orders.', hacker:'Chip\'s "wifi" is a router with the password on a sticky note. He needs an audit.'}[f];
+  if(extra) advise(FOUNDERS[f].name+' start: '+extra+' Next up will walk you to the first product.',{mood:'point', dur:9000});
 }
 
 /* ---------- endings ---------- */
@@ -2809,7 +3013,7 @@ function updateFx(dt){ for(let i=FX.length-1;i>=0;i--){ const f=FX[i]; f.t+=dt; 
 function burstAt(pos, colors, n){ for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, sp=rand(.8,2.4); fxSpawn(dotTex(pick(colors)), pos.clone(), {h:rand(.06,.12), v:new THREE.Vector3(Math.cos(a)*sp, rand(1.6,3.4), Math.sin(a)*sp), g:5.5, life:rand(.8,1.3), drag:.8}); } }
 function fxText(pos, txt, color, h){ fxSpawn(glyphTex(txt,color,56), pos, {h:h||.24, v:new THREE.Vector3(0,.55,0), life:1.8, depth:false}); }
 function celebrate(crew, st){ crew.forEach((p,i)=>{ const w=walkers.get(p.id); if(!w || !w.rig.root.visible) return; setTimeout(()=>{ if(st>=3 && w.rig.acts.TwistJump) rigPlay(w.rig,'TwistJump',true); const top=w.pos.clone(); top.y=1.0; if(i===0) fxText(top.clone().setY(1.35), st>=5?'LAUNCHED!':st>=4?'SHIPPED!':'DONE', st>=4?'#FBBF24':'#00E676'); burstAt(top, st>=4?['#FBBF24','#00E676','#F8FAFC','#EC4899','#3B82F6']:['#00E676','#F8FAFC','#A7F3D0'], st>=4?36:16); }, i*140); }); }
-function hireArrive(p){ const w=walkers.get(p.id); if(!w) return; const st=stageDef(); w.pos.copy(T2W(Math.floor(st.w/2), st.h-1)).add(new THREE.Vector3(0,0,1.6)); w.rig.root.position.copy(w.pos); w.state='idle'; w.t=0; if(w.rig.acts.RightHand) rigPlay(w.rig,'RightHand',true); fxText(w.pos.clone().setY(1.25),'HELLO!','#5EEAD4'); burstAt(w.pos.clone().setY(.8),['#5EEAD4','#FBBF24','#F8FAFC'],16); banner('👋', p.name+' joined the team', role(p)+' · '+S.team.length+' people now','#5EEAD4'); }
+function hireArrive(p){ const w=walkers.get(p.id); if(!w) return; const st=stageDef(); w.pos.copy(T2W(Math.floor(st.w/2), st.h-1)).add(new THREE.Vector3(0,0,1.6)); w.rig.root.position.copy(w.pos); w.state='idle'; w.t=0; if(w.rig.acts.RightHand) rigPlay(w.rig,'RightHand',true); fxText(w.pos.clone().setY(1.25),'HELLO!','#5EEAD4'); burstAt(w.pos.clone().setY(.8),['#5EEAD4','#FBBF24','#F8FAFC'],16); banner('👋', p.name+' joined the team', role(p)+' · '+S.team.length+' people now','#5EEAD4'); say(p, chatterLine(p)); journal(p.name+' joined', role(p)+(p.trait?' · '+TRAITS[p.trait].name:'')); }
 function lvlUp(p, k, w){ if(w && w.rig.root.visible){ fxText(w.pos.clone().setY(1.3), SKN[k]+' '+p.skills[k]+'!', SKC[k], .2); burstAt(w.pos.clone().setY(.9), [SKC[k],'#F8FAFC'], 12); } if(p.skills[k]%20===0) logInbox('<b>'+p.name+'</b> reached '+SKN[k]+' '+p.skills[k]+'.','info'); }
 const GLYPHS=['{ }','</>','01','fn()','✓','px','AI','#','=>','[ ]'];
 const _v3=new THREE.Vector3();
@@ -2889,6 +3093,25 @@ function buildDecor(s, W, H, wh){
     if(dept==='servers'){ neon('UPTIME', dp.color, 1.9, L, 1.55, .2, 'left'); for(let i=0;i<5;i++) bx(roomG,.68,1.75,.52, W/2-.42, 0, -H/2+1+i*1.12, mat('#0B1220',{metalness:.55,roughness:.3})); }
     if(dept==='general') neon('HQ', dp.color, 1.35, L, 1.55, .5, 'left');
   }
+  buildProdShelf(s,W,H,wh);
+}
+function buildProdShelf(s, W, H, wh){
+  const live=S.products.filter(p=>p.launched).slice(-8);
+  const B=-H/2+.08;
+  const shelfW=Math.min(W*.72, Math.max(1.6, live.length*.58+.5));
+  bx(roomG, shelfW, .07, .3, W*.2, .42, B+.14, mat('#1F2937'));
+  if(!live.length){ const empty=signPlane(roomG,'EMPTY SHELF','#111827','#64748B',1.15,.22, W*.2, .72, B+.16, .15); empty.userData.prodId=0; return; }
+  live.forEach((p,i)=>{
+    const x=W*.2 - (live.length-1)*.52/2 + i*.52;
+    const hit=p.score>=8, flop=p.score<5;
+    const col=hit?'#FBBF24':flop?'#475569':(p.kind==='game'?'#3B82F6':'#14B8A6');
+    const box=bx(roomG, .28, flop?.16:.42, .12, x, .5, B+.08, mat(col,{emissive:col,emissiveIntensity:hit?.85:.22}), false);
+    box.userData.prodId=p.id;
+    const label=signPlane(roomG, (prodIcon(p)+' '+p.name).slice(0,14), '#0B1220', hit?'#FDE68A':'#E2E8F0', .48, .16, x, .98, B+.18, hit?.7:.2);
+    label.userData.prodId=p.id;
+    if(hit && s>=1) poster([p.name.slice(0,14), (p.quote||'HIT').slice(0,18), '#0F172A','#F8FAFC', col, p.kind==='game'?'rocket':'chart'], -W/2+.02, 1.42, Math.min(H/2-1.4, -H/2+1.8+i*1.05), 'left');
+    if(hit && s>=2 && i===live.length-1) neon(p.name.slice(0,8).toUpperCase(), col, 1.6, -W/2+.02, 1.85, 0, 'left');
+  });
 }
 
 /* =====================================================================
@@ -3060,9 +3283,9 @@ function accelFinish(score){
   productsDay(true);
   confetti(); sfx('fanfare');
   const line=score>=2?'The room clapped. Two angels asked for a follow-up.':score>=0?'Polite applause. The stipend still clears.':'A tough room. You still leave with the stipend and a list of homework.';
-  openModal(`<div class="eyebrow">Demo Day</div><h2>${score>=2?'You crushed it':'Demo Day is over'}</h2>
-    <div class="take"><img src="${PORT[score>=2?'celebrate':'wave']}" alt=""><p>${line} Ada is in the hallway with a term sheet.</p></div>
-    <table class="pl"><tr><td>Stipend in the bank</td><td class="pos">${fmt(grant)}</td></tr><tr><td>Paper valuation bump</td><td>${fmt(bump)}</td></tr><tr><td>Fans from the livestream</td><td>+${40+Math.max(0,score)*40}</td></tr></table>
+  journal('Demo Day', line);
+  openModal(`<div class="eyebrow">Demo Day</div>
+    ${recapHTML(score>=2?'You crushed it':'Demo Day is over', [['Stipend', fmt(grant)],['Paper bump', fmt(bump)],['You own', myShare().toFixed(1)+'%'],[G('MRR','mrr'), fmt(saasNow().mrr)]], line+' Ada is in the hallway with a term sheet.')}
     <div class="lesson">Demo Day is theater with a term sheet waiting in the hallway. The number that matters next is still ${G('runway','runway')}.</div>
     <div class="mactions"><button class="btn pri" data-close>See the term sheet</button></div>`);
   news(S.name+' finished the Bot City Accelerator. Stipend: '+fmt(grant)+'.','good');
