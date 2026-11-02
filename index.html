@@ -126,6 +126,16 @@ body:has(#inspect:not([hidden])) #hustleBox, body.pal #hustleBox, body.drawer-op
 #modal:not(.drawer) .card{animation:mIn .26s cubic-bezier(.2,.8,.2,1)}
 @keyframes mIn{from{transform:translateY(10px) scale(.985);opacity:.4}}
 body.reduce #modal .card{animation:none}
+/* ---- round 29 · UX round 3 ---- */
+#banner{pointer-events:auto!important;cursor:pointer}
+#banner .bnx{position:absolute;top:6px;right:8px;text-decoration:none;font-size:14px;line-height:1;color:var(--txt-3,#94A3B8);opacity:0;transition:opacity .15s}
+#banner:hover .bnx{opacity:1}
+#perkChip{position:relative;margin-left:4px;width:32px;height:28px;border-radius:9px;border:1px solid rgba(196,181,253,.6);background:linear-gradient(160deg,rgba(139,92,246,.35),rgba(76,29,149,.35));font-size:15px;line-height:1;cursor:pointer;animation:pkPulse 1.8s ease-in-out infinite;display:grid;place-items:center;padding:0}
+#perkChip b{position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;border-radius:8px;background:#A78BFA;color:#0A0A1A;font:800 10px/16px var(--mono);padding:0 3px}
+@keyframes pkPulse{0%,100%{box-shadow:0 0 0 0 rgba(167,139,250,.55)}50%{box-shadow:0 0 0 6px rgba(167,139,250,0)}}
+#hLvl.pk{box-shadow:0 0 0 2px rgba(167,139,250,.7)}
+body.reduce #perkChip{animation:none}
+.chap.locked .hint i{color:var(--txt-2,#CBD5E1);font-style:italic}
 </style></head><body>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -5821,6 +5831,55 @@ function fadeEdges(el){ if(!el||el._fe) return; el._fe=1; const upd=()=>{ const 
 (function(){ const _op=openPanel; openPanel=function(p){ const r=_op(p); setTimeout(()=>{ $$('#modalCard .dtabs').forEach(fadeEdges); },0); return r; };
   const _rh=refreshHUD; let did=0; refreshHUD=function(){ const r=_rh(); if(!did && $('#hud')){ did=1; fadeEdges($('#hud')); } return r; }; })();
 
+/* =====================================================================
+   ROUND 29 · UX ROUND 3 + LOOSE ENDS
+   ===================================================================== */
+/* ---------- level-ups wait for you: pick perks from the badge ---------- */
+let PICK_OK=0;
+(function(){ const _pp=perkPick; perkPick=function(L, cards){ if(PICK_OK || cards || (modalOpen && $('#pkReroll'))) return _pp(L, cards);
+    S.perkPend=S.perkPend||[]; if(!S.perkPend.includes(L)) S.perkPend.push(L); perkChip();
+    for(let i=bannerQ.length-1;i>=0;i--) if(bannerQ[i].ic==='🎁') bannerQ.splice(i,1);
+    banner('🎁','Level '+(L+1)+'!', S.perkPend.length>1?S.perkPend.length+' perks waiting. Tap the gift next to your level whenever you\'re ready.':'Pick a perk whenever you\'re ready: tap the gift next to your level.','#C4B5FD',{small:1, dur:3400});
+    if(!modalOpen && modalQueue.length) modalQueue.shift()(); };
+  window.perkOpen=function(){ if(!S||!S.perkPend||!S.perkPend.length||modalOpen) return; if(ui.drawer) closeModal(); const L=S.perkPend.shift(); PICK_OK=1; try{ _pp(L); } finally { PICK_OK=0; } perkChip(); };
+  document.addEventListener('click', e=>{ if(!e.target.closest('#hLvl')||!S||!(S.perkPend||[]).length) return; e.stopImmediatePropagation(); e.preventDefault(); perkOpen(); }, true); })();
+function perkChip(){ const br=$('#hud .brand'); if(!br||!S) return; let c=$('#perkChip'); const n=(S.perkPend||[]).length; if(!n){ if(c) c.remove(); $('#hLvl')&&$('#hLvl').classList.remove('pk'); return; }
+  if(!c){ c=document.createElement('button'); c.id='perkChip'; c.setAttribute('aria-label','Pick a perk'); c.onclick=e=>{ e.stopPropagation(); perkOpen(); }; br.appendChild(c); } c.innerHTML='🎁'+(n>1?`<b>${n}</b>`:''); c.dataset.tip=n>1?n+' perks to pick':'Pick your level-up perk'; $('#hLvl')&&$('#hLvl').classList.add('pk'); }
+
+/* ---------- banners: tap to dismiss, hover to hold, never a long backlog ---------- */
+let BNT=null;
+function bannerOut(){ const el=$('#banner'); clearTimeout(BNT); el.classList.remove('in'); BNT=setTimeout(()=>{ el.hidden=true; nextBanner(); }, 300); }
+nextBanner=function(){ const el=$('#banner'); clearTimeout(BNT); while(bannerQ.length>4){ const i=bannerQ.findIndex(b=>b.small); bannerQ.splice(i>=0?i:0,1); } const b=bannerQ.shift(); if(!b){ bannerOn=false; el.hidden=true; return; } bannerOn=true;
+  el.className=b.small?'small':''; { const hd=$('#hud'); if(hd){ const hb=hd.getBoundingClientRect().bottom; if(hb>0) el.style.top=Math.round(hb+8)+'px'; } }
+  el.innerHTML=`<i>${b.ic}</i><div>${b.t?`<b>${b.t}</b>`:''}<span>${b.s||''}</span></div><u class="bnx" aria-hidden="true">×</u>`; const sp=el.querySelector('span'); if(sp) sp.dataset.base=sp.innerHTML;
+  el.style.setProperty('--bc', b.c||'#00E676'); el.hidden=false; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in'); if(!b.small) sfx('chime');
+  el._dur=b.dur; BNT=setTimeout(bannerOut, b.dur + (bannerQ.length?0:400)); };
+(function(){ const el=$('#banner'); if(!el) return; el.addEventListener('click', ()=>{ sfx('tick'); bannerOut(); }); el.addEventListener('mouseenter', ()=>{ clearTimeout(BNT); }); el.addEventListener('mouseleave', ()=>{ clearTimeout(BNT); if(!el.hidden) BNT=setTimeout(bannerOut, 1400); });
+  let sy=null; el.addEventListener('touchstart', e=>{ sy=e.touches[0].clientY; }, {passive:true}); el.addEventListener('touchend', e=>{ if(sy!=null && e.changedTouches[0].clientY-sy<-25) bannerOut(); sy=null; }, {passive:true}); })();
+
+/* ---------- swipe a drawer down to close it (phones) ---------- */
+(function(){ let st=null; document.addEventListener('touchstart', e=>{ if(!ui.drawer) return; const C=$('#modalCard'); if(!C||!C.contains(e.target)) return; const r=C.getBoundingClientRect(), y=e.touches[0].clientY; if(y-r.top>56 || C.scrollTop>0) return; st={y, C}; C.style.transition='none'; }, {passive:true});
+  document.addEventListener('touchmove', e=>{ if(!st) return; const dy=Math.max(0, e.touches[0].clientY-st.y); st.dy=dy; st.C.style.transform=`translateY(${dy}px)`; }, {passive:true});
+  document.addEventListener('touchend', ()=>{ if(!st) return; const C=st.C, dy=st.dy||0; st=null; C.style.transition='transform .22s cubic-bezier(.2,.8,.2,1)'; if(dy>90){ C.style.transform='translateY(100%)'; setTimeout(()=>{ closeModal(); C.style.transform=''; C.style.transition=''; }, 200); } else { C.style.transform=''; setTimeout(()=>{ C.style.transition=''; }, 240); } }, {passive:true}); })();
+
+/* ---------- Work opens where the action is ---------- */
+document.addEventListener('click', e=>{ const b=e.target.closest('#dockInner [data-g="work"]'); if(!b||!S||titleMode) return; if(ui.drawer && groupOf(ui.panel)==='work') return; if(S.projects.some(q=>q.done>=q.pts)){ e.stopImmediatePropagation(); initAudio(); sfx('tick'); openPanel('projects'); } }, true);
+
+/* ---------- keyboard: [ and ] switch drawer tabs, Esc peels one layer at a time ---------- */
+window.addEventListener('keydown', e=>{ if(!S||titleMode) return; const tg=e.target.tagName; if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT') return;
+  if((e.key==='['||e.key===']') && ui.drawer && ui.panel){ const g=groupOf(ui.panel); if(!g) return; const subs=GROUPS[g].filter(k=>k!=='build'), i=subs.indexOf(ui.panel), j=i+(e.key===']'?1:-1); if(j>=0&&j<subs.length){ e.preventDefault(); sfx('tick'); openPanel(subs[j]); } return; }
+  if(e.key==='Escape'){ const rc=$('#recap'); if(rc){ rc.remove(); e.stopImmediatePropagation(); return; } if(TIP && !TIP.hidden){ tipHide(); } const bn=$('#banner'); if(bn && !bn.hidden && !modalOpen && !ui.drawer && $('#inspect').hidden && $('#palette').hidden && ui.tool!=='place'){ bannerOut(); e.stopImmediatePropagation(); } } }, true);
+
+/* ---------- story panel: locked chapters show a teaser, not just "Locked" ---------- */
+(function(){ const _op=openPanel; openPanel=function(p){ const r=_op(p); if(p==='story') setTimeout(()=>{ $$('#modalCard .chap.locked').forEach((el,i)=>{ const h=el.querySelector('h5'); const m=h&&h.textContent.match(/Chapter (\d+)/); const n=m?+m[1]:0; const hint=el.querySelector('.hint'); if(hint && CHQ[n-1] && !hint.dataset.t){ hint.dataset.t=1; hint.innerHTML='🔒 <i>'+CHQ[n-1]+'</i> · '+CHAPTERS[n-1].goals.length+' goals'; } }); },0); return r; }; })();
+
+/* ---------- command bar knows about perks and the new keys ---------- */
+(function(){ const _ci=cmdIndex; cmdIndex=function(){ const R=_ci(); if((S.perkPend||[]).length) R.unshift({g:'Action', n:'Pick a perk ('+S.perkPend.length+' waiting)', kw:'level up perk reward', run:()=>perkOpen()}); return R; };
+  const _kp=keysPanel; keysPanel=function(){ _kp(); const K=$('#modalCard .keys'); if(K) K.insertAdjacentHTML('beforeend', [['[ ]','Previous / next tab'],['Esc','Close the top layer']].map(([k,d])=>`<div><kbd>${k}</kbd><span>${d}</span></div>`).join('')); };
+  const _rh=refreshHUD; refreshHUD=function(){ const r=_rh(); if(S && !titleMode && (S.perkPend||[]).length && !$('#perkChip')) perkChip(); return r; }; })();
+
+/* level curve: early levels unchanged, then a steady climb so level 80 is reachable in a long campaign */
+(function(){ const _ln=lvlNeed; lvlNeed=function(l){ return l<15 ? _ln(l) : Math.round(_ln(15)*(1+(l-15)*.18)/5)*5; }; })();
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
 function healSave(){
