@@ -772,6 +772,18 @@ body.titling #modal{z-index:40}
 .city.on{border-color:rgba(56,189,248,.55);background:rgba(56,189,248,.08)}
 .city.moon{border-color:rgba(251,191,36,.45);background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(99,102,241,.1))}
 .city .cf{font-size:28px}.city>div{flex:1;min-width:0}.city b{display:block}.city small{display:block;font-size:12px;color:#CBD5E1}.city em{color:#7DD3FC;font-style:normal;font-weight:700}
+/* ===== round 19: decorate ===== */
+.dchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.dchips button{padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#E2E8F0;font:600 12px var(--body);cursor:pointer}
+.dchips button small{color:var(--muted)}.dchips button.on{border-color:#FDBA74;background:rgba(251,146,60,.16)}
+.dsws{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin-top:8px}
+.dsw{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#E2E8F0;font:600 11.5px var(--body);cursor:pointer;text-align:center}
+.dsw i{width:56px;height:40px;border-radius:8px;border:1px solid rgba(255,255,255,.15)}
+.dsw.on{border-color:var(--neon);background:rgba(0,230,118,.12)}.dsw.lock{opacity:.4;cursor:not-allowed}
+.paints{display:flex;flex-wrap:wrap;gap:5px}
+.pt{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.25);cursor:pointer;padding:0;background:#0F172A;color:#CBD5E1;font-size:11px}
+.pt.on{border-color:#fff;box-shadow:0 0 0 2px var(--neon)}.pt.lock{opacity:.25;cursor:not-allowed}
+
 
 
 </style>
@@ -2227,9 +2239,9 @@ function fitWord(f){ return f>=55?'Great':f>=38?'Good':f>=25?'OK':'Weak'; }
 function fitColor(f){ return f>=55?'var(--neon)':f>=38?'#86EFAC':f>=25?'var(--gold)':'var(--red)'; }
 function offerScore(o){ const f=teamFit(PTYPES[o.type].w); return (f/100)*o.pay/Math.max(1,estDays(o)) * (estDays(o)<=o.days?1:.3); }
 function teamFit(w){ const ppl=S.team.filter(p=>!p.job && !p.training).map(p=>eff(p,w)).sort((a,b)=>b-a); return ppl.length?ppl[0]:0; }
-const GROUPS = {work:['contracts','projects','products'], team:['team','hire','pets'], office:['build'], company:['finance','funding','accel','upgrades','research','world'], story:['story','rank','ach','inbox']};
-const SUBN = {contracts:'Contracts', projects:'Projects', products:'Products', team:'Team', hire:'Hire', pets:'Pets', world:'World', finance:'Money', funding:'Funding', accel:'Accelerator', upgrades:'Upgrades', research:'Research', story:'Story', rank:'Leaderboard', ach:'Trophies', inbox:'Inbox'};
-const DRAWER = ['contracts','projects','products','team','hire','pets','world','finance','funding','accel','upgrades','research','story','rank','ach','inbox'];
+const GROUPS = {work:['contracts','projects','products'], team:['team','hire','pets'], office:['build','decor'], company:['finance','funding','accel','upgrades','research','world'], story:['story','rank','ach','inbox']};
+const SUBN = {contracts:'Contracts', projects:'Projects', products:'Products', team:'Team', hire:'Hire', pets:'Pets', world:'World', build:'Build', decor:'Decorate', finance:'Money', funding:'Funding', accel:'Accelerator', upgrades:'Upgrades', research:'Research', story:'Story', rank:'Leaderboard', ach:'Trophies', inbox:'Inbox'};
+const DRAWER = ['contracts','projects','products','team','hire','pets','world','decor','finance','funding','accel','upgrades','research','story','rank','ach','inbox'];
 function groupOf(p){ for(const g in GROUPS) if(GROUPS[g].includes(p)) return g; return null; }
 function markTabs(){ const g = ui.panel ? groupOf(ui.panel) : (!$('#palette').hidden ? 'office' : null); $$('#dockInner [data-g]').forEach(b=>b.classList.toggle('on', b.dataset.g===g)); }
 function openPanel(p){
@@ -2294,6 +2306,7 @@ function panelBody(p){
   if(p==='rank') rankPanel();
   if(p==='ach') achPanel();
   if(p==='pets') petsPanel();
+  if(p==='decor') decorPanel();
   if(p==='world') worldPanel();
   if(p==='inbox') inboxPanel();
   if(p==='products') productsPanel();
@@ -2331,7 +2344,7 @@ function refreshProjectsLive(){ $$('#projList [data-prj]').forEach(c=>{ const pr
 function showPalette(){
   hideAdvisor(); document.body.classList.add('pal'); const P=$('#palette'); $$('.tool').forEach(b=>b.classList.toggle('on', b.dataset.p==='build'));
   const st=stageDef(), nx=STAGES[S.stage+1];
-  const _ent=Object.entries(FURN).filter(([k,d])=>!d.unlock), _unl=Object.entries(FURN).filter(([k,d])=>d.unlock), _nu=_unl.filter(([k])=>isUnlocked(k)).length;
+  const _ent=Object.entries(FURN).filter(([k,d])=>!d.unlock && !d.decor), _unl=Object.entries(FURN).filter(([k,d])=>d.unlock), _nu=_unl.filter(([k])=>isUnlocked(k)).length;
   let grid='<div class="pgrid">'+_ent.map(([k,d])=>{ const lock=d.stage && S.stage<d.stage; return `<button class="pitem ${lock?'locked':''}" data-f="${k}" ${lock?'disabled':''}><img src="${ICONS[k]||MB_ASSETS.logo}" alt=""><div><div class="t">${d.name}</div><div class="c">${money(d.cost)}</div><div class="hint">${lock?'Needs an office':d.text}</div></div></button>`; }).join('')+'</div>'+`<h5 class="unlh">🔓 Unlockables · ${_nu} of ${_unl.length}</h5><div class="pgrid">`+_unl.map(([k,d])=>{ const ok=isUnlocked(k); return `<button class="pitem unl ${ok?'':'locked'}" data-f="${k}" ${ok?'':'disabled'}><img src="${ICONS[k]||MB_ASSETS.logo}" alt="" ${ok?'':'style="filter:brightness(0) opacity(.5)"'}><div><div class="t">${ok?d.name:'???'}</div><div class="c">${ok?money(d.cost):'Locked'}</div><div class="hint">${ok?d.text:'🔒 '+d.unlock.t}</div></div></button>`; }).join('')+'</div>';
   let h='';
   if(S.stage>=3) h+=`<div class="move"><div><b>MoneyBot Tower · ${S.floors.length} floor${S.floors.length>1?'s':''}</b><div class="hint">You're placing furniture on floor ${curFloor()+1} (${DEPTS[S.floors[curFloor()].dept].name}). Use the elevator on the left to switch floors or build a new one.</div></div><button class="btn pri" id="addFl">+ Floor · ${fmt(floorCost())}</button></div>`;
@@ -2475,7 +2488,7 @@ function renderStills(){
   PORT.rusty=shot(makeRig(GLTF.hero, cm('#B45309',{roughness:.5, metalness:.65}), 1),'LeftHand',.5,'r'); PORT.ada=shot(makeRig(GLTF.hero, cm('#C4B5FD'), 1),'Idle',.55,'y');
   PORT.juno=shot(makeRig(GLTF.hero, cm('#F472B6'), 1),'RightHand',.4,'g'); PORT.vera=shot(makeRig(GLTF.hero, cm('#FDE047'), 1),'LeftHand',.6,'g'); PORT.gray=shot(makeRig(GLTF.hero, cm('#475569',{roughness:.2, metalness:.55}), 1),'Idle',.9,'r');
   r.setSize(160,160); cam.aspect=1; cam.updateProjectionMatrix();
-  for(const k in FURN){ const g=buildFurnMesh(k); sc.add(g); const box=new THREE.Box3().setFromObject(g), c=box.getCenter(new THREE.Vector3()), sz=box.getSize(new THREE.Vector3()).length(), d=sz*1.6; cam.position.set(c.x+d*.6,c.y+d*.45,c.z+d*.7); cam.lookAt(c); r.render(sc,cam); ICONS[k]=r.domElement.toDataURL('image/png'); sc.remove(g); }
+  for(const k in FURN){ if(FURN[k].decor) continue; const g=buildFurnMesh(k); sc.add(g); const box=new THREE.Box3().setFromObject(g), c=box.getCenter(new THREE.Vector3()), sz=box.getSize(new THREE.Vector3()).length(), d=sz*1.6; cam.position.set(c.x+d*.6,c.y+d*.45,c.z+d*.7); cam.lookAt(c); r.render(sc,cam); ICONS[k]=r.domElement.toDataURL('image/png'); sc.remove(g); }
   r.dispose();
 }
 
@@ -4042,6 +4055,159 @@ const TIERN=['Bronze','Silver','Gold','Platinum','Diamond'], TIERI=['🥉','🥈
   const _au=animUnlocks; animUnlocks=function(dt){ _au(dt); updatePets(dt); };
   const _br=buildRoom; buildRoom=function(){ const r=_br(); world.petsDirty=true; for(const [id,o] of petObjs){ petG.remove(o.g); } petObjs.clear(); return r; };
   const _md=decoMorale; decoMorale=function(){ return _md(); };
+})();
+
+/* =====================================================================
+   ROUND 19 · DECORATE · floors, walls, wallpaper, lighting, paint, decor catalog
+   ===================================================================== */
+const SLVL=()=> (S.lvl||0)+1;
+const PAINTS = [['Snow','#F8FAFC',1],['Cloud','#E2E8F0',1],['Slate','#64748B',1],['Charcoal','#1F2937',2],['Ink','#0B1020',3],['Sand','#E7D7B8',2],['Latte','#C8A27A',4],['Walnut','#6B4423',6],['Brick','#B4533A',8],['Tomato','#EF4444',5],['Coral','#FB7185',7],['Blush','#FBCFE8',9],['Peach','#FDBA74',10],['Tangerine','#F97316',12],['Mustard','#EAB308',14],['Butter','#FEF08A',11],['Lime','#A3E635',16],['Mint','#86EFAC',13],['Forest','#166534',18],['Neon','#00E676',3],['Teal','#14B8A6',20],['Sky','#7DD3FC',15],['Ocean','#0EA5E9',22],['Cobalt','#2563EB',24],['Navy','#1E3A8A',26],['Lavender','#C4B5FD',19],['Grape','#7C3AED',28],['Plum','#86198F',30],['Hot Pink','#EC4899',25],['Gold','#FBBF24',35]];
+const FLOORS = [
+  ['concrete','Polished Concrete','concrete','#9AA3B0','#7B8494',1],['oak','Oak Planks','wood','#B08968','#9F7650',1],['dark','Dark Tile','tile','#151C2E','#00E676',1],
+  ['walnut','Walnut Planks','wood','#6B4423','#5A3A1E',4],['maple','Maple Planks','wood','#E2C08D','#D4AE79',6],['white','White Tile','tile','#F1F5F9','#CBD5E1',3],
+  ['marble','White Marble','marble','#F5F5F4','#A8A29E',12],['blackmarble','Black Marble','marble','#1C1917','#FBBF24',30],['checker','Diner Checker','checker','#F8FAFC','#111827',8],
+  ['redcarpet','Red Carpet','carpet','#991B1B','#7F1D1D',10],['bluecarpet','Blue Carpet','carpet','#1E3A8A','#1E40AF',9],['greencarpet','Green Carpet','carpet','#14532D','#166534',11],
+  ['hex','Hex Tile','hex','#0F766E','#134E4A',15],['terrazzo','Terrazzo','terrazzo','#E7E5E4','#F472B6',18],['herring','Herringbone','herring','#A16207','#854D0E',20],
+  ['tatami','Tatami','tatami','#D9C58B','#3F6212',22],['grass','Indoor Grass','grass','#4D7C0F','#65A30D',25],['sand','Beach Sand','sand','#E9D5A1','#D6B97A',28],
+  ['neongrid','Neon Grid','grid','#0A0A1A','#EC4899',32],['cybergrid','Cyber Grid','grid','#020617','#22D3EE',36],['goldtile','Gold Tile','tile','#B45309','#FBBF24',45],
+  ['space','Starfield','space','#020617','#F8FAFC',50],['lava','Lava Rock','marble','#1C1917','#F97316',60],['cloud9','Cloud Nine','marble','#E0F2FE','#FFFFFF',75]
+].map(([id,n,type,c1,c2,lvl])=>({id,n,type,c1,c2,lvl}));
+const PATTERNS = [['stripes','Stripes',5],['dots','Polka Dots',7],['chevron','Chevron',10],['brick','Brick',4],['circuit','Circuit Board',14],['waves','Waves',12],['stars','Stars',17],['plaid','Plaid',20],['triangles','Triangles',24],['code','Code Rain',30]];
+const PAPER_TINTS = [['Mint','#86EFAC','#14532D'],['Rose','#FBCFE8','#9D174D'],['Sky','#BAE6FD','#075985'],['Lemon','#FEF9C3','#A16207'],['Night','#1E293B','#38BDF8'],['Royal','#4C1D95','#FBBF24']];
+const PAPERS=[]; PATTERNS.forEach(([pid,pn,lv],i)=>PAPER_TINTS.forEach(([tn,bg,fg],j)=>PAPERS.push({id:pid+'_'+j, n:tn+' '+pn, pat:pid, bg, fg, lvl:lv+j*3})));
+const LIGHTS = [{id:'day', n:'Daylight', lvl:1},{id:'warm', n:'Warm Cozy', lvl:4, c:'#FFB86B', k:.35},{id:'cool', n:'Cool Focus', lvl:8, c:'#93C5FD', k:.35},{id:'neon', n:'Neon Night', lvl:15, c:'#00E676', k:.5},{id:'sunset', n:'Sunset Pink', lvl:20, c:'#F472B6', k:.45},{id:'moon', n:'Moonlight', lvl:28, c:'#6366F1', k:.55},{id:'candle', n:'Candlelight', lvl:35, c:'#F59E0B', k:.6},{id:'disco', n:'Disco Party', lvl:45, disco:1}];
+function roomKey(){ return 's'+S.stage+(S.stage>=3?'_f'+curFloor():''); }
+function roomStyle(){ S.rooms=S.rooms||{}; return S.rooms[roomKey()]||(S.rooms[roomKey()]={}); }
+const _texCache={};
+function floorStyleTex(F){ const k='fl'+F.id; if(_texCache[k]) return _texCache[k]; const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d'); g.fillStyle=F.c1; g.fillRect(0,0,128,128);
+  const T=F.type, R=Math.random;
+  if(T==='concrete'){ for(let i=0;i<600;i++){ g.fillStyle=`rgba(0,0,0,${R()*.07})`; g.fillRect(R()*128,R()*128,2,2); } g.strokeStyle='rgba(0,0,0,.12)'; g.strokeRect(0,0,128,128); }
+  if(T==='wood'){ for(let i=0;i<8;i++){ g.fillStyle=i%2?F.c2:F.c1; g.fillRect(0,i*16,128,16); g.fillStyle='rgba(0,0,0,.15)'; g.fillRect(0,i*16,128,1); g.fillRect((i*37)%128,i*16,1,16); for(let j=0;j<6;j++){ g.fillStyle='rgba(0,0,0,.05)'; g.fillRect(R()*128,i*16+R()*16,30,1); } } }
+  if(T==='tile'){ g.strokeStyle=F.c2; g.globalAlpha=.35; g.lineWidth=3; g.strokeRect(1.5,1.5,125,125); g.globalAlpha=1; }
+  if(T==='marble'){ g.strokeStyle=F.c2; g.globalAlpha=.35; for(let i=0;i<6;i++){ g.lineWidth=R()*2+.5; g.beginPath(); let x=R()*128, y=0; g.moveTo(x,y); while(y<128){ x+=R()*20-10; y+=R()*16; g.lineTo(x,y); } g.stroke(); } g.globalAlpha=1; }
+  if(T==='checker'){ g.fillStyle=F.c2; g.fillRect(0,0,64,64); g.fillRect(64,64,64,64); }
+  if(T==='carpet'){ for(let i=0;i<1500;i++){ g.fillStyle=R()<.5?F.c2:'rgba(255,255,255,.04)'; g.fillRect(R()*128,R()*128,1.5,1.5); } }
+  if(T==='hex'){ g.strokeStyle=F.c2; g.lineWidth=3; for(let y=0;y<4;y++) for(let x=0;x<4;x++){ const cx=x*36+(y%2)*18, cy=y*32; g.beginPath(); for(let a=0;a<6;a++){ const an=a/6*Math.PI*2; g.lineTo(cx+Math.cos(an)*18, cy+Math.sin(an)*18); } g.closePath(); g.stroke(); } }
+  if(T==='terrazzo'){ ['#F472B6','#38BDF8','#FBBF24','#22C55E','#1F2937'].forEach(col=>{ g.fillStyle=col; for(let i=0;i<14;i++){ g.beginPath(); g.arc(R()*128,R()*128,R()*3+1,0,7); g.fill(); } }); }
+  if(T==='herring'){ g.strokeStyle='rgba(0,0,0,.25)'; for(let i=-4;i<8;i++){ for(let j=0;j<8;j++){ g.fillStyle=(i+j)%2?F.c1:F.c2; g.save(); g.translate(j*16,i*16+j*8); g.rotate((j%2?1:-1)*Math.PI/4); g.fillRect(0,0,22,8); g.strokeRect(0,0,22,8); g.restore(); } } }
+  if(T==='tatami'){ g.strokeStyle=F.c2; g.lineWidth=4; g.strokeRect(2,2,124,60); g.strokeRect(2,66,124,60); for(let i=0;i<128;i+=4){ g.fillStyle='rgba(0,0,0,.05)'; g.fillRect(i,0,1,128); } }
+  if(T==='grass'){ for(let i=0;i<1200;i++){ g.fillStyle=R()<.5?F.c2:'#3F6212'; g.fillRect(R()*128,R()*128,1,3); } }
+  if(T==='sand'){ for(let i=0;i<1400;i++){ g.fillStyle=R()<.5?F.c2:'#F5E6C4'; g.fillRect(R()*128,R()*128,1,1); } }
+  if(T==='grid'){ g.strokeStyle=F.c2; g.lineWidth=2; g.shadowColor=F.c2; g.shadowBlur=8; g.strokeRect(1,1,126,126); g.shadowBlur=0; }
+  if(T==='space'){ for(let i=0;i<60;i++){ g.fillStyle=`rgba(255,255,255,${R()})`; g.fillRect(R()*128,R()*128,R()<.1?2:1,R()<.1?2:1); } }
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.encoding=THREE.sRGBEncoding; return _texCache[k]=t; }
+function paperTex(P){ const k='pp'+P.id; if(_texCache[k]) return _texCache[k]; const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d'); g.fillStyle=P.bg; g.fillRect(0,0,128,128); g.fillStyle=P.fg; g.strokeStyle=P.fg; g.globalAlpha=.55; const p=P.pat;
+  if(p==='stripes') for(let x=0;x<128;x+=32) g.fillRect(x,0,12,128);
+  if(p==='dots') for(let y=0;y<128;y+=32) for(let x=0;x<128;x+=32){ g.beginPath(); g.arc(x+16+(y%64?16:0),y+16,6,0,7); g.fill(); }
+  if(p==='chevron'){ g.lineWidth=6; for(let y=0;y<160;y+=32){ g.beginPath(); for(let x=0;x<=128;x+=32){ g.lineTo(x,y+(x%64?-12:12)); } g.stroke(); } }
+  if(p==='brick'){ g.lineWidth=3; for(let y=0;y<128;y+=21){ g.beginPath(); g.moveTo(0,y); g.lineTo(128,y); g.stroke(); for(let x=(y/21%2)*32;x<128;x+=64){ g.beginPath(); g.moveTo(x,y); g.lineTo(x,y+21); g.stroke(); } } }
+  if(p==='circuit'){ g.lineWidth=3; for(let i=0;i<10;i++){ let x=(i*37)%128, y=(i*53)%128; g.beginPath(); g.moveTo(x,y); x+=20; g.lineTo(x,y); y+=20; g.lineTo(x,y); g.stroke(); g.beginPath(); g.arc(x,y,4,0,7); g.fill(); } }
+  if(p==='waves'){ g.lineWidth=5; for(let y=16;y<140;y+=32){ g.beginPath(); for(let x=0;x<=128;x+=4) g.lineTo(x,y+Math.sin(x/128*Math.PI*4)*8); g.stroke(); } }
+  if(p==='stars'){ for(let i=0;i<8;i++){ const x=(i*47)%128+10, y=(i*29)%128+10; g.beginPath(); for(let a=0;a<10;a++){ const r=a%2?4:10, an=a/10*Math.PI*2; g.lineTo(x+Math.cos(an)*r,y+Math.sin(an)*r); } g.fill(); } }
+  if(p==='plaid'){ g.globalAlpha=.25; for(let x=0;x<128;x+=32){ g.fillRect(x,0,10,128); g.fillRect(0,x,128,10); } }
+  if(p==='triangles') for(let y=0;y<128;y+=32) for(let x=0;x<128;x+=32){ g.beginPath(); g.moveTo(x,y+28); g.lineTo(x+14,y+4); g.lineTo(x+28,y+28); g.fill(); }
+  if(p==='code'){ g.font='bold 12px monospace'; for(let x=0;x<128;x+=12) for(let y=0;y<128;y+=14) if(Math.random()<.5) g.fillText(Math.random()<.5?'1':'0',x,y); }
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.encoding=THREE.sRGBEncoding; t.repeat.set(4,1.6); return _texCache[k]=t; }
+function applyRoomStyle(){ if(!S || ui.fl===-1) return; const R=roomStyle(), st=stageDef(); if(!R.floor && !R.wall && !R.paper) return;
+  const floor=roomG.children[0];
+  if(R.floor && floor && floor.material && floor.material.map){ const F=FLOORS.find(x=>x.id===R.floor); if(F){ const t=floorStyleTex(F).clone(); t.needsUpdate=true; t.repeat.set(st.w, st.h); floor.material=new THREE.MeshStandardMaterial({map:t, roughness:F.type==='marble'||F.type==='tile'?.35:.8, metalness:F.id==='goldtile'?.5:0}); } }
+  if(R.wall || R.paper){ const wallHex=new THREE.Color(st.wall).getHex(); const P=R.paper&&PAPERS.find(x=>x.id===R.paper); const m = P ? new THREE.MeshStandardMaterial({map:paperTex(P), roughness:.9}) : new THREE.MeshStandardMaterial({color:R.wall, roughness:.9});
+    roomG.children.forEach(o=>{ if(o.isMesh && o.material && !o.material.map && o.material.color && o.material.color.getHex()===wallHex && o.scale && Math.max(o.scale.x,o.scale.z)>2) o.material=m; }); }
+}
+let _discoH=0;
+function lightMood(){ if(!S) return; const L=LIGHTS.find(x=>x.id===roomStyle().light); if(!L || L.id==='day') return; if(L.disco){ _discoH=(_discoH+.004)%1; hemi.color.setHSL(_discoH,.8,.6); if(world.eveL){ world.eveL.color.setHSL((_discoH+.5)%1,.9,.6); world.eveL.intensity=Math.max(world.eveL.intensity,.9); } return; }
+  hemi.color.set('#EEF6FF').lerp(new THREE.Color(L.c), L.k); if(world.eveL){ world.eveL.color.set(L.c); world.eveL.intensity=Math.max(world.eveL.intensity, L.k*1.4); } }
+
+/* furniture paint */
+function applyPaint(g, f){ if(g.userData.paint===(f.paint||null)) return; g.traverse(m=>{ if(!m.isMesh || !m.material || m.isSprite || !m.material.color || m.material.map) return; if(m.userData.baseMat==null) m.userData.baseMat=m.material; if(!f.paint){ m.material=m.userData.baseMat; return; } const b=m.userData.baseMat; if(b.emissiveIntensity>.3 || b.transparent) return; const nm=b.clone(); nm.color.lerp(new THREE.Color(f.paint), .7); m.material=nm; }); g.userData.paint=f.paint||null; }
+
+/* ---------------- decor catalog (generated) ---------------- */
+const DCATS = {rug:'Rugs', lamp:'Lamps', plant:'Plants', art:'Art', sculpt:'Sculptures', seat:'Seating', tech:'Gadgets'};
+const DECOR_COLS = [['Red','#EF4444'],['Blue','#3B82F6'],['Green','#22C55E'],['Purple','#8B5CF6'],['Gold','#FBBF24'],['Black','#1F2937']];
+(function(){
+  let i=0; const add=(id, d)=>{ FURN[id]=Object.assign({w:1,h:1}, d); i++; };
+  ['Solid','Striped','Checkered','Circle','Diamond','Zigzag'].forEach((p,pi)=>DECOR_COLS.forEach(([cn,c],ci)=>add('rug_'+pi+'_'+ci,{name:cn+' '+p+' Rug', cost:150+pi*80, w:2, h:2, flat:1, decor:{cat:'rug', lvl:1+pi*4+ci, p:pi, c}, text:'Ties the room together. Goes under furniture.'})));
+  ['Floor Lamp','Arc Lamp','Lava Lamp','Neon Tube','Paper Lantern'].forEach((p,pi)=>DECOR_COLS.forEach(([cn,c],ci)=>add('lamp_'+pi+'_'+ci,{name:cn+' '+p, cost:220+pi*120, decor:{cat:'lamp', lvl:2+pi*6+ci*2, p:pi, c}, text:'Soft light. Looks great at night.'})));
+  [['Cactus','#16A34A'],['Palm Tree','#15803D'],['Monstera','#166534'],['Fern','#22C55E'],['Sunflower','#FACC15'],['Cherry Blossom','#F9A8D4'],['Bamboo','#65A30D'],['Bonsai Grove','#14532D'],['Tulips','#F43F5E'],['Lavender Pot','#A78BFA'],['Orchid','#E879F9'],['Money Tree','#FBBF24']].forEach(([n,c],pi)=>add('plant_'+pi,{name:n, cost:120+pi*90, decor:{cat:'plant', lvl:1+pi*5, p:pi, c}, text:'Green things make people happier.'}));
+  for(let a=0;a<18;a++) add('art_'+a,{name:['Sunrise','Pixel Dreams','Blue Period','Circuit City','Neon Nights','Abstract No. ','Garage Days','The Pitch','Rocket Fuel','Moon Walk','Code Poem','Bot Portrait','Big Wave','Quiet Forest','Golden Hour','Data Bloom','First Dollar','Unicorn'][a]+(a===5?'5':''), cost:400+a*250, decor:{cat:'art', lvl:6+a*4, p:a}, text:'Original art on an easel.'});
+  ['Cube','Sphere','Ring','Spiral','Pyramid','Robot Head'].forEach((p,pi)=>[['Marble','#F5F5F4'],['Bronze','#B45309'],['Neon','#22D3EE']].forEach(([mn,c],mi)=>add('sculpt_'+pi+'_'+mi,{name:mn+' '+p, cost:1500+pi*900+mi*2500, decor:{cat:'sculpt', lvl:12+pi*6+mi*8, p:pi, c, m:mi}, text:'A statement piece.'})));
+  ['Beanbag','Armchair','Swing Chair','Hammock'].forEach((p,pi)=>DECOR_COLS.forEach(([cn,c],ci)=>add('seat_'+pi+'_'+ci,{name:cn+' '+p, cost:300+pi*400, decor:{cat:'seat', lvl:3+pi*8+ci*2, p:pi, c}, text:'Somewhere comfy to think.'})));
+  [['Retro TV','#78350F'],['Pinball Machine','#7C3AED'],['Claw Machine','#EC4899'],['Vinyl Player','#1F2937'],['Telescope','#64748B'],['Mini Fridge','#E5E7EB'],['Robot Butler','#CBD5E1'],['Hologram Pedestal','#22D3EE'],['Server Shrine','#0F172A'],['Golden Arcade','#FBBF24'],['Space Capsule','#F8FAFC'],['Time Machine','#A855F7']].forEach(([n,c],pi)=>add('tech_'+pi,{name:n, cost:2000+pi*3000, decor:{cat:'tech', lvl:8+pi*7, p:pi, c}, text:'Every startup needs a conversation piece.'}));
+})();
+const DECOR_KEYS=Object.keys(FURN).filter(k=>FURN[k].decor);
+function decorOK(k){ const D=FURN[k].decor; return !D || SLVL()>=D.lvl; }
+function decorMorale(){ const kinds=new Set(S.furn.filter(f=>FURN[f.kind]&&FURN[f.kind].decor).map(f=>f.kind)); return Math.min(8, kinds.size*.25); }
+function buildDecorMesh(kind, g){ const F=FURN[kind]; if(!F||!F.decor) return; const D=F.decor, c=D.c||'#94A3B8', M=mat(c), dark=mat('#1F2937'), cat=D.cat;
+  if(cat==='rug'){ const cv=document.createElement('canvas'); cv.width=cv.height=128; const x=cv.getContext('2d'); x.fillStyle=c; x.fillRect(0,0,128,128); x.fillStyle='rgba(255,255,255,.35)'; const p=D.p;
+    if(p===1) for(let i=0;i<128;i+=24) x.fillRect(i,0,10,128); if(p===2) for(let i=0;i<8;i++) for(let j=0;j<8;j++) if((i+j)%2) x.fillRect(i*16,j*16,16,16); if(p===3){ x.beginPath(); x.arc(64,64,44,0,7); x.fill(); x.fillStyle=c; x.beginPath(); x.arc(64,64,28,0,7); x.fill(); } if(p===4){ x.beginPath(); x.moveTo(64,10); x.lineTo(118,64); x.lineTo(64,118); x.lineTo(10,64); x.fill(); } if(p===5){ x.lineWidth=8; x.strokeStyle='rgba(255,255,255,.35)'; for(let y=16;y<128;y+=28){ x.beginPath(); for(let i=0;i<=128;i+=16) x.lineTo(i,y+(i%32?8:-8)); x.stroke(); } }
+    x.strokeStyle='rgba(255,255,255,.5)'; x.lineWidth=6; x.strokeRect(6,6,116,116); const t=new THREE.CanvasTexture(cv); t.encoding=THREE.sRGBEncoding; const r=new THREE.Mesh(new THREE.PlaneGeometry(1.9,1.9), new THREE.MeshStandardMaterial({map:t, roughness:.95})); r.rotation.x=-Math.PI/2; r.position.y=.012; r.receiveShadow=true; g.add(r); }
+  if(cat==='lamp'){ const glow=mat(c,{emissive:c, emissiveIntensity:1}); const p=D.p;
+    if(p===0){ cy(g,.15,.04,0,0,0,dark); cy(g,.02,1.3,0,.04,0,dark); const sh=new THREE.Mesh(new THREE.CylinderGeometry(.14,.24,.3,16,1,true), mat(c,{side:THREE.DoubleSide, emissive:c, emissiveIntensity:.5})); sh.position.y=1.42; g.add(sh); }
+    if(p===1){ cy(g,.18,.05,-.3,0,0,dark); const arc=new THREE.Mesh(new THREE.TorusGeometry(.7,.025,6,24,Math.PI*.6), dark); arc.position.set(.2,.8,0); arc.rotation.z=Math.PI*.15; g.add(arc); sp(g,.18,.12,.18,.55,1.35,0,glow); }
+    if(p===2){ cy(g,.1,.15,0,0,0,mat('#94A3B8',{metalness:.7})); const b=new THREE.Mesh(new THREE.CylinderGeometry(.06,.1,.4,12), new THREE.MeshStandardMaterial({color:c, emissive:c, emissiveIntensity:.8, transparent:true, opacity:.8})); b.position.y=.35; g.add(b); cy(g,.06,.08,0,.55,0,mat('#94A3B8',{metalness:.7})); }
+    if(p===3){ [-.25,0,.25].forEach((x,i)=>{ const t=cy(g,.03,1.1+i*.15,x,0,0,glow); }); }
+    if(p===4){ cy(g,.012,.6,0,1.1,0,dark); sp(g,.24,.28,.24,0,1.1,0,mat(c,{emissive:c, emissiveIntensity:.8})); }
+    halo(g,0,1.2,0,c,.9,.6); }
+  if(cat==='plant'){ cy(g,.2,.32,0,0,0,mat(['#F8FAFC','#B45309','#1F2937','#FBBF24'][D.p%4])); const p=D.p;
+    if(p===0){ cy(g,.08,.6,0,.3,0,M); cy(g,.05,.25,.12,.5,0,M).rotation.z=-.7; }
+    else if(p===1||p===6){ cy(g,.05,1.3,0,.3,0,mat('#78350F')); for(let i=0;i<6;i++){ const l=new THREE.Mesh(SPH,M); l.scale.set(.06,.04,.38); l.position.set(Math.cos(i)*.25,1.6,Math.sin(i)*.25); l.rotation.y=i; l.rotation.x=.4; g.add(l); } }
+    else { const n=p===4||p===8||p===9||p===10?5:7; for(let i=0;i<n;i++){ const l=new THREE.Mesh(new THREE.IcosahedronGeometry(.16,0), mat(i%2&&p>=4?c:'#16A34A',{flatShading:true})); l.position.set(rand(-.12,.12),.45+i*.09,rand(-.12,.12)); l.castShadow=true; g.add(l); } if(p===11) for(let i=0;i<5;i++) sp(g,.04,.04,.01,rand(-.15,.15),.6+i*.1,rand(-.15,.15),mat('#FBBF24',{metalness:.8})); } }
+  if(cat==='art'){ [-.25,.25].forEach(x=>{ const l=bx(g,.04,1.2,.04,x,0,0,mat('#92400E')); l.rotation.x=-.12; }); const cv=document.createElement('canvas'); cv.width=96; cv.height=72; const x=cv.getContext('2d'); const hue=D.p*47%360; x.fillStyle=`hsl(${hue},60%,85%)`; x.fillRect(0,0,96,72); for(let i=0;i<7;i++){ x.fillStyle=`hsl(${(hue+i*40)%360},70%,${40+i*5}%)`; const t=(D.p+i)%3; x.beginPath(); if(t===0) x.arc(10+((D.p*13+i*29)%80),10+((D.p*7+i*17)%55),6+i*2,0,7); else if(t===1) x.rect((D.p*11+i*23)%80,(D.p*5+i*13)%55,14+i*2,10+i); else { x.moveTo((i*19)%96,72); x.lineTo((i*31)%96,10); x.lineTo((i*41+20)%96,72); } x.fill(); } const t=new THREE.CanvasTexture(cv); t.encoding=THREE.sRGBEncoding; bx(g,.74,.58,.04,0,.68,.04,mat('#1F2937')); const p=new THREE.Mesh(new THREE.PlaneGeometry(.66,.5), new THREE.MeshStandardMaterial({map:t})); p.position.set(0,.97,.07); g.add(p); }
+  if(cat==='sculpt'){ const SM=D.m===2?mat(c,{emissive:c, emissiveIntensity:.8}):D.m===1?mat(c,{metalness:.85, roughness:.3}):mat(c,{roughness:.3}); bx(g,.5,.5,.5,0,0,0,mat('#E5E7EB')); let o; const p=D.p;
+    if(p===0){ o=new THREE.Mesh(BOX,SM); o.scale.setScalar(.35); o.rotation.set(.6,.6,0); } if(p===1){ o=new THREE.Mesh(SPH,SM); o.scale.setScalar(.22); } if(p===2){ o=new THREE.Mesh(new THREE.TorusGeometry(.2,.06,10,24),SM); } if(p===3){ o=new THREE.Mesh(new THREE.TorusKnotGeometry(.15,.04,48,8),SM); } if(p===4){ o=new THREE.Mesh(new THREE.ConeGeometry(.24,.4,4),SM); } if(p===5){ o=new THREE.Group(); const h=new THREE.Mesh(BOX,SM); h.scale.set(.4,.3,.3); o.add(h); [-.08,.08].forEach(x=>{ const e=new THREE.Mesh(SPH,mat('#22C55E',{emissive:'#22C55E', emissiveIntensity:1})); e.scale.setScalar(.04); e.position.set(x,0,.16); o.add(e); }); }
+    o.position.y=.82; o.castShadow=true; g.add(o); if(p!==5) g.userData.spin=o; }
+  if(cat==='seat'){ const p=D.p; if(p===0){ sp(g,.32,.22,.32,0,.2,0,mat(c,{roughness:.95})); } if(p===1){ bx(g,.7,.35,.7,0,0,0,M); bx(g,.7,.45,.15,0,.35,-.28,M); bx(g,.12,.25,.7,-.3,.35,0,M); bx(g,.12,.25,.7,.3,.35,0,M); } if(p===2){ cy(g,.02,.8,0,1.1,0,dark); const s=new THREE.Mesh(new THREE.SphereGeometry(.4,16,12,0,Math.PI*2,0,Math.PI*.65), mat(c,{side:THREE.DoubleSide})); s.rotation.x=Math.PI*.15; s.position.y=.85; g.add(s); } if(p===3){ [-.8,.8].forEach(x=>cy(g,.04,1.2,x,0,0,mat('#78350F'))); const h=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,1.5,16,1,true,Math.PI,Math.PI), mat(c,{side:THREE.DoubleSide})); h.rotation.z=Math.PI/2; h.position.y=.95; h.scale.z=.6; g.add(h); }
+    g.userData.seat=new THREE.Vector3(0,.15,0); g.userData.face=Math.PI; }
+  if(cat==='tech'){ const p=D.p; const body=bx(g,.7,[.6,1.4,1.5,1,1.2,.8,1.2,.3,1.6,1.5,1.8,1.6][p],.6,0,0,0,M); if(p===7){ const h=new THREE.Mesh(new THREE.ConeGeometry(.3,.8,16,1,true), new THREE.MeshBasicMaterial({color:c, transparent:true, opacity:.25, side:THREE.DoubleSide})); h.position.y=.7; g.add(h); const s=new THREE.Mesh(new THREE.IcosahedronGeometry(.15,0), mat(c,{emissive:c, emissiveIntensity:1})); s.position.y=.8; g.add(s); g.userData.spin=s; } else { const scr=bx(g,.5,.35,.03,0,[.15,.9,.9,.5,.6,.3,.7,0,1,.9,1.1,1][p],.31,mat('#0B1220',{emissive:['#38BDF8','#F472B6','#FDE047','#A3E635'][p%4], emissiveIntensity:.8}),false); } halo(g,0,.9,.3,c,.7,.5); }
+}
+let _dR=null, _dS=null, _dC=null;
+function decorIcon(k){ if(ICONS[k]) return ICONS[k]; try{ if(!_dR){ _dR=new THREE.WebGLRenderer({alpha:true, antialias:true, preserveDrawingBuffer:true}); _dR.outputEncoding=THREE.sRGBEncoding; _dR.setSize(120,120); _dS=new THREE.Scene(); _dS.add(new THREE.HemisphereLight(0xffffff,0x334155,.8)); const dl=new THREE.DirectionalLight(0xffffff,1); dl.position.set(2,4,5); _dS.add(dl); _dC=new THREE.PerspectiveCamera(30,1,.1,50); }
+  const g=buildFurnMesh(k); _dS.add(g); const box=new THREE.Box3().setFromObject(g), c=box.getCenter(new THREE.Vector3()), sz=box.getSize(new THREE.Vector3()).length(), d=sz*1.6; _dC.position.set(c.x+d*.6,c.y+d*.45,c.z+d*.7); _dC.lookAt(c); _dR.render(_dS,_dC); ICONS[k]=_dR.domElement.toDataURL('image/png'); _dS.remove(g); }catch(e){ ICONS[k]=MB_ASSETS.logo; } return ICONS[k]; }
+function decorGridHTML(){ const cat=ui.dcat||'rug'; const L=DECOR_KEYS.filter(k=>FURN[k].decor.cat===cat).sort((a,b)=>FURN[a].decor.lvl-FURN[b].decor.lvl); const open=DECOR_KEYS.filter(decorOK).length;
+  return `<h5 class="unlh" style="color:#FDBA74">🎨 Decor · ${open} of ${DECOR_KEYS.length} unlocked <button class="btn" id="openDecor" style="margin-left:8px;padding:3px 10px">Floors, walls &amp; lighting</button></h5><div class="dchips">${Object.entries(DCATS).map(([k,n])=>`<button class="${k===cat?'on':''}" data-dc="${k}">${n} <small>${DECOR_KEYS.filter(x=>FURN[x].decor.cat===k&&decorOK(x)).length}/${DECOR_KEYS.filter(x=>FURN[x].decor.cat===k).length}</small></button>`).join('')}</div>
+    <div class="pgrid">${L.map(k=>{ const d=FURN[k], ok=decorOK(k); return `<button class="pitem ${ok?'':'locked'}" data-f="${k}" ${ok?'':'disabled'}><img src="${ok?decorIcon(k):MB_ASSETS.logo}" alt="" ${ok?'':'style="filter:brightness(0) opacity(.4)"'}><div><div class="t">${d.name}</div><div class="c">${ok?money(d.cost):'🔒 Studio level '+d.decor.lvl}</div><div class="hint">${d.text}</div></div></button>`; }).join('')}</div>`; }
+function decorPanel(){ const R=roomStyle(), L=SLVL(), tab=ui.dtab||'floor';
+  const sw=(list,cur,key,f)=>list.map(x=>{ const ok=L>=x.lvl; return `<button class="dsw ${cur===x.id?'on':''} ${ok?'':'lock'}" data-ds="${key}:${x.id}" ${ok?'':'disabled'} title="${ok?x.n:'Unlocks at studio level '+x.lvl}">${f(x)}<span>${ok?x.n:'🔒 Lv '+x.lvl}</span></button>`; }).join('');
+  const PL=PAINTS.map(([n,c,lv],i)=>({id:c, n, lvl:lv}));
+  const body = tab==='floor' ? sw(FLOORS, R.floor, 'floor', x=>`<i class="dfl" style="background:${x.c1};box-shadow:inset 0 0 0 4px ${x.c2}"></i>`)
+    : tab==='wall' ? `<button class="dsw ${!R.wall&&!R.paper?'on':''}" data-ds="wall:"><i style="background:${stageDef().wall}"></i><span>Original</span></button>`+sw(PL, R.paper?null:R.wall, 'wall', x=>`<i style="background:${x.id}"></i>`)
+    : tab==='paper' ? sw(PAPERS, R.paper, 'paper', x=>`<i style="background:${x.bg};box-shadow:inset 0 0 0 3px ${x.fg}"></i>`)
+    : sw(LIGHTS, R.light||'day', 'light', x=>`<i style="background:${x.disco?'conic-gradient(red,yellow,lime,cyan,blue,magenta,red)':x.c||'#FFF7E6'}"></i>`);
+  const tot=FLOORS.length+PL.length+PAPERS.length+LIGHTS.length, own=[...FLOORS,...PL,...PAPERS,...LIGHTS].filter(x=>L>=x.lvl).length;
+  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Decorate · ${own} of ${tot} styles unlocked</div><h2>Make it yours</h2>
+    <p class="hint">Styling applies to the room you're looking at${S.stage>=3?' (this tower floor)':''}. New styles unlock as your studio levels up. Changing is free.</p>
+    <div class="rbr">${[['floor','🟫 Floors'],['wall','🖌️ Wall paint'],['paper','🧻 Wallpaper'],['light','💡 Lighting']].map(([k,n])=>`<button class="${k===tab?'on':''}" data-dt="${k}">${n}</button>`).join('')}</div>
+    <div class="dsws">${body}</div>
+    <div class="lesson">Office design is a real startup decision: a space people like being in helps you hire and keep good people. Every different decor item you place adds a little morale (up to +8).</div>`);
+  $$('#modalCard [data-dt]').forEach(b=>b.onclick=()=>{ ui.dtab=b.dataset.dt; sfx('tick'); openPanel('decor'); });
+  $$('#modalCard [data-ds]').forEach(b=>b.onclick=()=>{ const [k,v]=b.dataset.ds.split(':'); const R2=roomStyle(); if(k==='wall'){ R2.wall=v||null; R2.paper=null; } else if(k==='paper'){ R2.paper=v; } else R2[k]=v; world.roomDirty=true; sfx('chime'); openPanel('decor'); });
+}
+
+/* decor achievements */
+[['decor','Interior Designer','different decor items placed',()=>new Set(S.furn.filter(f=>FURN[f.kind]&&FURN[f.kind].decor).map(f=>f.kind)).size,[5,20,50,90,130]],['styles','Trendsetter','studio levels of style unlocked',()=>SLVL(),[10,25,45,60,80]]].forEach(([k,n,what,fn,th])=>th.forEach((t,i)=>ACH.push({id:'t_'+k+'_'+i, ic:TIERI[i], n:n+' '+TIERN[i], d:t+' '+what, test:()=>fn()>=t, rew:i>=2?(i===4?'Legendary Crate':i===3?'Epic Pet Crate':'Rare Pet Crate'):null, crate:i>=2?['r','e','l'][i-2]:null})));
+
+/* wiring */
+(function(){
+  let _pf=false;
+  const _cp=canPlace; canPlace=function(kind,x,y,rot,fl){ _pf=!!(FURN[kind]&&FURN[kind].flat); try{ return _cp(kind,x,y,rot,fl); } finally { _pf=false; } };
+  occupied=function(x,y,ignore,fl){ if(fl==null) fl=curFloor(); if(BLOCKED[S.stage].some(([a,b])=>a===x&&b===y)) return !_pf; return S.furn.some(f=>f!==ignore && floorOf(f)===fl && !!(FURN[f.kind]&&FURN[f.kind].flat)===_pf && x>=f.x && x<f.x+f.w && y>=f.y && y<f.y+f.h); };
+  const _bm=buildFurnMesh; buildFurnMesh=function(kind){ if(FURN[kind]&&FURN[kind].decor){ const g=new THREE.Group(); buildDecorMesh(kind,g); return g; } return _bm(kind); };
+  const _sf=syncFurn; syncFurn=function(){ const r=_sf(); S.furn.forEach(f=>{ const g=furnMeshes.get(f.id); if(g) applyPaint(g,f); }); return r; };
+  const _br=buildRoom; buildRoom=function(){ const r=_br(); applyRoomStyle(); return r; };
+  const _dl=dayLight; dayLight=function(){ const r=_dl(); lightMood(); return r; };
+  const _ua=upgAdd; upgAdd=function(k){ let a=_ua(k); if(k==='morale' && S) a+=decorMorale(); return a; };
+  const _sp=showPalette; showPalette=function(){ const r=_sp(); const P=$('#palette'); const grid=document.createElement('div'); grid.className='decorwrap'; grid.innerHTML=decorGridHTML(); P.appendChild(grid);
+    grid.querySelectorAll('[data-dc]').forEach(b=>b.onclick=()=>{ ui.dcat=b.dataset.dc; sfx('tick'); showPalette(); setTimeout(()=>{ const d=$('.decorwrap'); d&&d.scrollIntoView({block:'start'}); },0); });
+    grid.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ sfx('tick'); hidePalette(); ui.rot=0; setTool('place', b.dataset.f); });
+    const od=$('#openDecor'); if(od) od.onclick=()=>{ hidePalette(); openPanel('decor'); };
+    return r; };
+})();
+(function(){
+  const _if=inspectFurn; inspectFurn=function(id){ const r=_if(id); const f=S.furn.find(x=>x.id===id), I=$('#inspect'); if(!f||!I||I.hidden) return r; const L=SLVL();
+    const sec=document.createElement('div'); sec.className='sec'; sec.innerHTML=`<h5>Paint · $50</h5><div class="paints"><button class="pt ${!f.paint?'on':''}" data-pt="" title="Original">✕</button>${PAINTS.map(([n,c,lv])=>`<button class="pt ${f.paint===c?'on':''} ${L>=lv?'':'lock'}" data-pt="${c}" ${L>=lv?'':'disabled'} title="${L>=lv?n:n+' · studio level '+lv}" style="background:${c}"></button>`).join('')}</div>`;
+    const anchor=I.querySelector('.fact'); if(anchor) anchor.after(sec); else I.appendChild(sec);
+    sec.querySelectorAll('[data-pt]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const v=b.dataset.pt||null; if(v && S.cash<50){ toast('Paint costs $50.','warn'); return; } if(v){ S.cash-=50; S.month.furniture+=50; } f.paint=v; world.furnDirty=true; sfx('chime'); inspectFurn(f.id); });
+    return r; };
 })();
 
 /* ---------------- save / load ---------------- */
