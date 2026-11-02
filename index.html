@@ -92,6 +92,40 @@
 .slot2.slotnew{border-style:dashed;background:transparent}.slot2.slotnew em{color:var(--txt-2,#CBD5E1)}
 .ttip{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(28px + env(safe-area-inset-bottom,0px));z-index:31;margin:0;color:#CBD5E1;font-size:13.5px;text-align:center;max-width:calc(100vw - 32px);transition:opacity .6s}
 @media (max-width:640px){ .slot2 img,.slot2 .noth{width:72px;height:46px} }
+/* ---- round 28 · premium polish ---- */
+/* cinematic vignette over the 3D view */
+#vig{position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse 120% 90% at 50% 45%,transparent 55%,rgba(2,6,23,.38) 100%)}
+body.titling #vig{opacity:.6}
+/* refined scrollbars */
+#modalCard,#palette,#inspect,#side,#sideBody,.tmapwrap,.cmdlist{scrollbar-width:thin;scrollbar-color:rgba(148,163,184,.35) transparent}
+#modalCard::-webkit-scrollbar,#palette::-webkit-scrollbar,#inspect::-webkit-scrollbar,.tmapwrap::-webkit-scrollbar,.cmdlist::-webkit-scrollbar{width:8px;height:8px}
+#modalCard::-webkit-scrollbar-thumb,#palette::-webkit-scrollbar-thumb,#inspect::-webkit-scrollbar-thumb,.tmapwrap::-webkit-scrollbar-thumb,.cmdlist::-webkit-scrollbar-thumb{background:rgba(148,163,184,.28);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+#modalCard::-webkit-scrollbar-thumb:hover,#palette::-webkit-scrollbar-thumb:hover{background-color:rgba(148,163,184,.5)}
+#modalCard::-webkit-scrollbar-track,#palette::-webkit-scrollbar-track{background:transparent}
+/* keyboard focus */
+:focus-visible{outline:2px solid var(--neon,#00E676);outline-offset:2px;border-radius:8px}
+button:focus:not(:focus-visible){outline:none}
+::selection{background:rgba(0,230,118,.35);color:#fff}
+/* sideways-scrolling rows fade at the edges */
+.dtabs,#hud{--fl:0px;--fr:0px}
+.dtabs.fe-r,#hud.fe-r{--fr:28px}.dtabs.fe-l,#hud.fe-l{--fl:28px}
+.dtabs.fe-l,.dtabs.fe-r,#hud.fe-l,#hud.fe-r{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%)}
+@media (max-width:640px){ .dtabs{overflow-x:auto;scrollbar-width:none;margin-right:40px} .dtabs::-webkit-scrollbar{display:none} .dtabs button{flex:none} }
+/* the hustle coin stays out of the inspector and catalog */
+body:has(#inspect:not([hidden])) #hustle, body.pal #hustle, body.drawer-open #hustle{opacity:0;pointer-events:none;transform:scale(.85)}
+body:has(#inspect:not([hidden])) #hustleBox, body.pal #hustleBox, body.drawer-open #hustleBox{display:none!important}
+#hustle{transition:opacity .2s,transform .2s}
+/* tabular numbers everywhere money is shown */
+#hud .stat b,.hqt b,.kv b,.pl td,.lrow,.cm,#tip td{font-variant-numeric:tabular-nums}
+/* consistent card hover lift */
+.card2,.upg,.tech,.pitem,.slot2{transition:transform .16s var(--ease,ease),border-color .16s,box-shadow .16s,background .16s}
+.upg:not([disabled]):hover,.tech:not([disabled]):hover,.pitem:not([disabled]):hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.35)}
+/* locked catalog items read as locked, not broken */
+.pitem.locked,.upg[disabled]:not(.own),.tech[disabled]:not(.done):not(.active){filter:saturate(.55)}
+/* modal card entrance */
+#modal:not(.drawer) .card{animation:mIn .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes mIn{from{transform:translateY(10px) scale(.985);opacity:.4}}
+body.reduce #modal .card{animation:none}
 </style></head><body>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -1053,6 +1087,7 @@ body.focus #side,body.focus #hustleBox,body.focus #camctl,body.focus #advisor,bo
 
 </style>
 <canvas id="gl" tabindex="0"></canvas>
+<div id="vig"></div>
 <script>document.body.classList.add("titling")</script>
 
 <header id="hud">
@@ -5763,6 +5798,28 @@ const LOUD_CARD=/Delivered ·|Launch day ·|Patch notes ·/;
   const _ts=toast; toast=function(html, type){ if(QUIET && !type){ logInbox(html, type); return; } return _ts(html, type); };
   const _op=openPanel; openPanel=function(p){ const r=_op(p); if(p==='menu') setTimeout(()=>{ const sx=$('#modalCard .setx'); if(!sx || sx.querySelector('#sAuto')) return; const k=sx.querySelector('#sKeys'); const row=document.createElement('label'); row.className='setrow'; row.innerHTML=`<span>Celebrate automated work<small style="display:block;color:var(--txt-3,#94A3B8);font-size:11.5px">Full cards and confetti when department heads sign, ship or launch on their own</small></span><input type="checkbox" id="sAuto" ${UIP.autoCele?'checked':''}>`; sx.insertBefore(row, k); row.querySelector('input').onchange=e=>{ UIP.autoCele=e.target.checked; uiSave(); }; },0); return r; };
 })();
+
+/* =====================================================================
+   ROUND 28 · PREMIUM POLISH — rough edges
+   ===================================================================== */
+/* speech bubbles: stagger so two people talking at once never overlap */
+(function(){ const recent=[]; const _say=say; say=function(p, line){ if(!p||!line) return line; const w=walkers.get(p.id); if(!(w && w.rig.root && w.rig.root.visible)) return line; const now=performance.now(); for(let i=recent.length-1;i>=0;i--) if(now-recent[i].t>1700) recent.splice(i,1);
+  const pos=w.pos.clone(); pos.y=1.28; let bump=0; recent.forEach(r=>{ if(Math.hypot(r.x-pos.x, r.z-pos.z)<1.2) bump++; }); if(bump>2) return line; pos.y+=bump*.32; recent.push({x:pos.x,z:pos.z,t:now});
+  fxText(pos, line.length>22?line.slice(0,20)+'…':line, p.morale<35?'#FCA5A5':p.morale>75?'#A7F3D0':'#F8FAFC', .18); return line; }; })();
+/* tooltips never outlive what they point at */
+(function(){ const _ts=tipShow; tipShow=function(el, html){ _ts(el, html); if(TIP) TIP._el=el; };
+  const _op=openPanel; openPanel=function(p){ if(p!==ui.panel) tipHide(); return _op(p); };
+  const _rh=refreshHUD; refreshHUD=function(){ const r=_rh(); if(TIP && !TIP.hidden && TIP._el && !TIP._el.isConnected) tipHide(); return r; }; })();
+/* catalog filters only where they help */
+(function(){ const FB_FULL={upgrades:1, research:1}, FB_SEARCH={ach:1, rank:1};
+  const _fa=fbarAttach; fbarAttach=function(root, key, anchor){ if(!FB_FULL[key] && !FB_SEARCH[key]) return; _fa(root, key, anchor); if(FB_SEARCH[key]){ const b=root.querySelector('.fbar'); if(b){ const c=b.querySelector('.fchips'); if(c) c.remove(); } } };
+  palBar=function(){}; palSearch=function(){}; })();
+/* "Needs you" no longer repeats what Next Up already says */
+(function(){ const _cr=crewRender; crewRender=function(){ _cr(); const el=$('#crew'), nu=$('#nextUp'); if(!el||!nu||nu.hidden) return; const t=nu.textContent.toLowerCase(); el.querySelectorAll('[data-cw]').forEach(b=>{ const a=b.dataset.cw; if((a==='free'&&/nothing to do|free/.test(t)) || (a==='desk'&&/desk/.test(t)) || (a==='tired'&&/tired/.test(t))) b.remove(); }); if(!el.querySelector('[data-cw]')) el.remove(); }; })();
+/* scroll fade edges on rows that scroll sideways */
+function fadeEdges(el){ if(!el||el._fe) return; el._fe=1; const upd=()=>{ const l=el.scrollLeft>4, r=el.scrollLeft+el.clientWidth<el.scrollWidth-4; el.classList.toggle('fe-l',l); el.classList.toggle('fe-r',r); }; el.addEventListener('scroll',upd,{passive:true}); upd(); setTimeout(upd,300); }
+(function(){ const _op=openPanel; openPanel=function(p){ const r=_op(p); setTimeout(()=>{ $$('#modalCard .dtabs').forEach(fadeEdges); },0); return r; };
+  const _rh=refreshHUD; let did=0; refreshHUD=function(){ const r=_rh(); if(!did && $('#hud')){ did=1; fadeEdges($('#hud')); } return r; }; })();
 
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
