@@ -801,6 +801,11 @@ body.titling #modal{z-index:40}
 #hud .hbtns button{min-width:36px;min-height:36px}
 #hud .hbtns button.on{background:rgba(0,230,118,.18);border-radius:10px}
 #hud .lvlChip b{display:inline!important}
+/* ===== round 23 ===== */
+.sb.newb{background:#EC4899!important;color:#fff!important;font-size:9px!important;letter-spacing:.05em;padding:1px 5px!important;margin-left:4px}
+#dockInner .tool.hasnew::after{content:"NEW";position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:#EC4899;color:#fff;font:800 9px var(--body);padding:1px 5px;border-radius:999px;letter-spacing:.05em}
+#dockInner .tool{position:relative}
+
 /* sidebar */
 #side{position:fixed;left:max(10px,env(safe-area-inset-left,0px));top:calc(66px + env(safe-area-inset-top,0px));z-index:6;width:260px;display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 170px);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
 #sideTog{position:absolute;right:-30px;top:0;width:26px;height:34px;border-radius:0 10px 10px 0;border:1px solid var(--line);border-left:0;background:var(--panel);color:#CBD5E1;cursor:pointer;font-size:11px;backdrop-filter:blur(8px)}
@@ -2111,7 +2116,7 @@ function updateWalkers(dt, simDt){
       else if(p.breakT>0 && w.state!=='break'){ const spot=S.furn.find(f=>f.kind==='foam')||S.furn.find(f=>f.kind==='pizza')||S.furn.find(f=>f.kind==='coffee')||S.furn.find(f=>f.kind==='couch'); if(spot){ w.boost=spot.kind==='couch'?1.5:2; go(w, seatWorld(spot), 'break', spot); } else { w.boost=1; go(w, w.pos.clone(), 'break'); } }
       else if(w.state==='break'){ if(!(p.breakT>0)) w.state='idle'; }
       else if(pr || (p.job && desk)){ const seat=desk?seatWorld(desk):null; if(w.state!=='work' || (desk && w.furn!==desk) || (seat && w.pos.distanceTo(seat)>.3)){ go(w, seat||freeSpot(), 'work', desk); } }
-      else if(w.state==='work' || (w.state==='idle' && w.t<=0)){ w.t=rand(60,200); const fun=S.furn.filter(f=>['arcade','couch','coffee','pizza','vending','pingpong','aquarium','foam','goldbot','gong'].includes(f.kind)); if(fun.length && Math.random()<.5){ const f=pick(fun); go(w, seatWorld(f), 'hang', f); } else go(w, freeSpot(), 'idle'); }
+      else if(w.state==='work' || (w.state==='idle' && w.t<=0)){ w.t=rand(60,200); const fun=S.furn.filter(f=>isHang(f) && floorOf(f)===personFloor(p)); if(fun.length && Math.random()<.5){ const f=pick(fun); go(w, seatWorld(f), 'hang', f); } else go(w, freeSpot(), 'idle'); }
       else if(w.state==='hang' && w.t<=0){ w.state='idle'; w.t=0; }
     }
     // move
@@ -3907,7 +3912,7 @@ const COATS = [{id:'classic', n:'Classic'}, {id:'snow', n:'Snow', c:'#F8FAFC', a
 const PET_NAMES=['Biscuit','Pixel','Byte','Mochi','Nugget','Waffles','Sprocket','Pickles','Bean','Cosmo','Noodle','Turbo','Muffin','Widget','Pebble','Ziggy','Bloop','Captain','Dumpling','Gizmo','Fern','Juniper','Sushi','Taco','Bolt','Cookie','Chip Jr.','Server','Kernel','Patch'];
 function petKey(sp, coat){ return sp+':'+coat; }
 function petsOwned(){ return S.pets||(S.pets=[]); }
-function petDexCount(){ return new Set(petsOwned().map(p=>petKey(p.sp,p.coat))).size; }
+function petDexCount(){ return new Set(petsOwned().filter(p=>!p.visit).map(p=>petKey(p.sp,p.coat))).size; }
 function petCap(){ return S.stage>=3 ? 3*Math.max(1,(S.floors||[]).length) : [1,3,5][S.stage]||5; }
 function petBonus(k, add){ let v=add?0:1; petsOwned().forEach(p=>{ if(!p.act) return; const P=SPECIES[p.sp]&&SPECIES[p.sp].p; if(!P||P[k]==null) return; const m=1+.2*((p.bond||1)-1); if(add) v+=P[k]*m; else v*=1+(P[k]-1)*m; }); return v; }
 function grantPet(sp, coat, why){
@@ -4612,6 +4617,87 @@ function catalogSearch(q){ q=q.toLowerCase(); const L=Object.keys(FURN).filter(k
   $('#catAff').onchange=e=>{ ui.paff=e.target.checked; showPalette(); };
   $('#catClose').onclick=()=>hidePalette();
   return r; }; })();
+
+/* =====================================================================
+   ROUND 23 · balance · onboarding · performance · office life
+   ===================================================================== */
+/* ---------- 1 · balance: soft caps on stacked bonuses ---------- */
+const SOFTCAP = {speed:3, pay:3, prod:4, fans:5, click:40, bots:6, learn:3, xp:3};
+const FLOORCAP = {drain:.35, bug:.3, srv:.25};
+const ADDCAP = {qual:15, score:1.5, morale:22, rep:.25, offers:4};
+function soft(m, cap){ if(m<=1) return m; const C=cap-1, x=m-1; return 1+C*x/(C+x); }
+/* ---------- 3 · performance: per-frame cache for bonus lookups ---------- */
+let _mc={}, _ac={};
+(function(){
+  const _um=upgMul; upgMul=function(k){ if(_mc[k]!=null) return _mc[k]; let m=_um(k); if(SOFTCAP[k]) m=soft(m,SOFTCAP[k]); if(FLOORCAP[k]) m=Math.max(FLOORCAP[k], m); return _mc[k]=m; };
+  const _ua=upgAdd; upgAdd=function(k){ if(_ac[k]!=null) return _ac[k]; let a=_ua(k); if(ADDCAP[k]!=null) a=Math.min(a, ADDCAP[k]); return _ac[k]=a; };
+})();
+function bonusCacheClear(){ _mc={}; _ac={}; }
+
+/* performance: throttled shadows + adaptive resolution + static furniture */
+const PERF={t:0, frames:0, fps:60, low:0, shadowTick:0, level:0};
+function perfTick(dt){
+  bonusCacheClear();
+  PERF.frames++; PERF.t+=dt; if(PERF.t>=1){ PERF.fps=PERF.frames/PERF.t; PERF.frames=0; PERF.t=0;
+    if(PERF.fps<38){ PERF.low++; } else if(PERF.fps>55){ PERF.low=Math.max(0,PERF.low-1); }
+    if(PERF.low>=3 && PERF.level<2){ PERF.level++; PERF.low=0; if(PERF.level===1){ renderer.setPixelRatio(1); } if(PERF.level===2){ sun.shadow.mapSize.set(1024,1024); if(sun.shadow.map){ sun.shadow.map.dispose(); sun.shadow.map=null; } } resize(); } }
+  if(renderer.shadowMap.autoUpdate){ renderer.shadowMap.autoUpdate=false; }
+  PERF.shadowTick++; if(PERF.shadowTick>=(PERF.level?4:2)){ PERF.shadowTick=0; renderer.shadowMap.needsUpdate=true; }
+}
+function trimShadows(g){ let big=null, bv=0; g.traverse(m=>{ if(!m.isMesh) return; m.castShadow=false; const s=m.scale, v=s.x*s.y*s.z; if(v>bv){ bv=v; big=m; } }); if(big) big.castShadow=true; }
+
+/* ---------- 2 · onboarding: first-time intros + NEW tabs ---------- */
+const FEAT_INTROS = [
+  {k:'perks', ok:()=>(S.lvl||0)>=1, t:'Every time the studio levels up you pick a <b>perk card</b>. Tap the purple <b>LV</b> badge next to our name to see the ones we have.', panel:null},
+  {k:'equip', ok:()=>S.stats.delivered>=1, t:'Startups run on gear. Open <b>Office</b> and check the <b>Equipment</b> tab: 3D printers, monitor walls, nap pods. Each one gives a real bonus.', panel:'build', tab:'equip'},
+  {k:'pets', ok:()=>petsOwned().length>0 || Object.values(S.crates||{}).some(n=>n>0), t:'We have a pet! Pets wander the office and give small bonuses. Open <b>Team → Pets</b> to see them and open crates.', panel:'pets'},
+  {k:'decor', ok:()=>SLVL()>=3, t:'New styles unlocked! Open <b>Office → Style</b> to change floors, walls, wallpaper and lighting. It\'s free.', panel:'decor'},
+  {k:'coll', ok:()=>Object.keys((S.story&&S.story.unl)||{}).length>0, t:'We earned an <b>unlockable</b>: a one-of-a-kind item with a permanent bonus. There are 126 to collect in <b>Office → Unlockables</b>.', panel:'build', tab:'coll'},
+  {k:'ach', ok:()=>Object.keys(ACHS).length>=3, t:'Achievements count across every studio you build. See them, and change our colors and outfits, in <b>Story → Trophies</b>.', panel:'ach'},
+  {k:'rank', ok:()=>S.day>=30, t:'Want to know how we stack up? <b>Story → Leaderboard</b> ranks us against Bot City rivals and real tech giants.', panel:'rank'},
+  {k:'research', ok:()=>S.stage>=1, t:'We have an office, so we can do <b>research</b>: 351 projects in 8 branches. Find it under <b>Company → Research</b>.', panel:'research'},
+  {k:'hire2', ok:()=>S.stats.delivered>=3, t:'Specialists like a <b>Sales Lead</b> or <b>Product Manager</b> don\'t build, but they make everyone better. Look under <b>Team → Hire</b>.', panel:'hire'},
+  {k:'world', ok:()=>worldReady(), t:'The Tower is big enough to go global. Open offices around the world under <b>Company → World</b>.', panel:'world'},
+  {k:'legacy', ok:()=>legacy().points>0, t:'We have <b>legacy points</b>. Spend them on the legacy tree (Story → Trophies) to start your next studio stronger.', panel:'ach'}
+];
+const NEWTAB = {pets:'pets', decor:'decor', ach:'ach', rank:'rank', research:'research', world:'world', hire2:'hire'};
+function featTick(){ if(!S || titleMode || modalOpen) return; S.feat=S.feat||{}; for(const f of FEAT_INTROS){ if(S.feat[f.k]) continue; let ok=false; try{ ok=f.ok(); }catch(e){} if(!ok) continue; S.feat[f.k]=S.day; S.featNew=S.featNew||{}; if(NEWTAB[f.k]) S.featNew[NEWTAB[f.k]]=1;
+  advise(f.t,{mood:'point', acts: f.panel?[{t:'Show me', f:()=>{ if(f.panel==='build'){ ui.ptab=f.tab||'ess'; showPalette(); } else openPanel(f.panel); }},{t:'Later', f:()=>{}}]:[{t:'Got it', f:()=>{}}]}); refreshBadges(); return; } }
+(function(){
+  const _sb=subBadge; subBadge=function(k){ const r=_sb(k); return (S && S.featNew && S.featNew[k]) ? r+'<i class="sb newb">NEW</i>' : r; };
+  const _op=openPanel; openPanel=function(p){ if(S && S.featNew && S.featNew[p]){ delete S.featNew[p]; } return _op(p); };
+  const _rb=refreshBadges; refreshBadges=function(){ const r=_rb(); if(!S||!S.featNew) return r; Object.entries(GROUPS).forEach(([g,subs])=>{ const has=subs.some(s=>S.featNew[s]); const b=$(`#dockInner [data-g="${g}"]`); if(b) b.classList.toggle('hasnew', has); }); return r; };
+})();
+
+/* ---------- 5 · office life ---------- */
+function hangKinds(){ return ['arcade','couch','coffee','pizza','vending','pingpong','aquarium','foam','goldbot','gong','beanbag','jukebox','discoball','robotdog']; }
+function isHang(f){ const d=FURN[f.kind]; if(!d) return false; if(hangKinds().includes(f.kind)) return true; if(d.equip && (d.equip.cat==='fun'||d.equip.cat==='comfort')) return true; if(d.decor && d.decor.cat==='seat') return true; return false; }
+function lifeTick(dt){
+  if(!S || titleMode || ui.reduce) return;
+  for(const p of S.team){ const w=walkers.get(p.id); if(!w || w.state!=='hang' || !w.furn || !w.rig.root.visible) continue; const d=FURN[w.furn.kind];
+    if(d && (d.equip&&d.equip.cat==='fun') && Math.random()<dt*.25 && w.rig.cur==='Idle' && w.rig.acts.TwistJump) rigPlay(w.rig,'TwistJump',true);
+    if(Math.random()<dt*.08) fxText(w.pos.clone().setY(1.25), pick(d&&d.equip&&d.equip.cat==='fun'?['🎉','😂','🏆','🔥']:['😌','☕','💤','🙂']), '#F8FAFC', .18); }
+  // pets meet each other
+  if(Math.random()<dt*.3 && petObjs.size>1){ const L=[...petObjs.values()].filter(o=>o.g.visible); for(let i=0;i<L.length;i++) for(let j=i+1;j<L.length;j++){ if(L[i].g.position.distanceTo(L[j].g.position)<.6 && Math.random()<.3){ fxText(L[i].g.position.clone().setY(.7),'❤️','#F472B6',.16); return; } } }
+}
+const MOMENTS = [
+  {k:'bday', ok:()=>S.team.filter(p=>!p.founder).length>=2, run:()=>{ const p=pick(S.team.filter(x=>!x.founder)); S.team.forEach(q=>q.morale=clamp(q.morale+4,0,100)); const w=walkers.get(p.id); if(w){ fxText(w.pos.clone().setY(1.4),'🎂 Happy birthday!','#FBBF24'); burstAt(w.pos.clone().setY(.9),['#FBBF24','#F472B6','#38BDF8','#F8FAFC'],30); } banner('🎂','It\'s '+p.name+'\'s birthday!','Cake in the kitchen. Everyone\'s morale +4','#F472B6'); }},
+  {k:'pizza', ok:()=>S.team.length>=3, run:()=>{ S.team.forEach(q=>{ q.morale=clamp(q.morale+3,0,100); q.energy=clamp(q.energy+15,0,100); }); walkers.forEach(w=>{ if(w.rig.root.visible && Math.random()<.5) fxText(w.pos.clone().setY(1.25),'🍕','#F8FAFC',.2); }); banner('🍕','Surprise pizza!','Chip sent pizza for the whole team. Morale +3, energy +15','#FB923C'); }},
+  {k:'drill', ok:()=>S.team.length>=4 && S.stage>=1, run:()=>{ const st=stageDef(); walkers.forEach(w=>{ if(w.state!=='walk'){ go(w, T2W(ri(0,st.w-1), st.h-1), 'idle'); w.t=8; } }); banner('🚨','Fire drill!','Everyone out to the front of the office. Just practice!','#EF4444'); }},
+  {k:'petday', ok:()=>S.team.length>=3, run:()=>{ const sp=pick(Object.keys(SPECIES).filter(k=>SPECIES[k].r==='c'||SPECIES[k].r==='r')); const p={id:'visit'+S.seq++, sp, coat:'classic', name:pick(PET_NAMES), bond:1, act:true, fl:curFloor(), visit:S.day+3}; petsOwned().push(p); world.petsDirty=true; banner(SPECIES[sp].i,'Bring Your Pet to Work Day!',p.name+' the '+SPECIES[sp].n+' is visiting for 3 days','#5EEAD4'); }},
+  {k:'tourney', ok:()=>S.furn.some(f=>isHang(f) && FURN[f.kind].equip && FURN[f.kind].equip.cat==='fun' || f.kind==='arcade' || f.kind==='pingpong'), run:()=>{ const p=pick(S.team); S.team.forEach(q=>q.morale=clamp(q.morale+3,0,100)); const w=walkers.get(p.id); if(w){ fxText(w.pos.clone().setY(1.4),'🏆 Champion!','#FBBF24'); if(w.rig.acts.TwistJump) rigPlay(w.rig,'TwistJump',true); } banner('🏆','Office tournament','After-hours games! '+(p.founder?'You':p.name)+' won. Morale +3','#FBBF24'); }},
+  {k:'outage', ok:()=>S.stage>=1, run:()=>{ S.outage=clock.elapsedTime+8; banner('🔌','Power flicker','The lights went out for a moment. Someone hits the breaker.','#94A3B8'); }},
+  {k:'cookies', ok:()=>!!seen('momvisit'), run:()=>{ S.team.forEach(q=>q.morale=clamp(q.morale+2,0,100)); banner('🍪','Care package from Mom','A box of cookies with a note: "Eat a vegetable too." Morale +2','#5EEAD4'); }}
+];
+function momentDay(){ if(!S || S.day<8) return; S.nextMoment=S.nextMoment||S.day+ri(5,9); if(S.day<S.nextMoment) return; S.nextMoment=S.day+ri(6,11); const pool=MOMENTS.filter(m=>{ try{ return m.ok(); }catch(e){ return false; } }); if(pool.length) pick(pool).run();
+  S.pets=petsOwned().filter(p=>!p.visit || p.visit>S.day); world.petsDirty=true; }
+
+/* ---------- wiring ---------- */
+(function(){
+  const _au=animUnlocks; animUnlocks=function(dt){ perfTick(dt); _au(dt); lifeTick(dt); if(S && S.outage){ const on=clock.elapsedTime<S.outage; hemi.intensity*=on?.35:1; sun.intensity*=on?.3:1; if(!on) S.outage=0; } };
+  const _st=storyTick; storyTick=function(){ bonusCacheClear(); const r=_st(); momentDay(); setTimeout(featTick, 1200); return r; };
+  const _sf=syncFurn; syncFurn=function(){ const r=_sf(); for(const [id,g] of furnMeshes){ if(g.userData.trim) continue; const f=S.furn.find(x=>x.id===id); if(f && FURN[f.kind] && (FURN[f.kind].decor||FURN[f.kind].equip||FURN[f.kind].coll)){ trimShadows(g); } g.userData.trim=1; } return r; };
+})();
 
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
