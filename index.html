@@ -1779,8 +1779,8 @@ function checkGoals(){ _checkGoals(); storyCheck(); }
 function _checkGoals(){
   if(!S) return;
   for(let c=0;c<CHAPTERS.length;c++){ for(const g of CHAPTERS[c].goals){ if(!S.goals[g.id] && c<=S.chapter && g.test()){ S.goals[g.id]=S.day; banner('🎯','Goal complete',g.text,'#00E676'); gainXP(25); if(STORY[g.id]) advise(STORY[g.id],{mood:'point', dur:14000}); } } }
-  const ch=CHAPTERS[S.chapter]; if(ch && ch.goals.every(g=>S.goals[g.id])){ const done=S.chapter; S.chapter++; confetti(); sfx('fanfare');
-    queueModal(()=>openModal(`<div class="eyebrow">Chapter ${done+1} complete</div><h2>${ch.name}</h2><div class="take"><img src="${PORT.celebrate}" alt=""><p>${done===0?'You proved the idea works. Time to get a real office.':done===1?'You\'re a company now, not a side project.':done===2?'The studio is known across Bot City.':done===3?'From a garage to a tower. You did it. The ticker is next.':'You are a public company. The job changed.'}</p></div>${CHAPTERS[S.chapter]?`<p>Next: <b>Chapter ${S.chapter+1} · ${CHAPTERS[S.chapter].name}</b>.${STAGES[S.chapter]?' You can now move to the '+STAGES[S.chapter].name+' from the Office menu.':''}</p>`:''}<div class="mactions"><button class="btn pri" data-close>Onward</button></div>`)); }
+  const ch=CHAPTERS[S.chapter]; if(ch && ch.goals.every(g=>S.goals[g.id])){ const done=S.chapter; S.chapter++; confetti(); sfx('fanfare'); try{ chapterReward(done); }catch(e){}
+    queueModal(()=>openModal(`<div class="eyebrow">Chapter ${done+1} complete</div><h2>${ch.name}</h2><div class="take"><img src="${PORT.celebrate}" alt=""><p>${done===0?'You proved the idea works. Time to get a real office.':done===1?'You\'re a company now, not a side project.':done===2?'The studio is known across Bot City.':done===3?'From a garage to a tower. You did it. The ticker is next.':(CH_DONE[done]||'You are a public company. The job changed.')}</p></div>${CHAPTERS[S.chapter]?`<p>Next: <b>Chapter ${S.chapter+1} · ${CHAPTERS[S.chapter].name}</b>.${STAGES[S.chapter]?' You can now move to the '+STAGES[S.chapter].name+' from the Office menu.':''}</p>`:''}<div class="mactions"><button class="btn pri" data-close>Onward</button></div>`)); }
 }
 function goalNext(){ const ch=CHAPTERS[S.chapter]; if(!ch) return null; return ch.goals.find(g=>!S.goals[g.id]); }
 
@@ -5396,7 +5396,7 @@ function cmdIndex(){ const R=[];
   Object.keys(FURN).forEach(k=>{ const d=FURN[k]; if(d.coll&&d.coll.secret&&!furnAv(k).ok) return; const a=furnAv(k); R.push({g:furnGroupName(k).split(' · ')[0], n:d.name, kw:(d.text||'')+' '+furnGroupName(k)+' place buy furniture', meta:a.ok?money(d.cost):'🔒 '+a.why, pin:'f:'+k, run:()=>placeKind(k)}); });
   TECH.forEach(t=>R.push({g:'Research', n:t.name, kw:t.text+' research tech', meta:S.rsch.done[t.id]?'Done':fmt(t.cost), pin:S.rsch.done[t.id]?null:'t:'+t.id, run:()=>{ ui.rbr=t.br||'core'; ui.fq.research=t.name; openPanel('research'); }}));
   UPGRADES.forEach(u=>R.push({g:'Upgrade', n:u.name, kw:u.text+' upgrade '+u.cat, meta:'Lv '+upgLvl(u.id), pin:'u:'+u.id, run:()=>{ ui.fq.upgrades=u.name; openPanel('upgrades'); }}));
-  const ch=CHAPTERS[(S.chapter||1)-1]; if(ch) ch.goals.forEach(g=>R.push({g:'Goal', n:g.text, kw:'story chapter goal quest', meta:'Chapter '+S.chapter, pin:'g:'+g.id, run:()=>openPanel('story')}));
+  const ch=CHAPTERS[S.chapter||0]; if(ch) ch.goals.forEach(g=>R.push({g:'Goal', n:g.text, kw:'story chapter goal quest', meta:'Chapter '+((S.chapter||0)+1), pin:'g:'+g.id, run:()=>openPanel('story')}));
   (typeof ACH!=='undefined'?ACH:[]).forEach(a=>R.push({g:'Trophy', n:a.n, kw:a.d+' achievement trophy', meta:ACHS[a.id]?'Earned':'', run:()=>{ ui.fq.ach=a.n; openPanel('ach'); }}));
   return R; }
 function cmdScore(it, q){ const n=it.n.toLowerCase(), all=(n+' '+(it.kw||'')+' '+it.g).toLowerCase(); const ws=q.split(/\s+/).filter(Boolean); if(!ws.every(w=>all.includes(w))) return -1; let s=0; if(n===q) s+=100; if(n.startsWith(q)) s+=40; ws.forEach(w=>{ if(n.includes(w)) s+=10; if(new RegExp('\\b'+w.replace(/[^a-z0-9]/g,'')).test(n)) s+=6; }); if(it.g==='Go to') s+=8; if(it.g==='Action') s+=4; return s-n.length*.05; }
@@ -5576,6 +5576,172 @@ function volHTML(){ return [['master','Master volume'],['music','Music'],['sfx',
 function cmdBtn(){ if($('#hCmd')) return; const hb=$('#hud .hbtns'); if(!hb) return; const b=document.createElement('button'); b.id='hCmd'; b.innerHTML=ico('search'); b.dataset.tip='Search everything (Ctrl K)'; b.setAttribute('aria-label','Search everything'); b.onclick=()=>cmdOpen(); hb.insertBefore(b, hb.firstChild); }
 
 (function(){ const _rp=refreshPaused; refreshPaused=function(){ const r=_rp(); const el=$('#paused'); if(el && el.classList.contains('inmodal') && !el.hidden){ requestAnimationFrame(()=>{ const c=$('#modalCard'); if(c && c.getBoundingClientRect().bottom>innerHeight-52) el.hidden=true; }); } return r; }; })();
+/* =====================================================================
+   ROUND 26 · CHAPTERS 6–12 (12 chapters in total)
+   ===================================================================== */
+const prodDaily=()=>S.products.reduce((a,p)=>a+(p.launched?(p.rate||0):0),0);
+const citiesOpen=()=>Object.keys(S.cities||{}).filter(k=>S.cities[k]).length;
+const rdDone=()=>Object.keys(S.rsch.done).length;
+const achCount=()=>Object.keys(ACHS||{}).length;
+const unlCount=()=>UNLOCKS.filter(k=>{ try{ return isUnlocked(k); }catch(e){ return false; } }).length;
+const upgLevels=()=>UPGRADES.reduce((a,u)=>a+upgLvl(u.id),0);
+const upgMaxed=()=>UPGRADES.filter(u=>upgLvl(u.id)>=(u.fx?UPG_MAX:1)).length;
+const eqOwned=()=>new Set(S.furn.filter(f=>FURN[f.kind]&&FURN[f.kind].equip).map(f=>f.kind)).size;
+const moonDone=()=>TECH.filter(t=>t.br==='moon'&&S.rsch.done[t.id]).length;
+const rivalsBeaten=()=>!!(S.rivals && S.rivals.filter(r=>r.alive).every(r=>studioValue()>r.v));
+CHAPTERS.push(
+  {name:'Going Global', goals:[
+    {id:'c6city', text:'Open your first world office', test:()=>citiesOpen()>=1},
+    {id:'c6city3', text:'Open 3 world offices', test:()=>citiesOpen()>=3, prog:()=>citiesOpen()/3},
+    {id:'c6team', text:'Grow the team to 35', test:()=>S.team.length>=35, prog:()=>S.team.length/35},
+    {id:'c6cats', text:'Deliver work in all 6 categories', test:()=>Object.keys(S.stats.cats).length>=6, prog:()=>Object.keys(S.stats.cats).length/6},
+    {id:'c6fans', text:'Reach 1 million fans', test:()=>S.fans>=1e6, prog:()=>S.fans/1e6},
+    {id:'c6inv', text:'Invoice $10,000,000 in total', test:()=>S.stats.invoiced>=1e7, prog:()=>S.stats.invoiced/1e7}]},
+  {name:'The Platform', goals:[
+    {id:'c7live', text:'Have 5 products live at once', test:()=>S.products.filter(p=>p.launched).length>=5, prog:()=>S.products.filter(p=>p.launched).length/5},
+    {id:'c7nine', text:'Launch a product that scores 9 or more', test:()=>S.products.some(p=>p.launched&&p.score>=9)},
+    {id:'c7rate', text:'Earn $25,000 a day from products', test:()=>prodDaily()>=25000, prog:()=>prodDaily()/25000},
+    {id:'c7rd', text:'Finish 60 research projects', test:()=>rdDone()>=60, prog:()=>rdDone()/60},
+    {id:'c7upg', text:'Reach 50 upgrade levels', test:()=>upgLevels()>=50, prog:()=>upgLevels()/50},
+    {id:'c7lvl', text:'Reach studio level 25', test:()=>SLVL()>=25, prog:()=>SLVL()/25}]},
+  {name:'Award Season', goals:[
+    {id:'c8award', text:'Win a Bot City Game Award', test:()=>(S.awards||[]).some(a=>a.you)},
+    {id:'c8goty', text:'Win Game of the Year', test:()=>(S.awards||[]).some(a=>a.you&&a.cat==='goty')},
+    {id:'c8rivals', text:'Be worth more than every rival in Bot City', test:rivalsBeaten},
+    {id:'c8rep', text:'Reach 4.5 stars of reputation', test:()=>S.rep>=90, prog:()=>S.rep/90},
+    {id:'c8ach', text:'Earn 40 trophies', test:()=>achCount()>=40, prog:()=>achCount()/40}]},
+  {name:'Empire', goals:[
+    {id:'c9floors', text:'Build the tower to 8 floors', test:()=>S.stage>=3&&S.floors.length>=8, prog:()=>S.stage>=3?S.floors.length/8:0},
+    {id:'c9team', text:'Grow the team to 60', test:()=>S.team.length>=60, prog:()=>S.team.length/60},
+    {id:'c9cities', text:'Open 8 world offices', test:()=>citiesOpen()>=8, prog:()=>citiesOpen()/8},
+    {id:'c9unicorn', text:'Be worth $1 billion', test:()=>studioValue()>=1e9, prog:()=>studioValue()/1e9},
+    {id:'c9pets', text:'Adopt 8 office pets', test:()=>petsOwned().length>=8, prog:()=>petsOwned().length/8},
+    {id:'c9eq', text:'Own 30 different pieces of equipment', test:()=>eqOwned()>=30, prog:()=>eqOwned()/30}]},
+  {name:'Moonshot', goals:[
+    {id:'c10moonrd', text:'Finish 5 Moonshot research projects', test:()=>moonDone()>=5, prog:()=>moonDone()/5},
+    {id:'c10base', text:'Open the Moon Base', test:()=>cityOpen('moon')},
+    {id:'c10rd', text:'Finish 150 research projects', test:()=>rdDone()>=150, prog:()=>rdDone()/150},
+    {id:'c10val', text:'Be worth $10 billion', test:()=>studioValue()>=1e10, prog:()=>studioValue()/1e10},
+    {id:'c10lvl', text:'Reach studio level 40', test:()=>SLVL()>=40, prog:()=>SLVL()/40}]},
+  {name:'Bot City Forever', goals:[
+    {id:'c11cities', text:'Open every world office', test:()=>citiesOpen()>=CITIES.length, prog:()=>citiesOpen()/CITIES.length},
+    {id:'c11team', text:'Grow the team to 100', test:()=>S.team.length>=100, prog:()=>S.team.length/100},
+    {id:'c11rd', text:'Finish 250 research projects', test:()=>rdDone()>=250, prog:()=>rdDone()/250},
+    {id:'c11unl', text:'Collect 80 unlockables', test:()=>unlCount()>=80, prog:()=>unlCount()/80},
+    {id:'c11ach', text:'Earn 75 trophies', test:()=>achCount()>=75, prog:()=>achCount()/75},
+    {id:'c11y10', text:'Reach year 10', test:()=>S.day>=3240, prog:()=>S.day/3240}]},
+  {name:'The Robot\'s Dream', goals:[
+    {id:'c12rd', text:'Finish every research project', test:()=>rdDone()>=TECH.length, prog:()=>rdDone()/TECH.length},
+    {id:'c12lvl', text:'Reach studio level 80', test:()=>SLVL()>=80, prog:()=>SLVL()/80},
+    {id:'c12val', text:'Be worth $100 billion', test:()=>studioValue()>=1e11, prog:()=>studioValue()/1e11},
+    {id:'c12upg', text:'Max out 25 upgrades', test:()=>upgMaxed()>=25, prog:()=>upgMaxed()/25},
+    {id:'c12unl', text:'Unlock every unlockable', test:()=>unlCount()>=UNLOCKS.length, prog:()=>unlCount()/UNLOCKS.length}]}
+);
+CHQ.push('Bot City was the warm-up.', 'Stop shipping features. Start building ecosystems.', 'The red carpet is just another deadline.', 'Big enough to be the villain. Careful.', 'Some ideas only make sense from orbit.', 'Build something that outlives the plan.', 'MoneyBot has one more question.');
+const CH_DONE=['You proved the idea works. Time to get a real office.', 'You\'re a company now, not a side project.', 'The studio is known across Bot City.', 'From a garage to a tower. You did it. The ticker is next.', 'You are a public company. The job changed.',
+  'Your logo is on a billboard in a city you can\'t pronounce yet. The world noticed.', 'Other studios now build on top of you. That\'s what a platform is.', 'Trophies on the shelf, rivals in the rear-view mirror.', 'A billion-dollar company that still remembers the garage.', 'You put a studio on the Moon. Juno ran out of headlines.', 'Ten years. The company will outlive the plan.', 'Every chapter, finished. MoneyBot finally knows what it\'s for.'];
+Object.assign(STORY, {
+  c6city:'Our first office outside Bot City! Each one gives a different bonus. Check Company → World to see them all.',
+  c7rate:'$25,000 a day while we sleep. That is what recurring revenue looks like when it grows up.',
+  c8goty:'Game of the Year. MoneyBot is going to need a bigger trophy shelf. And a polishing cloth.',
+  c9unicorn:'One billion dollars. In startup words, a unicorn. In MoneyBot words: a lot of counting.',
+  c10base:'We are officially an interplanetary studio. The commute is terrible, but the view is unbeatable.',
+  c11y10:'Ten years since the garage. Mom still has the photo on her fridge.'});
+
+/* lasting bonuses from chapter choices */
+const CH_FX={
+  ch6:{fast:{pay:1.04}, local:{morale:2}, remote:{speed:1.03}},
+  ch7:{open:{prod:1.05}, garden:{score:.1}, tools:{learn:1.06}},
+  ch8:{campaign:{fans:1.08}, craft:{qual:1}, rivals:{pay:1.03}},
+  ch9:{diner:{morale:2}, fund:{rep:.004}, bigger:{speed:1.03}},
+  ch10:{moon:{learn:1.05}, careful:{bug:.96}, both:{speed:1.02}},
+  ch11:{mentor:{xp:1.06}, foundation:{rep:.005}, people:{drain:.96}},
+  ch12:{freedom:{speed:1.04}, money:{pay:1.05}, friends:{morale:3}}};
+function chFx(k, add){ let v=add?0:1; if(!S||!S.story) return v; const f=S.story.flags; for(const ch in CH_FX){ const o=CH_FX[ch][f[ch]]; if(o && o[k]!=null){ if(add) v+=o[k]; else v*=o[k]; } } return v; }
+(function(){ const _um=upgMul; upgMul=function(k){ return _um(k)*(S?chFx(k):1); }; const _ua=upgAdd; upgAdd=function(k){ return _ua(k)+(S?chFx(k,true):0); };
+  const _bs=bonusSources; bonusSources=function(k){ const out=_bs(k), add=k in BK_ADD, v=chFx(k,add); if(add?Math.abs(v)>1e-6:Math.abs(v-1)>1e-6) out.push(['Story choices',v]); return out; }; })();
+function chapterReward(done){ if(done<4) return; const cash=Math.round(Math.max(25000, monthlyFixed())*(done-2)/1000)*1000; S.cash+=cash; gainXP(80+done*25); setTimeout(()=>toast('Chapter reward: <b>'+fmt(cash)+'</b> and bonus XP.',''),900); }
+
+BEATS.push(
+  ['ch6', ()=>S.chapter>=5], ['ch7', ()=>S.chapter>=6], ['ch8', ()=>S.chapter>=7], ['ch9', ()=>S.chapter>=8], ['ch10', ()=>S.chapter>=9], ['ch11', ()=>S.chapter>=10], ['ch12', ()=>S.chapter>=11], ['allch', ()=>S.chapter>=12]);
+Object.assign(SCENES, {
+ch6:()=>({title:'Passport', lines:[
+  ['n','Bot City Byte headquarters. Juno has a map on the wall with exactly one pin in it: yours.'],
+  ['juno',`Here's my question for the morning edition. ${S.name} owns Bot City. So what? Every big studio eventually asks: is one city enough?`],
+  ['mb','I have prepared a spreadsheet of every city on Earth. It is 41,000 rows long. I have opinions about all of them.','point'],
+  ['juno','Your rivals are already flying out. Pixel Forge opened a desk in Tokyo last week. How are you going to do it?'],
+  ['mb','Partner, this choice will follow us into every new office. Choose the kind of global company we become.','wave']],
+  choices:[
+    {t:'Go fast. Big clients in big cities.', s:'Contracts pay 4% more, forever', f:()=>{ F().ch6='fast'; }, then:[['juno','Bold. My headline writes itself: "Bot City studio wants the world."']]},
+    {t:'Hire locals and let them lead.', s:'Morale +2 everywhere, forever', f:()=>{ F().ch6='local'; }, then:[['mb','Local leaders, local knowledge. And twice as many birthday cakes in the calendar.','happy']]},
+    {t:'Remote-first. Talent lives everywhere.', s:'Work 3% faster, forever', f:()=>{ F().ch6='remote'; }, then:[['mb','Time zones mean the sun never sets on our pull requests.','celebrate']]}],
+  post:[['mb','First stop: <b>Company → World</b>. Every office brings a different bonus.','point']]}),
+ch7:()=>({title:'Ecosystem', lines:[
+  ['n','A yellow scooter. Of course it\'s Vera Pixel. She\'s holding a cartridge and grinning.'],
+  ['vera','I have a proposal, and it\'s not tacos this time. Pixel Forge wants to ship our games on your platform. So do eleven other studios.'],
+  ['mb','When other companies build on top of you, you stop being a studio and start being a platform. App stores, game consoles, cloud services: same idea.','point'],
+  ['vera','Question is: do you open the doors, or keep the garden walled?']],
+  choices:[
+    {t:'Open the platform to everyone.', s:'Product revenue +5%, forever', f:()=>{ F().ch7='open'; F().vera=F().vera||'jam'; }, then:[['vera','Now we\'re talking. Rivals by day, partners by night.']]},
+    {t:'Walled garden. Quality first.', s:'Every product scores +0.1, forever', f:()=>{ F().ch7='garden'; }, then:[['vera','Your house, your rules. Just make sure the garden\'s worth the wall.']]},
+    {t:'Give away the tools. Win the developers.', s:'Learning +6%, forever', f:()=>{ F().ch7='tools'; }, then:[['mb','Free tools today, loyal developers tomorrow. It\'s a long game. I love long games.','happy']]}]}),
+ch8:()=>({title:'Award Season', lines:[
+  ['n','A gold envelope slides under the tower door. The Bot City Game Awards. Black tie. Robots welcome.'],
+  ['juno','Off the record? The judges love you. On the record? Mr. Gray bought the table right in front of yours.'],
+  ['gray','Congratulations on the nomination. It\'s nice to be noticed. I would know.'],
+  ['mb','Partner, awards don\'t pay salaries. But they do bring fans, and fans buy games. How do we play this?','point']],
+  choices:[
+    {t:'Campaign hard. Billboards, trailers, all of it.', s:'Fans +8% from launches, forever · costs $50,000', f:()=>{ F().ch8='campaign'; S.cash-=50000; S.month.marketing=(S.month.marketing||0)+50000; }, then:[['juno','Your billboard is bigger than MegaCorp\'s. Mr. Gray noticed.']]},
+    {t:'Let the work speak for itself.', s:'Quality +1 on everything, forever', f:()=>{ F().ch8='craft'; }, then:[['mb','No campaign. Just better games. If we lose, we lose with our heads held high and our polygons polished.','wave']]},
+    {t:'Use the spotlight to win clients.', s:'Contracts pay 3% more, forever', f:()=>{ F().ch8='rivals'; }, then:[['gray','Clever. Turning a party into a sales meeting. You learned something at MegaCorp after all.']]}]}),
+ch9:()=>({title:'Empire', lines:[
+  ['n','The top floor of the tower. Mom is looking out at the city, holding the same cookie tray she brought on day one.'],
+  ['mom','You know what I saw on the way up? Chip\'s Diner has a "closing soon" sign in the window.'],
+  ['chip','Rent tripled. Some fancy studio moved in next door and the landlord got ideas.'],
+  ['mb','Partner... I checked. The fancy studio is one of ours. Our New York team rented the building next door.','concerned'],
+  ['mom','Big companies forget the little places that fed them. Don\'t be one of those.']],
+  choices:[
+    {t:'Buy the building. Chip stays, rent-free.', s:'Morale +2 forever · costs $250,000', f:()=>{ F().ch9='diner'; S.cash-=250000; S.month.other=(S.month.other||0)+250000; }, then:[['chip','Free pie for life. For the robot too, if it ever learns to eat.']]},
+    {t:'Start a Bot City fund for small businesses.', s:'Reputation grows a little every day, forever', f:()=>{ F().ch9='fund'; }, then:[['mom','That\'s my kid.']]},
+    {t:'Keep growing. Chip will land on his feet.', s:'Work 3% faster, forever', f:()=>{ F().ch9='bigger'; }, then:[['mom','Hm.'],['mb','I will be sending Chip a fruit basket. From my personal budget. Which is zero dollars.','concerned']]}]}),
+ch10:()=>({title:'Moonshot', lines:[
+  ['n','Ada Vault, the angel who wrote your first check, walks in with a rolled-up blueprint.'],
+  ['ada','Every great company I\'ve backed had one idea that sounded completely ridiculous. This is yours.'],
+  ['n','She unrolls it. It\'s a studio. On the Moon.'],
+  ['mb','Low gravity. Zero commute. Questionable Wi-Fi. I am 94% in.','celebrate'],
+  ['ada','Moonshot research first. Then the base. It will cost a fortune and take years. How do you want to run it?']],
+  choices:[
+    {t:'All in. The Moon or bust.', s:'Learning +5%, forever', f:()=>{ F().ch10='moon'; }, then:[['ada','That\'s the founder I wrote a check to.']]},
+    {t:'Carefully. Test everything twice.', s:'5% fewer bugs, forever', f:()=>{ F().ch10='careful'; }, then:[['mb','Rocket science is famous for one thing: checking your math.','point']]},
+    {t:'Moonshots on Fridays. Clients the rest of the week.', s:'Work 2% faster, forever', f:()=>{ F().ch10='both'; }, then:[['ada','Balanced. Boring. Probably right.']]}],
+  post:[['mb','Moonshot research is in <b>Research → Moonshots</b>. The Moon Base appears in <b>World</b> once we\'re ready.','point']]}),
+ch11:()=>({title:'Forever', lines:[
+  ['n','Rusty Gears, your oldest rival, sits in the lobby with a ScrapCo mug. He looks older. So do you.'],
+  ['rusty','I\'m retiring. ScrapCo was never going to win, but it was fun to lose to you.'],
+  ['rusty','Here\'s the thing nobody tells you: the company will outlive the plan. Maybe even outlive you. So what do you leave behind?'],
+  ['mb','I have never thought about "after". I am a robot. I assumed I would simply be updated.','concerned']],
+  choices:[
+    {t:'A mentor program. Every senior trains a junior.', s:'Studio XP +6%, forever', f:()=>{ F().ch11='mentor'; }, then:[['rusty','Good. Somebody trained you once. Probably badly.']]},
+    {t:'A foundation that teaches kids to code.', s:'Reputation grows a little every day, forever', f:()=>{ F().ch11='foundation'; }, then:[['mom','I\'ll volunteer. I\'ve been teaching people since before computers.']]},
+    {t:'A company people never want to leave.', s:'People tire 4% slower, forever', f:()=>{ F().ch11='people'; }, then:[['rusty','Then make sure there\'s a good coffee machine. Trust me.']]}]}),
+ch12:()=>({title:'The Robot\'s Dream', lines:[
+  ['n','3:00 AM. The tower is quiet. MoneyBot is standing at the window where the garage used to be visible, a long time ago.'],
+  ['mb','Partner. Can I ask you the question you asked me on day one?','concerned'],
+  ['mb','MegaCorp built me to count money. You pulled me out of a recycling bin. Since then I have counted billions. And yet.','concerned'],
+  ['mb','The best number I ever counted was <b>1</b>. Our first client. Chip\'s Diner. One website.','happy'],
+  ['mb','So. What was all of this <i>for</i>?','point']],
+  choices:[
+    {t:'Freedom. To build what we want.', s:'Work 4% faster, forever', f:()=>{ F().ch12='freedom'; }, then:[['mb','Freedom. Then let\'s keep using it.','celebrate']]},
+    {t:'Winning. And we won.', s:'Contracts pay 5% more, forever', f:()=>{ F().ch12='money'; }, then:[['mb','We did win. I counted it. Twice.','happy']]},
+    {t:'Each other. And the people we met on the way.', s:'Morale +3, forever', f:()=>{ F().ch12='friends'; }, then:[['mb','...My emotion module has crashed. Please give me a moment.','happy'],['mb','Rebooted. Partner, it has been an honor.','wave']]}],
+  post:[['mb','The last chapter. Finish it and we can say we did <b>everything</b>.','point']]}),
+allch:()=>({title:'The End (for now)', kicker:'Epilogue · Every chapter complete', lines:[
+  ['n','Every chapter, every goal, every number MoneyBot ever wanted to count.'],
+  ['mb',`From a garage with ${money(5000)} to this. Partner, you finished the whole story.`,'celebrate'],
+  ['mb','The studio keeps running. Rivals will rise, new awards every year, and there is always one more upgrade. But the story? The story is yours.','wave']],
+  choices:[{t:'Keep building', s:'+500 XP', f:()=>{ gainXP(500); F().allch=1; }, then:[['mb','Onward. Always onward.','happy']]}]})
+});
+
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
 function healSave(){
