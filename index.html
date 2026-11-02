@@ -5880,6 +5880,36 @@ window.addEventListener('keydown', e=>{ if(!S||titleMode) return; const tg=e.tar
 
 /* level curve: early levels unchanged, then a steady climb so level 80 is reachable in a long campaign */
 (function(){ const _ln=lvlNeed; lvlNeed=function(l){ return l<15 ? _ln(l) : Math.round(_ln(15)*(1+(l-15)*.18)/5)*5; }; })();
+/* =====================================================================
+   ROUND 30 · LONGER LATE GAME (first ~10 hours unchanged) + PLAY-TIME TRACKER
+   ===================================================================== */
+/* research: tiers 6-10 take longer and cost more (tiers 1-5 unchanged) */
+TECH.forEach(t=>{ if(t.tier>=6 && !t._long){ t._long=1; const k=t.tier-5; t.days=Math.round(t.days*(1+.25*k)); t.cost=Math.round(t.cost*(1+.2*k)/100)*100; } });
+/* levels: above 40 each level climbs a little steeper */
+(function(){ const _ln=lvlNeed; lvlNeed=function(l){ const b=_ln(l); return l<40 ? b : Math.round(b*(1+(l-40)*.04)/5)*5; }; })();
+/* late chapters ask for more */
+(function(){ const G={}; CHAPTERS.forEach(c=>c.goals.forEach(g=>G[g.id]=g)); const set=(id,text,test,prog)=>{ const g=G[id]; if(!g) return; g.text=text; g.test=test; g.prog=prog; };
+  const unl=()=>UNLOCKS.filter(k=>{ try{ return isUnlocked(k); }catch(e){ return false; } }).length, rd=()=>Object.keys(S.rsch.done).length, ach=()=>Object.keys(ACHS||{}).length, eq=()=>new Set(S.furn.filter(f=>FURN[f.kind]&&FURN[f.kind].equip).map(f=>f.kind)).size;
+  const mx=()=>UPGRADES.filter(u=>upgLvl(u.id)>=(u.fx?UPG_MAX:1)).length;
+  set('c9team','Grow the team to 70',()=>S.team.length>=70,()=>S.team.length/70);
+  set('c9pets','Adopt 10 office pets',()=>petsOwned().length>=10,()=>petsOwned().length/10);
+  set('c9eq','Own 40 different pieces of equipment',()=>eq()>=40,()=>eq()/40);
+  set('c10rd','Finish 170 research projects',()=>rd()>=170,()=>rd()/170);
+  set('c11team','Grow the team to 120',()=>S.team.length>=120,()=>S.team.length/120);
+  set('c11rd','Finish 280 research projects',()=>rd()>=280,()=>rd()/280);
+  set('c11unl','Collect 95 unlockables',()=>unl()>=95,()=>unl()/95);
+  set('c11ach','Earn 90 trophies',()=>ach()>=90,()=>ach()/90);
+  set('c11y10','Reach year 15',()=>S.day>=5040,()=>S.day/5040);
+  set('c12upg','Max out 35 upgrades',()=>mx()>=35,()=>mx()/35);
+  if(typeof STORY!=='undefined') STORY.c11y10='Fifteen years since the garage. Mom still has the photo on her fridge.'; })();
+
+/* play-time tracker */
+setInterval(()=>{ if(S && !titleMode && !document.hidden){ S.playMs=(S.playMs||0)+5000; } }, 5000);
+function playTxt(ms){ const m=Math.floor((ms||0)/60000); return m<60 ? m+' min played' : (m/60).toFixed(m<600?1:0)+' h played'; }
+(function(){ const _hq=hqPanel; hqPanel=function(){ const r=_hq(); const eb=$('#modalCard .eyebrow'); if(eb && !eb.dataset.pt){ eb.dataset.pt=1; eb.insertAdjacentHTML('beforeend',' · '+playTxt(S.playMs)+' · chapter '+Math.min(CHAPTERS.length,(S.chapter||0)+1)+' of '+CHAPTERS.length); } return r; };
+  const _sm=slotMeta; slotMeta=function(n){ const m=_sm(n); if(!m) return m; try{ const s=JSON.parse(localStorage.getItem(slotKey(n))||'null'); m.play=s&&s.playMs||0; m.ch=s&&s.chapter||0; }catch(e){} return m; };
+  const _sr=slotsRender; slotsRender=function(){ _sr(); $$('#slots [data-slot]').forEach(b=>{ const m=slotMeta(+b.dataset.slot); const sp=b.querySelector('span'); if(m && sp && !sp.dataset.pt){ sp.dataset.pt=1; sp.textContent+=' · Ch. '+Math.min(CHAPTERS.length,m.ch+1)+' · '+playTxt(m.play); } }); }; })();
+
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
 function healSave(){
