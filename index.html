@@ -1352,8 +1352,8 @@ const CHAPTERS = [
     {id:'demo', text:'Finish Demo Day', test:()=>S.accel&&S.accel.status==='done'},
     {id:'ltv', text:'Make LTV bigger than CAC', test:()=>{ const u=unitEcon(); return u.ltv>0 && u.cac>0 && u.ltv>u.cac; }}]},
   {name:'Public', goals:[
-    {id:'ipo', text:'List on the Bot City Exchange', test:()=>S.ipo&&S.ipo.status==='listed'},
-    {id:'earn', text:'Report your first earnings', test:()=>S.ipo&&(S.ipo.reports||0)>=1},
+    {id:'ipo', text:'Go public on the Bot City Exchange, or stay private and reach a $200M valuation', test:()=>!!(S.ipo&&S.ipo.status==='listed') || studioValue()>=2e8, prog:()=>(S.ipo&&S.ipo.status==='listed')?1:studioValue()/2e8},
+    {id:'earn', text:'Report your first earnings, or stay private and earn $10,000 a day from products', test:()=>!!(S.ipo&&(S.ipo.reports||0)>=1) || (!(S.ipo&&S.ipo.status==='listed') && S.products.reduce((a,p)=>a+(p.launched?p.rate||0:0),0)>=10000), prog:()=>(S.ipo&&S.ipo.status==='listed')?Math.min(1,S.ipo.reports||0):S.products.reduce((a,p)=>a+(p.launched?p.rate||0:0),0)/10000},
     {id:'buy', text:'Acquire a studio', test:()=>!!(S.story&&(S.story.flags.boughtStudio||S.story.flags.boughtScrap))}
   ]}
 ];
@@ -5640,6 +5640,7 @@ CHAPTERS.push(
 CHQ.push('Bot City was the warm-up.', 'Stop shipping features. Start building ecosystems.', 'The red carpet is just another deadline.', 'Big enough to be the villain. Careful.', 'Some ideas only make sense from orbit.', 'Build something that outlives the plan.', 'MoneyBot has one more question.');
 const CH_DONE=['You proved the idea works. Time to get a real office.', 'You\'re a company now, not a side project.', 'The studio is known across Bot City.', 'From a garage to a tower. You did it. The ticker is next.', 'You are a public company. The job changed.',
   'Your logo is on a billboard in a city you can\'t pronounce yet. The world noticed.', 'Other studios now build on top of you. That\'s what a platform is.', 'Trophies on the shelf, rivals in the rear-view mirror.', 'A billion-dollar company that still remembers the garage.', 'You put a studio on the Moon. Juno ran out of headlines.', 'Ten years. The company will outlive the plan.', 'Every chapter, finished. MoneyBot finally knows what it\'s for.'];
+Object.defineProperty(CH_DONE,4,{get(){ return (S&&S.ipo&&S.ipo.status==='listed')?'You are a public company. The job changed.':'Still private, still yours, and worth more than most public companies. The job changed anyway.'; }});
 Object.assign(STORY, {
   c6city:'Our first office outside Bot City! Each one gives a different bonus. Check Company → World to see them all.',
   c7rate:'$25,000 a day while we sleep. That is what recurring revenue looks like when it grows up.',
