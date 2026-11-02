@@ -740,6 +740,39 @@ body.titling #modal{z-index:40}
 .wslide img{width:90px;height:105px;object-fit:contain}
 .wbig{font-family:var(--display);font-size:clamp(34px,8vw,56px);font-weight:800;line-height:1.05;margin:8px 0;color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.4)}
 .wslide p{font-size:16px;color:#E2E8F0}
+/* ===== round 18: pets, deep research, levels, world ===== */
+.crates{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.crt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px;border-radius:14px;border:1px solid color-mix(in srgb,var(--rc) 50%,transparent);background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--rc) 20%,transparent),rgba(255,255,255,.02) 70%);text-align:center}
+.crt>span{font-size:30px}.crt b{font-size:12.5px}.crt small{color:var(--muted);font-size:11px}.crt .btnrow{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}.crt .btn{padding:4px 8px;font-size:11.5px}
+@media (max-width:640px){ .crates{grid-template-columns:1fr 1fr} }
+.mypets{display:grid;gap:6px}
+.mypet{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.mypet.on{border-color:color-mix(in srgb,var(--rc) 70%,transparent);background:color-mix(in srgb,var(--rc) 10%,transparent)}
+.mypet .pi{font-size:26px}.mypet>div{flex:1;min-width:0}.mypet b{display:block}.mypet small{display:block;font-size:11.5px;color:var(--muted)}
+.dex{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.dexrow{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;border:1px solid color-mix(in srgb,var(--rc) 35%,transparent);background:rgba(255,255,255,.02)}
+.dexrow .pi{font-size:20px}.dexrow>div:nth-child(2){flex:1;min-width:0}.dexrow b{display:block;font-size:12.5px}.dexrow small{font-size:10.5px;color:var(--rc)}
+.coats{display:flex;gap:3px}.coats i{width:11px;height:11px;border-radius:50%;border:1.5px solid;opacity:.5}.coats i.on{opacity:1;box-shadow:0 0 6px currentColor}
+.crate{text-align:center}
+.cbox{font-size:96px;cursor:pointer;display:grid;justify-items:center;padding:20px;filter:drop-shadow(0 10px 30px color-mix(in srgb,var(--rc) 60%,transparent))}
+.cbox span{font-size:14px;color:var(--rc);font-weight:700}
+.cbox.shake{animation:cshake .9s ease-in-out}
+@keyframes cshake{0%,100%{transform:none}10%,30%,50%,70%{transform:rotate(-8deg) scale(1.05)}20%,40%,60%,80%{transform:rotate(8deg) scale(1.1)}90%{transform:scale(1.4)}}
+.creveal{padding:16px;border-radius:20px;border:2px solid var(--rc);background:radial-gradient(ellipse at 50% 20%,color-mix(in srgb,var(--rc) 35%,transparent),rgba(10,10,26,.9) 70%);box-shadow:0 0 50px color-mix(in srgb,var(--rc) 40%,transparent);animation:envPop .5s cubic-bezier(.2,1.4,.4,1)}
+.creveal .pr{font:700 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--rc)}
+.creveal .pbig{font-size:84px;line-height:1.1}
+.rbr{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 6px}
+.rbr button{padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#E2E8F0;font:600 12px var(--body);cursor:pointer}
+.rbr button small{color:var(--muted);font-weight:500}
+.rbr button.on{border-color:var(--neon);background:rgba(0,230,118,.14)}
+.ulv{font:700 10px var(--mono);color:var(--gold);margin-left:4px}
+.upip{display:flex;gap:2px;margin:4px 0 2px}.upip u{flex:1;height:4px;border-radius:9px;background:rgba(255,255,255,.1);text-decoration:none}.upip u.on{background:linear-gradient(90deg,var(--neon),var(--gold))}
+.cities{display:grid;gap:6px;margin-top:10px}
+.city{display:flex;gap:10px;align-items:center;padding:10px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.city.on{border-color:rgba(56,189,248,.55);background:rgba(56,189,248,.08)}
+.city.moon{border-color:rgba(251,191,36,.45);background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(99,102,241,.1))}
+.city .cf{font-size:28px}.city>div{flex:1;min-width:0}.city b{display:block}.city small{display:block;font-size:12px;color:#CBD5E1}.city em{color:#7DD3FC;font-style:normal;font-weight:700}
+
 
 </style>
 <canvas id="gl" tabindex="0"></canvas>
@@ -2194,9 +2227,9 @@ function fitWord(f){ return f>=55?'Great':f>=38?'Good':f>=25?'OK':'Weak'; }
 function fitColor(f){ return f>=55?'var(--neon)':f>=38?'#86EFAC':f>=25?'var(--gold)':'var(--red)'; }
 function offerScore(o){ const f=teamFit(PTYPES[o.type].w); return (f/100)*o.pay/Math.max(1,estDays(o)) * (estDays(o)<=o.days?1:.3); }
 function teamFit(w){ const ppl=S.team.filter(p=>!p.job && !p.training).map(p=>eff(p,w)).sort((a,b)=>b-a); return ppl.length?ppl[0]:0; }
-const GROUPS = {work:['contracts','projects','products'], team:['team','hire'], office:['build'], company:['finance','funding','accel','upgrades','research'], story:['story','rank','ach','inbox']};
-const SUBN = {contracts:'Contracts', projects:'Projects', products:'Products', team:'Team', hire:'Hire', finance:'Money', funding:'Funding', accel:'Accelerator', upgrades:'Upgrades', research:'Research', story:'Story', rank:'Leaderboard', ach:'Trophies', inbox:'Inbox'};
-const DRAWER = ['contracts','projects','products','team','hire','finance','funding','accel','upgrades','research','story','rank','ach','inbox'];
+const GROUPS = {work:['contracts','projects','products'], team:['team','hire','pets'], office:['build'], company:['finance','funding','accel','upgrades','research','world'], story:['story','rank','ach','inbox']};
+const SUBN = {contracts:'Contracts', projects:'Projects', products:'Products', team:'Team', hire:'Hire', pets:'Pets', world:'World', finance:'Money', funding:'Funding', accel:'Accelerator', upgrades:'Upgrades', research:'Research', story:'Story', rank:'Leaderboard', ach:'Trophies', inbox:'Inbox'};
+const DRAWER = ['contracts','projects','products','team','hire','pets','world','finance','funding','accel','upgrades','research','story','rank','ach','inbox'];
 function groupOf(p){ for(const g in GROUPS) if(GROUPS[g].includes(p)) return g; return null; }
 function markTabs(){ const g = ui.panel ? groupOf(ui.panel) : (!$('#palette').hidden ? 'office' : null); $$('#dockInner [data-g]').forEach(b=>b.classList.toggle('on', b.dataset.g===g)); }
 function openPanel(p){
@@ -2260,6 +2293,8 @@ function panelBody(p){
   if(p==='research') researchPanel();
   if(p==='rank') rankPanel();
   if(p==='ach') achPanel();
+  if(p==='pets') petsPanel();
+  if(p==='world') worldPanel();
   if(p==='inbox') inboxPanel();
   if(p==='products') productsPanel();
   if(p==='upgrades') upgradesPanel();
@@ -3748,6 +3783,265 @@ veraend:()=>({title:'Vera\'s offer', lines:[
   const _sw=spawnWalker; spawnWalker=function(p){ const had=walkers.has(p.id); const r=_sw(p); if(!had && p.founder && walkers.has(p.id)) applyOutfit(); return r; };
   const _br=buildRoom; buildRoom=function(){ const r=_br(); applyTheme(); return r; };
   const _st=storyTick; storyTick=function(){ const r=_st(); checkAch(); return r; };
+})();
+
+/* =====================================================================
+   ROUND 18 · MEGA EXPANSION
+   pets · deep research · upgrade levels · tiered achievements · world offices
+   ===================================================================== */
+
+/* ---------------- OFFICE PETS ---------------- */
+const RARITY = {c:{n:'Common', col:'#94A3B8'}, r:{n:'Rare', col:'#38BDF8'}, e:{n:'Epic', col:'#C084FC'}, l:{n:'Legendary', col:'#FBBF24'}};
+// b: body type · e: ears · t: tail · c/a: main/accent colors · p: perk
+const SPECIES = {
+  cat:{n:'Cat', i:'🐈', r:'c', b:'quad', e:'pointy', t:'long', c:'#F59E0B', a:'#FEF3C7', p:{morale:1}, d:'Morale +1'},
+  dog:{n:'Dog', i:'🐕', r:'c', b:'quad', e:'floppy', t:'short', c:'#A16207', a:'#FDE68A', p:{morale:2}, d:'Morale +2'},
+  hamster:{n:'Hamster', i:'🐹', r:'c', b:'quad', e:'round', t:'none', c:'#FDBA74', a:'#FFF7ED', s:.6, p:{click:1.04}, d:'Hustle +4%'},
+  bunny:{n:'Bunny', i:'🐇', r:'c', b:'quad', e:'long', t:'puff', c:'#E5E7EB', a:'#FBCFE8', p:{morale:1}, d:'Morale +1'},
+  duck:{n:'Duck', i:'🦆', r:'c', b:'bird', c:'#FDE047', a:'#F97316', p:{xp:1.03}, d:'Studio XP +3%'},
+  frog:{n:'Frog', i:'🐸', r:'c', b:'blob', c:'#4ADE80', a:'#14532D', p:{learn:1.03}, d:'Learning +3%'},
+  turtle:{n:'Turtle', i:'🐢', r:'c', b:'shell', c:'#65A30D', a:'#78350F', p:{drain:.98}, d:'Tire 2% slower'},
+  pigeon:{n:'Pigeon', i:'🐦', r:'c', b:'bird', c:'#94A3B8', a:'#6366F1', p:{xp:1.03}, d:'Studio XP +3%'},
+  mouse:{n:'Mouse', i:'🐭', r:'c', b:'quad', e:'round', t:'long', c:'#D1D5DB', a:'#FBCFE8', s:.55, p:{click:1.04}, d:'Hustle +4%'},
+  corgi:{n:'Corgi', i:'🐶', r:'r', b:'quad', e:'pointy', t:'short', c:'#EA580C', a:'#FFFFFF', s:.9, low:1, p:{morale:3}, d:'Morale +3'},
+  fox:{n:'Fox', i:'🦊', r:'r', b:'quad', e:'pointy', t:'fluffy', c:'#EA580C', a:'#FFFFFF', p:{speed:1.02}, d:'Work +2%'},
+  panda:{n:'Panda', i:'🐼', r:'r', b:'quad', e:'round', t:'short', c:'#F8FAFC', a:'#111827', s:1.15, p:{morale:2, drain:.98}, d:'Morale +2, tire 2% slower'},
+  penguin:{n:'Penguin', i:'🐧', r:'r', b:'bird', c:'#111827', a:'#F8FAFC', up:1, p:{bug:.98}, d:'2% fewer bugs'},
+  parrot:{n:'Parrot', i:'🦜', r:'r', b:'bird', c:'#22C55E', a:'#EF4444', p:{fans:1.05}, d:'Fans +5%'},
+  capybara:{n:'Capybara', i:'🦫', r:'r', b:'quad', e:'round', t:'none', c:'#92400E', a:'#78350F', s:1.2, p:{morale:3}, d:'Morale +3. Everyone loves him'},
+  pig:{n:'Mini Pig', i:'🐷', r:'r', b:'quad', e:'pointy', t:'curly', c:'#F9A8D4', a:'#EC4899', snout:1, p:{pay:1.02}, d:'Contracts +2%'},
+  owl:{n:'Owl', i:'🦉', r:'r', b:'bird', c:'#A16207', a:'#FDE68A', up:1, p:{learn:1.06}, d:'Learning +6%'},
+  sloth:{n:'Sloth', i:'🦥', r:'r', b:'quad', e:'none', t:'none', c:'#A8A29E', a:'#57534E', p:{drain:.95}, d:'Tire 5% slower'},
+  axolotl:{n:'Axolotl', i:'🦎', r:'e', b:'quad', e:'gills', t:'long', c:'#F9A8D4', a:'#DB2777', low:1, p:{qual:1}, d:'Quality +1'},
+  redpanda:{n:'Red Panda', i:'🐾', r:'e', b:'quad', e:'round', t:'fluffy', c:'#C2410C', a:'#FFFFFF', p:{morale:3, speed:1.02}, d:'Morale +3, work +2%'},
+  robodog:{n:'Robo Dog', i:'🤖', r:'e', b:'quad', e:'pointy', t:'short', c:'#CBD5E1', a:'#22C55E', metal:1, p:{speed:1.04}, d:'Work +4%'},
+  robocat:{n:'Robo Cat', i:'🦾', r:'e', b:'quad', e:'pointy', t:'long', c:'#475569', a:'#38BDF8', metal:1, p:{bots:1.1}, d:'Hustle Bots +10%'},
+  slime:{n:'Code Slime', i:'🟢', r:'e', b:'blob', c:'#4ADE80', a:'#052E16', glow:1, p:{bug:.95}, d:'5% fewer bugs'},
+  ghost:{n:'Office Ghost', i:'👻', r:'e', b:'ghost', c:'#F1F5F9', a:'#111827', glow:1, p:{xp:1.08}, d:'Studio XP +8%'},
+  dragon:{n:'Baby Dragon', i:'🐉', r:'l', b:'quad', e:'horns', t:'long', c:'#16A34A', a:'#FBBF24', wings:1, p:{speed:1.05, pay:1.03}, d:'Work +5%, contracts +3%'},
+  unicorn:{n:'Unicorn', i:'🦄', r:'l', b:'quad', e:'horn', t:'fluffy', c:'#FDF2F8', a:'#C084FC', s:1.2, p:{fans:1.15, morale:3}, d:'Fans +15%, morale +3'},
+  phoenix:{n:'Phoenix', i:'🔥', r:'l', b:'bird', c:'#F97316', a:'#FDE047', glow:1, wings:1, p:{rep:.03}, d:'Reputation grows daily'},
+  alien:{n:'Alien', i:'👽', r:'l', b:'ghost', c:'#86EFAC', a:'#111827', glow:1, p:{score:.1}, d:'Products score +0.1'},
+  moneypup:{n:'MoneyBot Pup', i:'💰', r:'l', b:'quad', e:'round', t:'short', c:'#FBBF24', a:'#05070D', metal:1, p:{click:1.15, bots:1.1}, d:'Hustle +15%, bots +10%'}
+};
+const COATS = [{id:'classic', n:'Classic'}, {id:'snow', n:'Snow', c:'#F8FAFC', a:'#CBD5E1'}, {id:'midnight', n:'Midnight', c:'#1E293B', a:'#818CF8'}, {id:'golden', n:'Golden', c:'#FBBF24', a:'#B45309', metal:1}, {id:'neon', n:'Neon', c:'#22C55E', a:'#A3E635', glow:1}];
+const PET_NAMES=['Biscuit','Pixel','Byte','Mochi','Nugget','Waffles','Sprocket','Pickles','Bean','Cosmo','Noodle','Turbo','Muffin','Widget','Pebble','Ziggy','Bloop','Captain','Dumpling','Gizmo','Fern','Juniper','Sushi','Taco','Bolt','Cookie','Chip Jr.','Server','Kernel','Patch'];
+function petKey(sp, coat){ return sp+':'+coat; }
+function petsOwned(){ return S.pets||(S.pets=[]); }
+function petDexCount(){ return new Set(petsOwned().map(p=>petKey(p.sp,p.coat))).size; }
+function petCap(){ return S.stage>=3 ? 3*Math.max(1,(S.floors||[]).length) : [1,3,5][S.stage]||5; }
+function petBonus(k, add){ let v=add?0:1; petsOwned().forEach(p=>{ if(!p.act) return; const P=SPECIES[p.sp]&&SPECIES[p.sp].p; if(!P||P[k]==null) return; const m=1+.2*((p.bond||1)-1); if(add) v+=P[k]*m; else v*=1+(P[k]-1)*m; }); return v; }
+function grantPet(sp, coat, why){
+  const L=petsOwned(); const dup=L.find(p=>p.sp===sp && p.coat===coat);
+  if(dup){ dup.bond=Math.min(5,(dup.bond||1)+1); banner(SPECIES[sp].i, dup.name+' bonded! Level '+dup.bond, 'Duplicate '+SPECIES[sp].n+': its bonus grows 20%', RARITY[SPECIES[sp].r].col); return dup; }
+  const p={id:'pet'+(S.seq++), sp, coat, name:pick(PET_NAMES), bond:1, act:L.filter(x=>x.act).length<petCap(), fl:curFloor(), got:S.day};
+  L.push(p); world.petsDirty=true; banner(SPECIES[sp].i, 'New pet: '+p.name+' the '+(coat==='classic'?'':COATS.find(c=>c.id===coat).n+' ')+SPECIES[sp].n, (why?why+' · ':'')+SPECIES[sp].d, RARITY[SPECIES[sp].r].col); return p;
+}
+const CRATES = {c:{n:'Pet Crate', i:'📦', w:[70,25,5,0], cost:2000}, r:{n:'Rare Pet Crate', i:'🎁', w:[35,45,17,3], cost:9000}, e:{n:'Epic Pet Crate', i:'💎', w:[5,40,42,13], cost:45000}, l:{n:'Legendary Crate', i:'👑', w:[0,0,40,60], cost:0}};
+function crateCost(t){ return Math.round(CRATES[t].cost*Math.pow(1.7,S.stage)/100)*100; }
+function rollPet(t){ const w=CRATES[t].w, roll=Math.random()*100; const r=roll<w[0]?'c':roll<w[0]+w[1]?'r':roll<w[0]+w[1]+w[2]?'e':'l'; const pool=Object.keys(SPECIES).filter(k=>SPECIES[k].r===r); const sp=pick(pool); const coat=Math.random()<.55?'classic':pick(COATS.slice(1)).id; return {sp, coat}; }
+function giveCrate(t, why){ S.crates=S.crates||{}; S.crates[t]=(S.crates[t]||0)+1; banner(CRATES[t].i, 'You got a '+CRATES[t].n+'!', (why?why+' · ':'')+'Open it in Team → Pets', RARITY[t].col); refreshBadges&&refreshBadges(); }
+function openCrate(t){
+  S.crates=S.crates||{}; if(!(S.crates[t]>0)) return; S.crates[t]--; const res=rollPet(t), Sp=SPECIES[res.sp], R=RARITY[Sp.r], coat=COATS.find(c=>c.id===res.coat);
+  openModal(`<div class="crate" style="--rc:${R.col}"><div class="eyebrow">${CRATES[t].n}</div><div class="cbox" id="cbox">${CRATES[t].i}<span>Tap to open</span></div><div class="creveal" id="crev" hidden><div class="pr">${R.n}</div><div class="pbig">${Sp.i}</div><h2>${coat.id==='classic'?'':coat.n+' '}${Sp.n}</h2><p>${Sp.d}</p></div><div class="mactions"><button class="btn pri" id="cDone" hidden>Nice!</button></div></div>`);
+  $('#cbox').onclick=()=>{ const b=$('#cbox'); if(b.classList.contains('shake')) return; b.classList.add('shake'); sfx('tick'); setTimeout(()=>{ b.hidden=true; $('#crev').hidden=false; $('#cDone').hidden=false; sfx(Sp.r==='l'||Sp.r==='e'?'fanfare':'chime'); if(Sp.r!=='c') confetti(); grantPet(res.sp, res.coat); }, ui.reduce?50:900); };
+  $('#cDone').onclick=()=>{ closeModal(); openPanel('pets'); };
+}
+function petsPanel(){
+  const L=petsOwned(), act=L.filter(p=>p.act).length, cap=petCap(), C=S.crates||{};
+  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Pets · ${petDexCount()} of ${Object.keys(SPECIES).length*COATS.length} collected</div><h2>Office pets</h2>
+    <div class="upbar"><i style="width:${petDexCount()/(Object.keys(SPECIES).length*COATS.length)*100}%"></i></div>
+    <p class="hint">Pets wander the office and give small bonuses while they're out (${act}/${cap} out now; bigger offices fit more). Duplicates raise a pet's bond level, up to 5.</p>
+    <div class="sec"><h5>Crates</h5><div class="crates">${['c','r','e','l'].map(t=>`<div class="crt" style="--rc:${RARITY[t].col}"><span>${CRATES[t].i}</span><b>${CRATES[t].n}</b><small>You have ${C[t]||0}</small><div class="btnrow">${C[t]?`<button class="btn pri" data-oc="${t}">Open</button>`:''}${CRATES[t].cost?`<button class="btn" data-bc="${t}" ${S.cash<crateCost(t)?'disabled':''}>Buy · ${money(crateCost(t))}</button>`:''}</div></div>`).join('')}</div>
+      <p class="hint">Also earned from level-ups, awards, character requests and gold achievements.</p></div>
+    ${L.length?`<div class="sec"><h5>Your pets</h5><div class="mypets">${L.map(p=>{ const Sp=SPECIES[p.sp]; return `<div class="mypet ${p.act?'on':''}" style="--rc:${RARITY[Sp.r].col}"><span class="pi">${Sp.i}</span><div><b>${p.name}</b><small>${p.coat==='classic'?'':COATS.find(c=>c.id===p.coat).n+' '}${Sp.n} · bond ${'♥'.repeat(p.bond||1)}</small><small>${Sp.d}</small></div><button class="btn ${p.act?'':'pri'}" data-pt="${p.id}">${p.act?'Send home':'Bring to office'}</button></div>`; }).join('')}</div></div>`:''}
+    <div class="sec"><h5>Pet collection</h5><div class="dex">${Object.entries(SPECIES).map(([k,Sp])=>`<div class="dexrow" style="--rc:${RARITY[Sp.r].col}"><span class="pi">${L.some(p=>p.sp===k)?Sp.i:'❔'}</span><div><b>${L.some(p=>p.sp===k)?Sp.n:'???'}</b><small>${RARITY[Sp.r].n}</small></div><div class="coats">${COATS.map(c=>{ const has=L.some(p=>p.sp===k&&p.coat===c.id); const col=c.c||Sp.c; return `<i class="${has?'on':''}" title="${c.n}" style="background:${has?col:'transparent'};border-color:${col}"></i>`; }).join('')}</div></div>`).join('')}</div></div>`);
+  $$('#modalCard [data-oc]').forEach(b=>b.onclick=()=>{ openCrate(b.dataset.oc); });
+  $$('#modalCard [data-bc]').forEach(b=>b.onclick=()=>{ const t=b.dataset.bc, c=crateCost(t); if(S.cash<c) return; S.cash-=c; S.month.other+=c; cashPop(-c); S.crates=S.crates||{}; S.crates[t]=(S.crates[t]||0)+1; sfx('build'); openCrate(t); });
+  $$('#modalCard [data-pt]').forEach(b=>b.onclick=()=>{ const p=L.find(x=>x.id===b.dataset.pt); if(!p) return; if(!p.act && L.filter(x=>x.act).length>=petCap()){ toast('The office is full of pets! Send one home or get a bigger office.','warn'); return; } p.act=!p.act; p.fl=curFloor(); world.petsDirty=true; sfx('tick'); openPanel('pets'); });
+}
+/* pet meshes */
+const petG=new THREE.Group(); const petObjs=new Map();
+function petMat(col, o){ return new THREE.MeshStandardMaterial(Object.assign({color:col, roughness:.55, metalness:.05}, o||{})); }
+function buildPet(p){
+  const Sp=SPECIES[p.sp], coat=COATS.find(c=>c.id===p.coat)||COATS[0], c=coat.c||Sp.c, a=coat.a||Sp.a, metal=coat.metal||Sp.metal, glow=coat.glow||Sp.glow;
+  const M=petMat(c, metal?{metalness:.8, roughness:.25}:glow?{emissive:c, emissiveIntensity:.35}:{}), A=petMat(a), K=petMat('#05070D',{roughness:.2});
+  const g=new THREE.Group(), body=new THREE.Group(); g.add(body); const s=(Sp.s||1)*.42; body.scale.setScalar(s);
+  const eyes=(y,z,dx)=>{ [-dx,dx].forEach(x=>{ const e=new THREE.Mesh(SPH,K); e.scale.setScalar(.07); e.position.set(x,y,z); body.add(e); }); };
+  if(Sp.b==='quad'){ const legH=Sp.low?.18:.35;
+    const tor=new THREE.Mesh(SPH,M); tor.scale.set(.42,.32,.6); tor.position.y=legH+.28; tor.castShadow=true; body.add(tor);
+    const head=new THREE.Mesh(SPH,M); head.scale.setScalar(.3); head.position.set(0,legH+.58,.5); head.castShadow=true; body.add(head);
+    const snout=new THREE.Mesh(SPH,A); snout.scale.set(.15,.11,.12); snout.position.set(0,legH+.5,.76); body.add(snout); if(Sp.snout){ snout.scale.set(.13,.1,.1); }
+    eyes(legH+.64,.74,.12);
+    [[-.22,-.32],[.22,-.32],[-.22,.32],[.22,.32]].forEach(([x,z])=>{ const l=new THREE.Mesh(BOX,M); l.scale.set(.12,legH+.12,.12); l.position.set(x,(legH+.12)/2,z); body.add(l); body.userData.legs=(body.userData.legs||[]).concat(l); });
+    const e=Sp.e, ear=(geo,sc,rx,y,o)=>{ [-1,1].forEach(sx=>{ const m=new THREE.Mesh(geo,o||M); m.scale.set(...sc); m.position.set(sx*.17,y,.45); m.rotation.z=-sx*rx; body.add(m); }); };
+    if(e==='pointy') ear(new THREE.ConeGeometry(.5,1,4),[.18,.24,.12],.2,legH+.86);
+    if(e==='floppy') ear(SPH,[.08,.2,.1],-.4,legH+.62);
+    if(e==='round') ear(SPH,[.1,.1,.06],.2,legH+.84,A);
+    if(e==='long') ear(SPH,[.07,.3,.06],.1,legH+1);
+    if(e==='gills'){ [-1,1].forEach(sx=>[0,1,2].forEach(i=>{ const m=new THREE.Mesh(SPH,A); m.scale.set(.04,.12,.04); m.position.set(sx*(.28+i*.02),legH+.6+i*.08,.42); m.rotation.z=-sx*(.8-i*.3); body.add(m); })); }
+    if(e==='horn'){ const h=new THREE.Mesh(new THREE.ConeGeometry(.06,.35,8),petMat('#FDE68A',{metalness:.6})); h.position.set(0,legH+.95,.62); h.rotation.x=.5; body.add(h); }
+    if(e==='horns') ear(new THREE.ConeGeometry(.5,1,6),[.08,.22,.08],.35,legH+.86,A);
+    const t=Sp.t; if(t && t!=='none'){ const tl=new THREE.Mesh(SPH,t==='fluffy'||t==='puff'?A:M); if(t==='long'){ tl.scale.set(.06,.06,.4); tl.position.set(0,legH+.42,-.75); tl.rotation.x=-.6; } if(t==='fluffy'){ tl.scale.set(.16,.16,.4); tl.position.set(0,legH+.42,-.75); tl.rotation.x=-.5; } if(t==='short'){ tl.scale.set(.07,.07,.14); tl.position.set(0,legH+.42,-.6); } if(t==='puff'){ tl.scale.setScalar(.12); tl.position.set(0,legH+.32,-.6); } if(t==='curly'){ tl.scale.set(.05,.05,.12); tl.position.set(0,legH+.4,-.62); } body.add(tl); body.userData.tail=tl; }
+    if(Sp.wings){ [-1,1].forEach(sx=>{ const w=new THREE.Mesh(SPH,A); w.scale.set(.04,.28,.36); w.position.set(sx*.42,legH+.5,0); w.rotation.z=sx*.6; body.add(w); }); }
+  } else if(Sp.b==='bird'){
+    const tor=new THREE.Mesh(SPH,M); tor.scale.set(.32,Sp.up?.48:.34,Sp.up?.32:.46); tor.position.y=Sp.up?.48:.36; tor.castShadow=true; body.add(tor);
+    const belly=new THREE.Mesh(SPH,A); belly.scale.set(.24,Sp.up?.38:.24,.2); belly.position.set(0,Sp.up?.44:.32,Sp.up?.16:.2); body.add(belly);
+    const head=new THREE.Mesh(SPH,M); head.scale.setScalar(.24); head.position.set(0,Sp.up?.98:.7,Sp.up?.06:.32); body.add(head);
+    const beak=new THREE.Mesh(new THREE.ConeGeometry(.08,.2,6),petMat('#F59E0B')); beak.rotation.x=Math.PI/2; beak.position.set(0,Sp.up?.95:.68,Sp.up?.32:.6); body.add(beak);
+    eyes(Sp.up?1.04:.76,Sp.up?.26:.52,.1);
+    [-1,1].forEach(sx=>{ const w=new THREE.Mesh(SPH,Sp.wings?A:M); w.scale.set(.05,Sp.wings?.36:.24,.3); w.position.set(sx*.32,Sp.up?.55:.4,0); w.rotation.z=sx*(Sp.wings?.7:.2); body.add(w); body.userData.wings=(body.userData.wings||[]).concat(w); });
+    [-.1,.1].forEach(x=>{ const l=new THREE.Mesh(BOX,petMat('#F59E0B')); l.scale.set(.05,.16,.05); l.position.set(x,.08,0); body.add(l); });
+  } else if(Sp.b==='shell'){
+    const sh=new THREE.Mesh(new THREE.SphereGeometry(1,16,10,0,Math.PI*2,0,Math.PI/2),A); sh.scale.set(.48,.36,.58); sh.position.y=.18; sh.castShadow=true; body.add(sh);
+    const head=new THREE.Mesh(SPH,M); head.scale.setScalar(.18); head.position.set(0,.26,.62); body.add(head); eyes(.32,.76,.08);
+    [[-.3,-.36],[.3,-.36],[-.3,.36],[.3,.36]].forEach(([x,z])=>{ const l=new THREE.Mesh(SPH,M); l.scale.set(.1,.1,.12); l.position.set(x,.1,z); body.add(l); });
+  } else { // blob & ghost
+    const bl=new THREE.Mesh(SPH, Sp.b==='ghost'?petMat(c,{transparent:true,opacity:.85,emissive:c,emissiveIntensity:.35}):M); bl.scale.set(.42,Sp.b==='ghost'?.55:.34,.42); bl.position.y=Sp.b==='ghost'?.75:.34; bl.castShadow=true; body.add(bl);
+    eyes(Sp.b==='ghost'?.85:.44,.38,.14); if(Sp.p.score){ [-1,1].forEach(sx=>{ const an=new THREE.Mesh(SPH,A); an.scale.setScalar(.06); an.position.set(sx*.18,Sp.b==='ghost'?1.32:.8,.1); body.add(an); }); }
+    body.userData.blob=bl;
+  }
+  if((p.bond||1)>=3){ const hl=new THREE.Mesh(new THREE.TorusGeometry(.1,.015,6,16), new THREE.MeshBasicMaterial({color:RARITY[Sp.r].col})); hl.rotation.x=Math.PI/2; hl.position.y=(Sp.b==='quad'?1.25:1.4)*s/.32*.32+.05; g.add(hl); }
+  g.userData.bob=Math.random()*6; return g;
+}
+function syncPets(){ if(!petG.parent) scene.add(petG); const want=new Set(petsOwned().filter(p=>p.act).map(p=>p.id));
+  for(const [id,o] of petObjs){ if(!want.has(id)){ petG.remove(o.g); petObjs.delete(id); } }
+  petsOwned().forEach(p=>{ if(!p.act || petObjs.has(p.id)) return; const g=buildPet(p); petG.add(g); const st=stageDef(); const pos=T2W(ri(0,st.w-1), ri(1,st.h-1)); g.position.copy(pos); petObjs.set(p.id,{g, p, tgt:pos.clone(), t:rand(0,3)}); });
+  world.petsDirty=false; }
+function updatePets(dt){
+  if(!S || titleMode) return; if(world.petsDirty || (!petObjs.size && petsOwned().some(p=>p.act))) syncPets(); petG.visible = ui.fl!==-1;
+  const st=stageDef(), tt=clock.elapsedTime;
+  for(const o of petObjs.values()){ const p=o.p; const vis = S.stage<3 || (p.fl||0)===curFloor(); o.g.visible=vis; if(!vis) continue;
+    o.t-=dt; const d=o.tgt.clone().sub(o.g.position); d.y=0; const L=d.length();
+    if(L<.05){ if(o.t<=0){ o.t=rand(2,7); if(Math.random()<.35 && walkers.size){ const w=pick([...walkers.values()]); if(w.rig.root.visible){ o.tgt=w.pos.clone().add(new THREE.Vector3(rand(-.5,.5),0,rand(.3,.7))); } } else { o.tgt=T2W(rand(0,st.w-1), rand(.5,st.h-1)); } } }
+    else { const sp=Math.min(L, dt*(SPECIES[p.sp].b==='shell'?.25:.75)*Math.max(1,Math.min(2.5,S.speed||1))); o.g.position.addScaledVector(d.normalize(), sp); o.g.rotation.y += (((Math.atan2(d.x,d.z)-o.g.rotation.y)+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*6); }
+    const moving=L>=.05, b=o.g.children[0];
+    b.position.y = SPECIES[p.sp].b==='ghost' ? .1+Math.sin(tt*2+o.g.userData.bob)*.05 : moving ? Math.abs(Math.sin(tt*10+o.g.userData.bob))*.03 : 0;
+    if(b.userData.tail) b.userData.tail.rotation.y=Math.sin(tt*(moving?10:4)+o.g.userData.bob)*.5;
+    if(b.userData.blob){ const k=1+Math.sin(tt*5+o.g.userData.bob)*.06; b.userData.blob.scale.y=(SPECIES[p.sp].b==='ghost'?.55:.34)*k; }
+    if(b.userData.wings) b.userData.wings.forEach((w,i)=>w.rotation.z=(i?1:-1)*(.2+Math.abs(Math.sin(tt*(moving?14:3)))*.5));
+  }
+}
+
+/* ---------------- DEEP RESEARCH (generated) ---------------- */
+const RBRANCH = {
+  core:{n:'Core', ic:'⭐'},
+  eng:{n:'Engineering', ic:'⚙️', topics:[['Build Pipelines','speed',1.015],['Test Automation','bug',.97],['Code Quality','qual',.6],['Dev Tools','speed',1.015],['Infrastructure','srv',.96],['Performance','score',.04],['Open Source','rep',.01],['Platform Teams','speed',1.015]]},
+  design:{n:'Design', ic:'🎨', topics:[['Design Systems','qual',.6],['User Research','score',.04],['Motion Design','fans',1.03],['Accessibility','rep',.01],['Brand Craft','pay',1.012],['Game Feel','score',.04],['Sound Design','fans',1.03],['Prototyping','speed',1.012]]},
+  ai:{n:'AI', ic:'🧠', topics:[['Machine Learning','prod',1.025],['AI Copilots','speed',1.018],['Recommendation Engines','prod',1.025],['Computer Vision','score',.04],['Language Models','pay',1.015],['AI Safety','bug',.97],['Autonomous Agents','bots',1.05],['Data Platforms','learn',1.03]]},
+  sec:{n:'Security', ic:'🛡️', topics:[['Threat Modeling','bug',.97],['Encryption','rep',.01],['Bug Bounties','bug',.97],['Zero Trust','pay',1.012],['Incident Response','rep',.01],['Compliance','pay',1.012],['Red Teams','qual',.5],['Fraud Detection','prod',1.02]]},
+  biz:{n:'Business', ic:'💼', topics:[['Sales Playbooks','pay',1.015],['Partnerships','offers',.25],['Pricing Strategy','pay',1.015],['Customer Success','rep',.01],['Enterprise Deals','pay',1.015],['Market Research','fans',1.03],['Finance Ops','srv',.97],['Global Expansion','offers',.25]]},
+  growth:{n:'Growth', ic:'📈', topics:[['Viral Loops','fans',1.04],['Community','fans',1.04],['Live Events','prod',1.025],['Creator Economy','fans',1.04],['Subscriptions','prod',1.025],['App Store Optimization','prod',1.02],['Esports','fans',1.04],['Merch','prod',1.02]]},
+  people:{n:'People', ic:'🫂', topics:[['Wellness','drain',.97],['Learning Culture','learn',1.04],['Career Ladders','morale',.8],['Team Rituals','morale',.8],['Hybrid Work','drain',.97],['Mentorship','learn',1.04],['Equity Plans','morale',.8],['Leadership','speed',1.012]]},
+  moon:{n:'Moonshots', ic:'🚀', topics:[['Quantum Computing','speed',1.02],['Brain Interfaces','learn',1.05],['Space Servers','srv',.94],['Fusion Power','drain',.96],['Robotics','bots',1.06],['Holograms','score',.05],['Time Crystals','click',1.06],['Teleportation','pay',1.02]]}
+};
+const ROMAN=['I','II','III','IV','V'];
+TECH.forEach(t=>{ if(!t.br) t.br='core'; });
+Object.entries(RBRANCH).forEach(([bk,B],bi)=>{ if(!B.topics) return; B.topics.forEach(([name,k,v],ti)=>{ for(let L=1;L<=5;L++){ const tier=Math.min(10, L*2-1+(ti%2)+(bk==='moon'?1:0)); const id=bk+'_'+ti+'_'+L; const fx={}; fx[k]=v; const cost=Math.round(2500*Math.pow(2.05,tier-1)*(bk==='moon'?3:1)/100)*100; const days=Math.round(4+tier*2.8+(bk==='moon'?6:0));
+  const req = L>1 ? bk+'_'+ti+'_'+(L-1) : (bk==='moon' ? 'agents' : null);
+  const eff = k==='qual'?'Quality +'+v:k==='score'?'Product scores +'+v:k==='rep'?'Reputation grows daily':k==='offers'?'+'+v+' contract slot':k==='morale'?'Morale +'+v:k==='drain'||k==='bug'||k==='srv'?((1-v)*100).toFixed(0)+'% less '+({drain:'tiredness',bug:'bugs',srv:'server cost'})[k]:'+'+((v-1)*100).toFixed(1).replace('.0','')+'% '+({speed:'work speed',fans:'fans',prod:'product revenue',pay:'contract pay',learn:'learning',bots:'Hustle Bot speed',click:'hustle power'})[k];
+  TECH.push({id, name:name+' '+ROMAN[L-1], cost, days, tier, req, br:bk, fx, text:eff+'.'}); } }); });
+// offers effects need whole numbers to matter: round down total
+function researchPanel(){
+  const R=S.rsch; if(!R.q) R.q=R.cur?[{id:R.cur,prog:R.prog||0}]:[]; const slots=researchSlots(), free=slots-R.q.length, rate=researchRate(); const br=ui.rbr||'core';
+  const list=TECH.filter(t=>t.br===br); const done=list.filter(t=>R.done[t.id]).length;
+  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">R&amp;D · ${Object.keys(R.done).length} of ${TECH.length} done</div><h2>Research</h2>
+    <div class="slots">${Array.from({length:slots},(_,i)=>{ const s=R.q[i], t=s&&TECH.find(x=>x.id===s.id); return t?`<div class="slot on"><b>${t.name}</b><div class="meter"><i style="width:${Math.min(100,s.prog/t.days*100)}%"></i></div><span class="hint">${Math.max(0,Math.ceil((t.days-s.prog)/rate))} days left</span></div>`:`<div class="slot"><b>Empty slot</b><span class="hint">Pick something below</span></div>`; }).join('')}</div>
+    <p class="hint">${slots} research slot${slots>1?'s':''}${jobN('res')?` · research runs ${Math.round((rate-1)*100)}% faster`:''}. Hire Researchers for more slots.</p>
+    <div class="rbr">${Object.entries(RBRANCH).map(([k,B])=>{ const L2=TECH.filter(t=>t.br===k), d=L2.filter(t=>R.done[t.id]).length; return `<button class="${k===br?'on':''}" data-rb="${k}">${B.ic} ${B.n} <small>${d}/${L2.length}</small></button>`; }).join('')}</div>
+    <div class="upbar"><i style="width:${done/list.length*100}%"></i></div>
+    <div class="techtree">${[...new Set(list.map(t=>t.tier))].sort((a,b)=>a-b).map(tier=>`<div class="tcol"><h5>Tier ${tier}</h5>${list.filter(t=>t.tier===tier).map(t=>{ const dn=R.done[t.id], active=R.q.some(s=>s.id===t.id), locked=t.req&&!R.done[t.req]; return `<button class="tech ${dn?'done':''} ${active?'active':''}" data-tech="${t.id}" ${dn||active||locked||!free||S.cash<t.cost?'disabled':''}><b>${t.name}</b><small>${t.text}</small><em>${dn?'Done':active?'In progress':locked?'Needs '+(TECH.find(x=>x.id===t.req)||{name:'?'}).name:fmt(t.cost)+' · '+Math.ceil(t.days/rate)+' days'}</em></button>`; }).join('')}</div>`).join('')}</div>
+    <div class="lesson">R&amp;D is spending money today on something that doesn't pay off until later. Big tech companies spend 10–20% of their revenue on it.</div>`);
+  $$('[data-rb]').forEach(b=>b.onclick=()=>{ ui.rbr=b.dataset.rb; sfx('tick'); openPanel('research'); });
+  $$('[data-tech]').forEach(b=>b.onclick=()=>{ const t=TECH.find(x=>x.id===b.dataset.tech); if(S.cash<t.cost || R.q.length>=researchSlots()) return; S.cash-=t.cost; S.month.research=(S.month.research||0)+t.cost; R.q.push({id:t.id, prog:0}); R.cur = R.q.length>=researchSlots()?R.q[0].id:null; sfx('build'); cashPop(-t.cost); openPanel('research'); });
+}
+
+/* ---------------- UPGRADE LEVELS ---------------- */
+const UPG_MAX=10;
+function upgLvl(id){ return (S.upgL||{})[id] || (S.upg[id]?1:0); }
+function upgCostAt(u){ const L=upgLvl(u.id); return Math.round(u.cost*Math.pow(2.3,L)/50)*50; }
+function upgradesPanel(){
+  const cats=['Hustle','Team','Engineering','Products','Business'], lv=UPGRADES.reduce((a,u)=>a+upgLvl(u.id),0), maxT=UPGRADES.reduce((a,u)=>a+(u.fx?UPG_MAX:1),0);
+  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Upgrades · ${lv} of ${maxT} levels</div><h2>Level up the studio</h2>
+    <div class="upbar"><i style="width:${lv/maxT*100}%"></i></div>
+    <div class="sec"><h5>Hustle Bots</h5><div class="row"><span>You own <b>${S.bots}</b>. Each one auto-hustles about every ${Math.round(30/upgMul('bots'))} minutes of game time.<br><span class="hint">Click power: ${clickPower().toFixed(2)} · ${S.hustles.toLocaleString()} clicks so far</span></span><button class="btn pri" id="buyBot">Buy · ${fmt(botCost())}</button></div></div>
+    ${cats.map(c=>{ const L=UPGRADES.filter(u=>u.cat===c).sort((a,b)=>a.cost-b.cost); return `<div class="sec"><h5>${c}</h5><div class="upgrid">${L.map(u=>{ const l=upgLvl(u.id), mx=u.fx?UPG_MAX:1, maxed=l>=mx, cost=upgCostAt(u), can=S.cash>=cost; return `<button class="upg ${l?'own':''} ${!maxed&&can?'can':''}" data-u="${u.id}" ${maxed||!can?'disabled':''}><span class="ui">${u.icon}</span><b>${u.name}${mx>1?` <span class="ulv">Lv ${l}/${mx}</span>`:''}</b><small>${u.text}${mx>1&&l?' (stacks each level)':''}</small>${mx>1?`<i class="upip">${Array.from({length:mx},(_,j)=>`<u class="${j<l?'on':''}"></u>`).join('')}</i>`:''}<em>${maxed?'Maxed':can?(l?'Level up · ':'')+fmt(cost):'Need '+fmt(cost-S.cash)+' more'}</em></button>`; }).join('')}</div></div>`; }).join('')}
+    <div class="lesson">Upgrades are investments: you pay once and they pay you back on every project after. Buy the ones that pay back fastest first.</div>`);
+  $('#buyBot').onclick=()=>{ const c=botCost(); if(S.cash<c){ toast('Not enough cash.','bad'); sfx('err'); return; } S.cash-=c; S.month.upgrades+=c; S.bots++; sfx('build'); cashPop(-c); openPanel('upgrades'); };
+  $$('[data-u]').forEach(b=>b.onclick=()=>{ const u=UPGRADES.find(x=>x.id===b.dataset.u), c=upgCostAt(u); if(S.cash<c) return; S.cash-=c; S.month.upgrades+=c; S.upgL=S.upgL||{}; const L=upgLvl(u.id)+1; S.upgL[u.id]=L; S.upg[u.id]=S.upg[u.id]||S.day; sfx('chime'); cashPop(-c); banner(u.icon, u.name+(L>1?' level '+L:''), u.text, '#FBBF24'); gainXP(5+L*2); openPanel('upgrades'); });
+}
+
+/* ---------------- WORLD OFFICES ---------------- */
+const CITIES = [
+  {id:'nyc', n:'New York', f:'🇺🇸', cost:4e5, rent:60000, fx:{pay:1.06}, d:'Finance and media clients. Contracts +6%.'},
+  {id:'lon', n:'London', f:'🇬🇧', cost:5e5, rent:65000, fx:{offers:1}, d:'Europe\'s biggest tech scene. +1 contract slot.'},
+  {id:'tok', n:'Tokyo', f:'🇯🇵', cost:6e5, rent:70000, fx:{score:.15}, d:'Home of legendary game studios. Products score +0.15.'},
+  {id:'seo', n:'Seoul', f:'🇰🇷', cost:5.5e5, rent:55000, fx:{fans:1.15}, d:'Esports capital. Fans +15%.'},
+  {id:'ber', n:'Berlin', f:'🇩🇪', cost:4.5e5, rent:45000, fx:{qual:2}, d:'Indie design scene. Quality +2.'},
+  {id:'blr', n:'Bangalore', f:'🇮🇳', cost:3.5e5, rent:30000, fx:{speed:1.06}, d:'Huge engineering talent pool. Work +6%.'},
+  {id:'sgp', n:'Singapore', f:'🇸🇬', cost:6e5, rent:65000, fx:{prod:1.08}, d:'Gateway to Asia. Product revenue +8%.'},
+  {id:'lag', n:'Lagos', f:'🇳🇬', cost:3e5, rent:25000, fx:{prod:1.06, fans:1.06}, d:'Africa\'s fastest-growing app market. Revenue and fans +6%.'},
+  {id:'sao', n:'São Paulo', f:'🇧🇷', cost:3.5e5, rent:35000, fx:{fans:1.1}, d:'Massive mobile gaming market. Fans +10%.'},
+  {id:'tor', n:'Toronto', f:'🇨🇦', cost:4e5, rent:45000, fx:{learn:1.12}, d:'AI research hub. Learning +12%.'},
+  {id:'syd', n:'Sydney', f:'🇦🇺', cost:4.5e5, rent:50000, fx:{morale:3}, d:'Great beaches, happy team. Morale +3.'},
+  {id:'dxb', n:'Dubai', f:'🇦🇪', cost:8e5, rent:80000, fx:{pay:1.08}, d:'Big-budget clients. Contracts +8%.'},
+  {id:'moon', n:'Moon Base', f:'🌕', cost:5e7, rent:2e6, fx:{speed:1.15, prod:1.2, fans:1.3}, d:'The first studio on the Moon. Work +15%, revenue +20%, fans +30%.', moon:1}
+];
+function cityOpen(id){ return !!(S.cities||{})[id]; }
+function cityFx(k, add){ let v=add?0:1; CITIES.forEach(c=>{ if(!cityOpen(c.id) || c.fx[k]==null) return; if(add) v+=c.fx[k]; else v*=c.fx[k]; }); return v; }
+function cityRent(){ return CITIES.reduce((a,c)=>a+(cityOpen(c.id)?c.rent:0),0); }
+function worldReady(){ return S.stage>=3 && S.floors.length>=3; }
+function worldPanel(){
+  const n=Object.keys(S.cities||{}).length;
+  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Global offices · ${n} of ${CITIES.length}</div><h2>Take ${S.name} worldwide</h2>
+    ${worldReady()?`<p class="hint">Each office costs money to open and adds monthly rent, but gives a permanent bonus. You need ${fmt(cityRent())} a month in rent for the ones you have.</p>`:`<div class="pathcard"><b>Locked.</b> Build the MoneyBot Tower to 3 floors to start opening offices around the world.</div>`}
+    <div class="cities">${CITIES.map(c=>{ const open=cityOpen(c.id), lockM=c.moon && (n<12 || !TECH.filter(t=>t.br==='moon').some(t=>S.rsch.done[t.id])), can=worldReady() && !open && !lockM && S.cash>=c.cost; return `<div class="city ${open?'on':''} ${c.moon?'moon':''}"><span class="cf">${c.f}</span><div><b>${c.n}</b><small>${c.d}</small><small class="hint">${open?'Open since '+dateStr(S.cities[c.id]):'Opens for '+fmt(c.cost)+' · '+fmt(c.rent)+'/mo rent'}${lockM?' · Needs all 12 cities and a Moonshot research':''}</small></div>${open?'<em>✓ Open</em>':`<button class="btn ${can?'pri':''}" data-city="${c.id}" ${can?'':'disabled'}>Open</button>`}</div>`; }).join('')}</div>
+    <div class="lesson">Opening offices abroad gets you new customers, talent and time zones. It also adds fixed costs and makes the company harder to manage. Big companies expand when their home market is already working.</div>`);
+  $$('[data-city]').forEach(b=>b.onclick=()=>{ const c=CITIES.find(x=>x.id===b.dataset.city); if(S.cash<c.cost) return; S.cash-=c.cost; S.month.moving+=c.cost; S.cities=S.cities||{}; S.cities[c.id]=S.day; cashPop(-c.cost); confetti(); sfx('fanfare'); banner(c.f,'New office: '+c.n, c.d, '#38BDF8'); gainXP(c.moon?500:120); if(c.moon) giveCrate('l','A space pet signed up'); openPanel('world'); });
+}
+
+/* ---------------- TIERED ACHIEVEMENTS ---------------- */
+const TIERN=['Bronze','Silver','Gold','Platinum','Diamond'], TIERI=['🥉','🥈','🥇','💠','💎'];
+[
+  ['ship','Shipper','client projects shipped',()=>S.stats.delivered,[25,100,300,750,2000]],
+  ['stars','Star Collector','five-star reviews',()=>S.stats.fiveStar,[25,100,300,800,2000]],
+  ['inv','Revenue','invoiced in total',()=>S.stats.invoiced,[5e5,5e6,5e7,5e8,5e9],1],
+  ['team','Headcount','people on the team',()=>S.team.length,[15,30,60,100,150]],
+  ['click','Hustle','hustle clicks',()=>S.hustles,[5000,25000,100000,500000,2000000]],
+  ['launch','Launcher','products launched',()=>S.products.filter(p=>p.launched).length,[3,10,25,50,100]],
+  ['rd','Researcher','research projects finished',()=>Object.keys(S.rsch.done).length,[25,60,120,200,TECH.length]],
+  ['perks','Perk Hoarder','perks collected',()=>Object.values(S.perks||{}).reduce((a,b)=>a+b,0),[15,25,40,60,90]],
+  ['lvl','Studio Level','studio level',()=>(S.lvl||0)+1,[10,30,50,75,100]],
+  ['quest','Good Friend','character requests finished',()=>S.stats.quests||0,[20,40,75,120,200]],
+  ['pets','Pet Collector','pets collected',()=>petDexCount(),[5,15,40,80,145]],
+  ['cities','Globetrotter','world offices open',()=>Object.keys(S.cities||{}).length,[1,3,6,10,13]],
+  ['floors','Architect','tower floors',()=>S.stage>=3?S.floors.length:0,[5,10,15,20,25]],
+  ['val','Valuation','company value',()=>studioValue(),[1e8,1e9,1e10,1e11,1e12],1],
+  ['prod','Passive Income','a day from products',()=>prodRate(),[5000,25000,100000,500000,2e6],1],
+  ['fans','Fandom','fans',()=>S.fans,[1e4,1e5,1e6,1e7,1e8]],
+  ['upg','Tinkerer','upgrade levels',()=>UPGRADES.reduce((a,u)=>a+upgLvl(u.id),0),[40,80,140,200,242]],
+  ['bots','Bot Boss','Hustle Bots',()=>S.bots,[10,25,50,100,200]],
+  ['clients','Loyalty','VIP clients',()=>Object.keys(S.clients||{}).filter(n=>clientTier(n)>=3).length,[2,5,10,20,40]],
+  ['years','Veteran','years in business',()=>Math.floor(S.day/360),[2,5,10,20,50]],
+  ['awards','Trophy Case','awards won',()=>(S.awards||[]).filter(a=>a.you).length,[3,8,15,30,60]],
+  ['heads','Org Chart','department heads',()=>S.team.filter(p=>p.promo).length,[4,6,7,10,15]],
+  ['unl','Decorator','special items unlocked',()=>Object.keys((S.story&&S.story.unl)||{}).length,[5,10,15,19,19]],
+  ['bond','Best Friends','max-bond pets',()=>petsOwned().filter(p=>(p.bond||1)>=5).length,[1,3,8,15,30]]
+].forEach(([k,n,what,fn,th,money])=>th.forEach((t,i)=>ACH.push({id:'t_'+k+'_'+i, ic:TIERI[i], n:n+' '+TIERN[i], d:(money?(k==='prod'?fmt(t):fmt(t)):t.toLocaleString())+' '+what, test:()=>fn()>=t, rew:i>=2?(i===4?'Legendary Crate':i===3?'Epic Pet Crate':'Rare Pet Crate'):null, crate:i>=2?['r','e','l'][i-2]:null})));
+
+/* ---------------- wiring ---------------- */
+(function(){
+  const _um=upgMul; upgMul=function(k){ let m=_um(k); if(!S) return m; if(S.upgL) UPGRADES.forEach(u=>{ const L=S.upgL[u.id]||0; if(L>1 && u.fx && u.fx[k]!=null) m*=Math.pow(u.fx[k], L-1); }); m*=petBonus(k)*cityFx(k); return m; };
+  const _ua=upgAdd; upgAdd=function(k){ let a=_ua(k); if(!S) return a; if(S.upgL) UPGRADES.forEach(u=>{ const L=S.upgL[u.id]||0; if(L>1 && u.fx && u.fx[k]!=null) a+=u.fx[k]*(L-1); }); a+=petBonus(k,true)+cityFx(k,true); if(k==='offers') a=Math.floor(a); return a; };
+  const _gx=gainXP; gainXP=function(n){ const before=S?(S.lvl||0):0; const r=_gx(n*(S?petBonus('xp'):1)); if(S){ for(let L=before+1; L<=(S.lvl||0); L++){ if(L%5===0) giveCrate('r','Level '+(L+1)+' reward'); else if(L%2===0) giveCrate('c','Level '+(L+1)+' reward'); } } return r; };
+  const _ca=checkAch; checkAch=function(){ const had=new Set(Object.keys(ACHS)); _ca(); ACH.forEach(a=>{ if(a.crate && ACHS[a.id] && !had.has(a.id)) giveCrate(a.crate, a.n); }); };
+  const _qd=questDone; questDone=function(pr, st, pay){ const r=_qd(pr, st, pay); if(pr.quest && st>=3) giveCrate('c', CAST[pr.quest.who].name+' says thanks'); return r; };
+  const _aw=awardsModal; awardsModal=function(y, cats){ const n0=(S.awards||[]).filter(a=>a.you).length; const r=_aw(y, cats); const t=setInterval(()=>{ if(!document.querySelector('.awards')){ clearInterval(t); if((S.awards||[]).filter(a=>a.you).length>n0) giveCrate('e','Award winner'); } }, 500); return r; };
+  const _em=endMonth; endMonth=function(){ const r=_em(); const rent=cityRent(); if(rent){ S.cash-=rent; const last=S.history[S.history.length-1]; if(last){ last.expenses+=rent; last.fixed=(last.fixed||0)+rent; last.cash=S.cash; } } return r; };
+  const _st=storyTick; storyTick=function(){ const r=_st(); if(S.story && seen('chip') && !S.petGift){ S.petGift=1; grantPet('cat','classic','A gift from Chip: a kitten from behind the diner'); } if(S.story && seen('tower') && S.petGift===1){ S.petGift=2; grantPet('robodog','classic','A housewarming gift from Mr. Gray. Suspicious.'); } return r; };
+  const _au=animUnlocks; animUnlocks=function(dt){ _au(dt); updatePets(dt); };
+  const _br=buildRoom; buildRoom=function(){ const r=_br(); world.petsDirty=true; for(const [id,o] of petObjs){ petG.remove(o.g); } petObjs.clear(); return r; };
+  const _md=decoMorale; decoMorale=function(){ return _md(); };
 })();
 
 /* ---------------- save / load ---------------- */
