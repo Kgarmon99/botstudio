@@ -700,6 +700,7 @@ button.perk:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 16px 40px 
 .accHero img{width:64px;height:76px;object-fit:contain}
 .lrow .tag{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:1px 6px;color:var(--muted);margin-left:6px}
 .lrow .tag.priv{color:#C4B5FD;border-color:rgba(196,181,253,.45)}
+.lrow .tag.pub{color:#5EEAD4;border-color:rgba(94,234,212,.45)}
 @media (max-width:640px){ .saas{grid-template-columns:1fr 1fr} }
 </style>
 <canvas id="gl" tabindex="0"></canvas>
@@ -788,7 +789,9 @@ const PROG=[[261.6,329.6,392.0,523.3],[196.0,246.9,293.7,392.0],[220.0,261.6,329
 const BOX = new THREE.BoxGeometry(1,1,1), CYL = new THREE.CylinderGeometry(1,1,1,20), SPH = new THREE.SphereGeometry(1,20,14), ICO = new THREE.IcosahedronGeometry(1,0);
 const MATS = {};
 let haloTex=null; const halos=[];
+function num(v, d){ v=+v; return Number.isFinite(v) ? v : (d==null?0:d); }
 function money(v, dec){
+  v = num(v, 0);
   const neg = v < 0; v = Math.abs(v);
   const d = dec != null ? dec : (v < 100 && v % 1 !== 0 ? 2 : 0);
   return (neg?'-$':'$') + v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1046,7 +1049,7 @@ function botCost(){ return Math.round(1500*Math.pow(1.2, S.bots||0)/50)*50; }
 function clickPower(){ let c=.45*upgMul('click')*(hasF('goldbot')?1.1:1)*(has('kb')?2:1)*(has('drinks')?2:1)*(has('copilot')?1.5:1)*(has('quantum')?3:1)*legacyMult(); return c; }
 function globalSpeed(){ return upgMul('speed')*(has('monitors')?1.05:1)*(has('copilot')?1.1:1)*(has('quantum')?1.15:1)*legacyMult(); }
 function bugMult(){ return (jobN('pm')?.9:1)*upgMul('bug')*(has('snippets')?.85:1)*(has('tests')?.75:1); }
-function fmt(v){ const a=Math.abs(v); if(a>=1e9) return (v<0?'-$':'$')+(a/1e9).toFixed(2)+'B'; if(a>=1e6) return (v<0?'-$':'$')+(a/1e6).toFixed(2)+'M'; return money(Math.round(v)); }
+function fmt(v){ v=num(v,0); const a=Math.abs(v); if(a>=1e9) return (v<0?'-$':'$')+(a/1e9).toFixed(2)+'B'; if(a>=1e6) return (v<0?'-$':'$')+(a/1e6).toFixed(2)+'M'; return money(Math.round(v)); }
 
 /* ---------------- state ---------------- */
 let S = null;
@@ -1161,8 +1164,8 @@ function step(dm){
   S.min+=dm;
   workTick(dm);
   // products earn continuously during the day
-  let inc=0, srv=0; S.products.forEach(p=>{ if(!p.launched) return; const g=(p.rate||0)*dm/540, c=(p.srv||0)*dm/540; p.rev+=g; p.revM=(p.revM||0)+g; inc+=g; srv+=c; });
-  if(inc||srv){ S.cash+=inc-srv; S.month.product+=inc; S.month.collected+=inc; S.month.servers+=srv; S.stats.productRev=(S.stats.productRev||0)+inc; }
+  let inc=0, srv=0; S.products.forEach(p=>{ if(!p.launched) return; const g=num(p.rate,0)*dm/540, c=num(p.srv,0)*dm/540; p.rev=num(p.rev,0)+g; p.revM=num(p.revM,0)+g; inc+=g; srv+=c; });
+  if(inc||srv){ S.cash=num(S.cash,0)+inc-srv; S.month.product=num(S.month.product,0)+inc; S.month.collected=num(S.month.collected,0)+inc; S.month.servers=num(S.month.servers,0)+srv; S.stats.productRev=num(S.stats.productRev,0)+inc; }
   // hustle bots auto-click
   if(S.bots){ S.botAcc=(S.botAcc||0)+dm*S.bots*upgMul('bots')/30; while(S.botAcc>=1){ S.botAcc--; hustle(null, true); } }
   if(S.frenzy>0) S.frenzy=Math.max(0,S.frenzy-dm);
@@ -1202,7 +1205,7 @@ function endDay(){
   if(S.day>=S.nextCands){ refreshCands(3); refreshSpecs(); S.nextCands=S.day+7; }
   // events
   if(--S.eventT<=0){ S.eventT=ri(5,9); rollEvent(); }
-  productsDay(); trendDay(); researchDay(); boardDay(); headsDay(); questTick(); accelDay();
+  productsDay(); trendDay(); researchDay(); boardDay(); headsDay(); questTick(); accelDay(); ipoDay();
   { const pi=S.products.reduce((a,p)=>a+(p.launched?(p.rate||0):0),0); if(pi>0) coinRain(Math.min(4,1+Math.floor(pi/2500))); }
   if(S.day%30===1) endMonth();
   setTimeout(refreshDrawer,0);
@@ -1224,7 +1227,7 @@ function endMonth(){
   if(S.negMonths>=2) queueModal(gameOver);
 }
 function burn(){ const h=S.history.slice(-3); if(!h.length) return null; const net=h.reduce((a,r)=>a+(r.collected-r.expenses),0)/h.length; return net; }
-function runway(){ const fixed=S.team.reduce((a,p)=>a+p.salary,0)+rentNow()+stageDef().util+45*S.team.length+S.loan*.015; const b=burn(); const out = b==null ? -fixed : b; if(out>=0) return Infinity; return Math.max(0,S.cash)/-out; }
+function runway(){ const fixed=S.team.reduce((a,p)=>a+p.salary,0)+rentNow()+stageDef().util+45*S.team.length+S.loan*.015; const b=burn(); const out = b==null ? -fixed : b; if(out>=0) return Infinity; return Math.max(0,num(S.cash))/Math.max(.01,-out); }
 
 /* projects */
 function acceptOffer(o){
@@ -1433,12 +1436,13 @@ function launch(pr){
   const combo=comboMult(prod.a,prod.b), trend=S.trend&&(S.trend.a===prod.a||S.trend.b===prod.b)?1.15:1;
   const last=S.products.filter(p=>p.launched).slice(-1)[0], novelty = last && last.a===prod.a && last.b===prod.b ? .85 : 1;
   let base=(q/100*5.2 + fit*3.2 + 1)*combo*novelty*trend + (prod.kind==='game'&&has('engine')?.4:0);
-  base += (prod.feats||[]).reduce((a,k)=>a+FEATS[k].s,0);
+  base += (prod.feats||[]).reduce((a,k)=>a+((FEATS[k]||{}).s||0),0);
   base+=(hasF('gong')?.3:0)+upgAdd('score'); base=clamp(base,1,10);
   const revs=REVIEWERS.map(r=>({r, s:clamp(Math.round((base+rand(-.8,.8))*2)/2,1,10)}));
   prod.score=revs.reduce((a,x)=>a+x.s,0)/4; prod.launched=S.day; prod.age=0; prod.boost=1; prod.fit=fit; prod.combo=combo;
+  prod.users=num(prod.users,0); prod.rev=num(prod.rev,0); prod.units=num(prod.units,0); prod.rate=0; prod.srv=0;
   S.known[prod.a+'|'+prod.b]=combo; S.known['recipe|'+prod.a]=fit;
-  const z=SIZES[prod.size];
+  const z=SIZES[prod.size]||SIZES.S;
   if(prod.kind==='game'){ prod.price=z.price.game*(S.rsch.done.console?1.5:1); prod.peak=(40+S.fans*.06+S.rep*2.5)*Math.pow(prod.score/5,2.4)*z.mult*trend; }
   else { prod.price=z.price.app; prod.grow=(8+S.fans*.015+S.rep*.4)*Math.pow(prod.score/5,2)*z.mult*trend; prod.churn=clamp(.16-prod.score*.012,.02,.16)*((prod.feats||[]).includes('sync')?.85:1); }
   S.fans+=Math.round(Math.pow(prod.score,2)*z.mult*6*upgMul('fans')*(jobN('mkt')?1.25:1)*(S.story&&S.story.flags.mission==='world'?1.25:1)); storyRecord('score', prod.score, '⭐', 'Best reviews yet', prod.name+' scored '+prod.score.toFixed(1));
@@ -1448,10 +1452,28 @@ function launch(pr){
 }
 function productsDay(onlyRates){
   const g=has('growth')?1.15:1, ad=(has('ads')?1.2:1)*upgMul('prod')*(1+.1*Math.min(3,jobN('mkt'))), srvC=(has('cloud')?.7:1)*upgMul('srv')*srvMult();
-  S.products.forEach(p=>{ if(!p.launched) return; const promo=(p.promoT>0?1+p.promoLvl*.6:1)*(p.boost||1)*legacyMult();
-    if(!onlyRates){ p.age++; if(p.promoT>0) p.promoT--; if(p.boost>1) p.boost=Math.max(1,p.boost-.04); }
-    if(p.kind==='game'){ const decay=18+p.score*4; const units=p.peak*Math.exp(-p.age/decay)*promo*g + p.score*.4; p.unitsDay=units; if(!onlyRates) p.units+=units; p.rate=units*p.price*.7*ad*accelProdMul(); p.srv=0; }
-    else { if(!onlyRates){ const add=p.grow*promo*g*Math.max(.25,1-p.age/400); p.users=Math.max(0, (p.users||0) + add - (p.users||0)*p.churn/30); } p.rate=(p.users||0)*p.price/30*ad*accelProdMul(); p.srv=(p.users||0)*.35/30*srvC*((S.floors||[]).some(f=>f.dept==='servers')?.6:1); }
+  S.products.forEach(p=>{
+    if(!p.launched) return;
+    if(!SIZES[p.size]) p.size='S';
+    p.score=num(p.score,5); p.age=num(p.age,0); p.price=num(p.price, p.kind==='game'?SIZES[p.size].price.game:SIZES[p.size].price.app);
+    const promo=(p.promoT>0?1+num(p.promoLvl,1)*.6:1)*num(p.boost,1)*legacyMult();
+    if(!onlyRates){ p.age++; if(p.promoT>0) p.promoT--; if(num(p.boost,1)>1) p.boost=Math.max(1,num(p.boost,1)-.04); }
+    if(p.kind==='game'){
+      p.peak=num(p.peak,40);
+      const decay=18+p.score*4, units=p.peak*Math.exp(-p.age/Math.max(1,decay))*promo*g + p.score*.4;
+      p.unitsDay=num(units,0); if(!onlyRates) p.units=num(p.units,0)+p.unitsDay;
+      p.rate=num(p.unitsDay*p.price*.7*ad*accelProdMul(),0); p.srv=0;
+    } else {
+      p.grow=num(p.grow,8); p.churn=clamp(num(p.churn,.1),.02,.4); p.users=num(p.users,0);
+      if(!onlyRates){
+        const add=p.grow*promo*g*Math.max(.25,1-p.age/400);
+        p.users=Math.max(0, p.users + add - p.users*p.churn/30);
+        if(add>0){ S.stats=S.stats||{}; S.stats.acqUsers=num(S.stats.acqUsers,0)+add; }
+      }
+      p.rate=num(p.users*p.price/30*ad*accelProdMul(),0);
+      p.srv=num(p.users*.35/30*srvC*((S.floors||[]).some(f=>f.dept==='servers')?.6:1),0);
+    }
+    p.rev=num(p.rev,0); p.rate=num(p.rate,0); p.srv=num(p.srv,0);
   });
 }
 function launchShow(prod, revs, fit, combo, trend){
@@ -1472,8 +1494,8 @@ function productsPanel(){
   const inc=live.reduce((a,p)=>a+(p.rate||0)-(p.srv||0),0);
   openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Products · ${fmt(inc)} a day</div><h2>Your products</h2>
     ${S.trend?`<p class="hint">🔥 Trending until ${dateStr(S.trend.until)}: <b>${S.trend.a}</b> and <b>${S.trend.b}</b>. Products that match sell better.</p>`:''}
-    <div class="cards">${live.map(p=>`<div class="card2"><div class="row"><span class="cat" style="background:${p.kind==='game'?CATC.Games:CATC.Apps}">${p.kind==='game'?'Game':'App'}</span><b style="color:${p.score>=8?'var(--neon)':p.score>=6?'var(--gold)':'var(--red)'}">${p.score.toFixed(1)}/10</b></div><h4>${p.name}</h4><div class="hint">${p.a} · ${p.b} · ${SIZES[p.size].name}${p.updates?' · v'+(p.updates+1)+'.0':''}</div>
-      <div class="kv"><div><label>${p.kind==='game'?'Sold/day':'Users'}</label><b>${p.kind==='game'?Math.round(p.unitsDay||0).toLocaleString():Math.round(p.users).toLocaleString()}</b></div><div><label>Per day</label><b class="pos">${fmt((p.rate||0)-(p.srv||0))}</b></div><div><label>Lifetime</label><b>${fmt(p.rev)}</b></div><div><label>${p.kind==='game'?'Price':G('Churn','churn')}</label><b>${p.kind==='game'?money(p.price):(p.churn*100).toFixed(1)+'%'}</b></div></div>
+    <div class="cards">${live.map(p=>`<div class="card2"><div class="row"><span class="cat" style="background:${p.kind==='game'?CATC.Games:CATC.Apps}">${p.kind==='game'?'Game':'App'}</span><b style="color:${num(p.score)>=8?'var(--neon)':num(p.score)>=6?'var(--gold)':'var(--red)'}">${num(p.score,0).toFixed(1)}/10</b></div><h4>${p.name}</h4><div class="hint">${p.a} · ${p.b} · ${(SIZES[p.size]||SIZES.S).name}${p.updates?' · v'+(p.updates+1)+'.0':''}${p.kind!=='game'?' · churn '+(num(p.churn,.1)*100).toFixed(1)+'%':''}</div>
+      <div class="kv"><div><label>${p.kind==='game'?'Sold/day':'Users'}</label><b>${p.kind==='game'?Math.round(num(p.unitsDay,0)).toLocaleString():Math.round(num(p.users,0)).toLocaleString()}</b></div><div><label>Per day</label><b class="pos">${fmt(num(p.rate,0)-num(p.srv,0))}</b></div><div><label>Lifetime</label><b>${fmt(p.rev)}</b></div><div><label>${p.kind==='game'?'Price':G('LTV','ltv')}</label><b>${p.kind==='game'?money(p.price):money(Math.round(num(p.price,0)/Math.max(.02,num(p.churn,.1))))}</b></div></div>
       <div class="btnrow"><button class="btn" data-upd="${p.id}" ${S.projects.some(q=>q.prod===p.id)?'disabled':''}>${S.projects.some(q=>q.prod===p.id)?'Update in progress':'Build an update'}</button><button class="btn" data-promo="${p.id}" ${p.promoT>0?'disabled':''}>${p.promoT>0?'Campaign running':'Ad campaign · '+fmt(promoCost(p))}</button></div></div>`).join('')}
       ${dev.map(p=>`<div class="card2"><div class="row"><span class="cat" style="background:#64748B">In development</span></div><h4>${p.name}</h4><div class="hint">${p.a} · ${p.b} · ${SIZES[p.size].name}. Check progress in Projects.</div></div>`).join('')}</div>
     ${!S.products.length?'<p class="hint">You haven\'t made anything of your own yet. Client work pays now. Products can pay forever.</p>':''}
@@ -1481,10 +1503,10 @@ function productsPanel(){
     <div class="lesson">Client work is trading time for money. Products are building an asset that earns without you. Most studios do both: client work pays the bills while products are built.</div>`);
   $('#npNew').onclick=()=>{ closeModal(); newProductModal(); };
   $$('[data-upd]').forEach(b=>b.onclick=()=>{ const prod=S.products.find(p=>p.id===+b.dataset.upd); registerProd(prod); const pr={id:S.seq++, type:prodTypeKey(prod,true), client:'Your studio', own:true, update:true, prod:prod.id, pts:PTYPES[prodTypeKey(prod,true)].pts, done:0, qSum:0, qPts:0, bugs:0, polish:0, pay:0, due:S.day+99999, start:S.day, crunch:false, net:0, deposit:0}; S.projects.push(pr); const tw=PTYPES[pr.type].w; S.team.filter(p=>!p.proj&&!p.training).sort((a,c)=>eff(c,tw)-eff(a,tw)).slice(0,1).forEach(p=>p.proj=pr.id); closeModal(); openPanel('projects'); });
-  $$('[data-promo]').forEach(b=>b.onclick=()=>{ const p=S.products.find(x=>x.id===+b.dataset.promo), c=promoCost(p); if(S.cash<c){ toast('Not enough cash.','bad'); sfx('err'); return; } S.cash-=c; S.month.marketing+=c; p.promo=(p.promo||0)+1; p.promoLvl=Math.min(4,p.promo); p.promoT=14; productsDay(true); sfx('coin'); openPanel('products'); });
+    $$('[data-promo]').forEach(b=>b.onclick=()=>{ const p=S.products.find(x=>x.id===+b.dataset.promo), c=promoCost(p); if(S.cash<c){ toast('Not enough cash.','bad'); sfx('err'); return; } S.cash-=c; S.month.marketing+=c; S.stats.mktSpend=num(S.stats.mktSpend,0)+c; p.promo=(p.promo||0)+1; p.promoLvl=Math.min(4,p.promo); p.promoT=14; productsDay(true); sfx('coin'); openPanel('products'); });
 }
 function promoCost(p){ return Math.round(800*Math.pow(1.7,p.promo||0)*SIZES[p.size].mult/50)*50; }
-function valuation(){ if(!S) return 0; const h=S.history.slice(-3), rev=h.length?h.reduce((a,r)=>a+r.revenue,0)/h.length*12:0; const prodY=S.products.reduce((a,p)=>a+(p.launched?((p.rate||0)-(p.srv||0))*365:0),0); return Math.max(0, S.cash-S.loan + rev*1.5 + prodY*3 + S.rep*1000 + (S.accel&&S.accel.bump||0)); }
+function valuation(){ if(!S) return 0; const h=S.history.slice(-3), rev=h.length?h.reduce((a,r)=>a+num(r.revenue,0),0)/h.length*12:0; const prodY=S.products.reduce((a,p)=>a+(p.launched?(num(p.rate,0)-num(p.srv,0))*365:0),0); return Math.max(0, num(S.cash)-num(S.loan) + rev*1.5 + prodY*3 + num(S.rep)*1000 + (S.accel&&S.accel.bump||0) + (S.ipo&&S.ipo.bump||0)); }
 function exitPanel(){
   const v=Math.max(valuation(), ...S.funding.rounds.map(r=>r.pre+r.amt)), mine=v*myShare()/100, pts=Math.floor(Math.sqrt(mine/100000)), L=legacy();
   openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Exit</div><h2>Sell ${S.name}?</h2>
@@ -1534,7 +1556,7 @@ const PITCH = [
   {q:'Why is your team the one to do this?', a:[['We\'ve shipped STATS for real clients already.',1],['We\'re really passionate.',0],['Honestly, we\'re still learning everything.',-1]], why:'Traction beats passion. Show what you\'ve already done.'},
   {q:'What happens if your biggest client leaves?', a:[['No single client is more than a fifth of our revenue.',1],['They would never leave us.',-1],['We\'d find another one.',0]], why:'Depending on one customer is a big risk. Spreading out revenue lowers it.'}
 ];
-function nextRound(){ const done=S.funding.rounds.map(r=>r.id); return ROUNDS.find(r=>!done.includes(r.id)); }
+function nextRound(){ if(S.ipo && S.ipo.status==='listed') return null; const done=S.funding.rounds.map(r=>r.id); return ROUNDS.find(r=>!done.includes(r.id)); }
 function myShare(){ return (S.funding.cap.find(c=>c.you)||{pct:100}).pct; }
 function fundingPanel(){
   const F=S.funding, nr=nextRound();
@@ -1542,10 +1564,13 @@ function fundingPanel(){
     <div class="captable">${F.cap.map((c,i)=>`<div class="capbar" style="flex:${c.pct};background:${c.you?'var(--neon)':['#3B82F6','#A855F7','#F59E0B','#EC4899','#14B8A6','#EF4444'][i%6]}" title="${c.name} ${c.pct.toFixed(1)}%"></div>`).join('')}</div>
     <table class="pl">${F.cap.map(c=>`<tr><td>${c.you?'<b>You</b>':c.name}</td><td>${c.pct.toFixed(1)}%</td></tr>`).join('')}</table>
     ${F.target?`<div class="card2" style="margin-top:10px"><div class="row"><b>Board target</b><span class="hint">Check-in ${dateStr(F.target.day)}</span></div><div class="hint">Average ${fmt(F.target.rev)} revenue a month (last 3 months). Now: ${fmt(avgRev())}.</div><div class="meter"><i style="width:${Math.min(100,avgRev()/F.target.rev*100)}%"></i></div></div>`:''}
-    <div class="sec"><h5>Funding ladder</h5>${ROUNDS.map(r=>{ const done=F.rounds.find(x=>x.id===r.id); return `<div class="goal ${done?'done':''}"><i>${done?'✓':''}</i><span><b>${r.name}</b> · ${fmt(r.raise[0])}–${fmt(r.raise[1])}${done?' · raised '+fmt(done.amt)+' at '+fmt(done.pre)+' valuation':' · '+r.need}</span></div>`; }).join('')}</div>
+    <div class="sec"><h5>Funding ladder</h5>${ROUNDS.map(r=>{ const done=F.rounds.find(x=>x.id===r.id); return `<div class="goal ${done?'done':''}"><i>${done?'✓':''}</i><span><b>${r.name}</b> · ${fmt(r.raise[0])}–${fmt(r.raise[1])}${done?' · raised '+fmt(done.amt)+' at '+fmt(done.pre)+' valuation':' · '+r.need}</span></div>`; }).join('')}${F.rounds.find(x=>x.id==='demo')?`<div class="goal done"><i>✓</i><span><b>Demo Day round</b> · raised ${fmt(F.rounds.find(x=>x.id==='demo').amt)} at ${fmt(F.rounds.find(x=>x.id==='demo').pre)} valuation</span></div>`:''}${S.ipo&&S.ipo.status==='listed'?`<div class="goal done"><i>✓</i><span><b>IPO · ${S.ipo.ticker}</b> · raised ${fmt(S.ipo.raise)} at ${fmt(S.ipo.pre)} valuation</span></div>`:''}</div>
     ${nr?`<div class="mactions"><button class="btn pri" id="pitchBtn" ${nr.ok()?'':'disabled'}>${nr.ok()?'Pitch for the '+nr.name:'Not ready for the '+nr.name+' yet'}</button></div>`:''}
+    ${ipoHTML()}
     <div class="lesson">Selling part of your company is called equity funding. You get cash now and give up a slice of the future. Each round shrinks your slice, which is called dilution. A smaller slice of a much bigger company can still be worth far more.</div>`);
   const b=$('#pitchBtn'); if(b) b.onclick=()=>{ closeModal(); pitch(nr); };
+  const f=$('#ipoFile'); if(f) f.onclick=()=>{ closeModal(); ipoFile(); };
+  const r=$('#ipoRoad'); if(r) r.onclick=()=>{ closeModal(); ipoRoadshow(); };
 }
 function avgRev(){ const h=S.history.slice(-3); return h.length?h.reduce((a,r)=>a+r.revenue,0)/h.length:0; }
 function pitch(r){
@@ -1574,7 +1599,7 @@ function takeDeal(r, amt, pre){ if(r.id==='angel' && S.story && S.story.flags.ad
   const F=S.funding, post=pre+amt, k=pre/post;
   F.cap.forEach(c=>c.pct*=k); F.cap.push({name:r.who, pct:amt/post*100});
   F.rounds.push({id:r.id, amt, pre, day:S.day}); S.cash+=amt; S.month.funding=(S.month.funding||0)+amt; S.stats.raised=(S.stats.raised||0)+amt;
-  if(r.id!=='ff'){ const now=Math.max(5000,avgRev()); F.target={rev:Math.round(now*1.6), day:S.day+180, from:now}; }
+  if(r.id!=='ff' && r.id!=='demo' && r.id!=='ipo'){ const now=Math.max(5000,avgRev()); F.target={rev:Math.round(now*1.6), day:S.day+180, from:now}; }
   confetti(); sfx('fanfare'); news(S.name+' raised '+fmt(amt)+' from '+r.who+'!','good');
   advise('We raised <b>'+fmt(amt)+'</b>! That money isn\'t revenue and it isn\'t a loan. We sold part of the company for it. Spend it on things that make the company grow faster, like people and products.',{mood:'celebrate', dur:14000});
   checkGoals(); refreshHUD();
@@ -1583,6 +1608,89 @@ function boardDay(){ const F=S.funding; if(!F.target || S.day<F.target.day) retu
   queueModal(()=>openModal(`<div class="eyebrow">Board meeting · ${dateStr()}</div><h2>${ok?'Target hit!':'Target missed'}</h2><div class="take"><img src="${PORT[ok?'celebrate':'concerned']}" alt=""><p>${ok?'The investors are thrilled. Monthly revenue went from '+fmt(F.target.from)+' to '+fmt(avgRev())+'.':'The board wanted '+fmt(F.target.rev)+' a month and we\'re at '+fmt(avgRev())+'. They\'re worried. '+(F.misses>=1?'If we miss again, they may replace you as CEO.':'')}</p></div><div class="lesson">Taking investment means answering to a board. Investors want growth, because that's how they make their money back.</div><div class="mactions"><button class="btn pri" data-close>OK</button></div>`));
   if(ok){ F.misses=0; S.rep=clamp(S.rep+3,0,100); S.team.forEach(p=>p.morale=clamp(p.morale+5,0,100)); F.target={rev:Math.round(Math.max(5000,avgRev())*1.5), day:S.day+180, from:avgRev()}; }
   else { F.misses=(F.misses||0)+1; S.team.forEach(p=>p.morale=clamp(p.morale-6,0,100)); F.target.day=S.day+120; if(F.misses>=3) queueModal(()=>openModal(`<div class="eyebrow">Board meeting</div><h2 style="color:var(--red)">You\'ve been replaced as CEO</h2><p>Three missed targets in a row. The board voted to bring in a new CEO. You still own ${myShare().toFixed(1)}% of ${S.name}.</p><div class="lesson">Founders can lose control of their own company once investors own enough of it.</div><div class="mactions"><button class="btn" data-close>Keep playing anyway</button></div>`)); }
+}
+
+function ipoTicker(){ const n=(S.name||'BOTS').replace(/[^A-Za-z]/g,'').toUpperCase(); return (n.slice(0,4)||'BOTS'); }
+function ipoCost(){ return Math.max(25000, Math.round(studioValue()*.002/1000)*1000); }
+function ipoEligible(){ return !!(S && !S.ipo && S.funding.rounds.some(r=>r.id==='a') && S.stage>=3 && S.team.length>=10 && studioValue()>=2e7); }
+function ipoHTML(){
+  const I=S.ipo;
+  if(I&&I.status==='listed') return `<div class="sec"><h5>${G('IPO','ipo')} · ${I.ticker}</h5><p>Listed ${dateStr(I.day)} on the Bot City Exchange. You sold ${(I.sold||12).toFixed(1)}% to the public and raised <b class="pos">${fmt(I.raise)}</b>.</p><p class="hint">Next earnings: ${dateStr(I.nextEarn)}. The market watches ${G('MRR','mrr')}, ${G('burn','burn')}, and ${G('LTV','ltv')} / ${G('CAC','cac')}.</p></div>`;
+  if(I&&I.status==='filed'){ const left=Math.max(0,I.roadDay-S.day); return `<div class="sec"><h5>${G('IPO','ipo')} · ${G('S-1','s1')} filed</h5><p>Roadshow in ${left} day${left===1?'':'s'} (${dateStr(I.roadDay)}). Ticker reserved: <b>${I.ticker}</b>.</p></div>`; }
+  if(I&&I.status==='road') return `<div class="sec"><h5>${G('IPO','ipo')} · roadshow</h5><p>The book is open. Walk the street, then list.</p><div class="mactions"><button class="btn pri" id="ipoRoad">Start the roadshow</button></div></div>`;
+  const ok=ipoEligible(), c=ipoCost();
+  return `<div class="sec"><h5>${G('IPO','ipo')}</h5><p>Listing on the Bot City Exchange lets anyone buy shares. You raise a large check, early investors get a public mark, and every quarter the numbers go on the wall.</p><p class="hint">Need: Series A, the MoneyBot Tower, 10 people, and a ${fmt(2e7)} valuation. ${ok?'You qualify.':'Not yet.'}</p><div class="mactions"><button class="btn ${ok?'pri':''}" id="ipoFile" ${ok?'':'disabled'}>${ok?'File the S-1 · '+fmt(c):'Not ready to file'}</button></div></div>`;
+}
+function ipoFile(){
+  const c=ipoCost();
+  if(!ipoEligible()){ toast('Not ready to file.','warn'); return; }
+  if(S.cash<c){ toast('Need '+fmt(c)+' for lawyers and the S-1.','bad'); sfx('err'); return; }
+  S.cash-=c; S.month.other+=c;
+  S.ipo={status:'filed', fileDay:S.day, roadDay:S.day+21, cost:c, ticker:ipoTicker(), bump:0};
+  confetti(); sfx('fanfare');
+  news(S.name+' confidentially filed to go public. Ticker: '+S.ipo.ticker+'.','good');
+  advise('We filed. Twenty-one quiet days, then the <b>roadshow</b>. Know '+G('MRR','mrr')+', '+G('LTV','ltv')+', and '+G('runway','runway')+' cold.',{mood:'point', dur:12000});
+  openPanel('funding'); refreshHUD();
+}
+function ipoDay(){
+  const I=S.ipo; if(!I) return;
+  if(I.status==='filed' && S.day>=I.roadDay){ I.status='road'; banner('🔔','Roadshow starts today','Open Company → Funding and walk the street.','#FBBF24'); advise('Partner. The <b>roadshow</b> is live. Same story, a hundred rooms, then we price the shares.',{mood:'point', dur:10000}); }
+  if(I.status==='listed' && I.nextEarn && S.day>=I.nextEarn) ipoEarnings();
+}
+function ipoRoadshow(){
+  const m=saasNow(), u=unitEcon();
+  const qs=[
+    {q:'Why go public now instead of raising another private round?', a:[['The business is ready for public scrutiny, and a listing lets early holders mark the paper.',1],['We want the party and the ticker.',-1],['The lawyers said it was time.',0]]},
+    {q:'What will the public money be used for?', a:[['Ship two more products, hire into the bottleneck, and keep a year of runway.',1],['A much nicer lobby.',-1],['Growth.',0]]},
+    {q:'How do you make money, in one chart?', a:[[`${G('MRR','mrr')} ${fmt(m.mrr)}, ${G('LTV','ltv')} ${u.ltv?money(Math.round(u.ltv)):'n/a'}, ${G('gross margin','gm')} ${u.mrr?Math.round(u.gm*100)+'%':'n/a'}.`,1],['It is complicated. Trust us.',-1],['Subscriptions, mostly.',0]]}
+  ];
+  let i=0, score=0;
+  const ask=()=>{
+    const q=qs[i];
+    openModal(`<div class="eyebrow">Roadshow · question ${i+1} of 3</div><h2>Bot City Exchange</h2><div class="take"><img src="${PORT.point}" alt=""><p>“${q.q}”</p></div><div class="choices">${q.a.slice().sort(()=>Math.random()-.5).map(a=>`<button class="btn" data-sc="${a[1]}">${a[0]}</button>`).join('')}</div>`);
+    $$('[data-sc]').forEach(b=>b.onclick=()=>{ score+=+b.dataset.sc; i++; closeModal(); if(i<3) ask(); else ipoPrice(score); });
+  };
+  ask();
+}
+function ipoPrice(score){
+  const I=S.ipo; if(!I) return;
+  if(score<=-2){ I.status='filed'; I.roadDay=S.day+30; openModal(`<div class="eyebrow">Roadshow</div><h2>They passed</h2><p>The book came in light. File an amendment and try again in a month. Know the numbers colder next time.</p><div class="lesson">Public investors punish fuzzy answers. Private rooms forgive them. The exchange does not.</div><div class="mactions"><button class="btn pri" data-close>OK</button></div>`); news('The IPO roadshow slipped. Retry in 30 days.','warn'); return; }
+  const pre=Math.round(Math.max(studioValue(), 2e7)*(1+score*.08)/1000)*1000;
+  const sold=12, amt=Math.round(pre*(sold/100)/(1-sold/100)/1000)*1000, post=pre+amt, after=myShare()*(pre/post);
+  openModal(`<div class="eyebrow">Term sheet · IPO · ${I.ticker}</div><h2>Price the offering</h2>
+    <p>The exchange will list ${S.name} at a <b>${fmt(pre)}</b> pre-money valuation. Public shareholders buy <b>${sold}%</b>.</p>
+    <table class="pl"><tr><td>Pre-money</td><td>${fmt(pre)}</td></tr><tr><td>Primary raise</td><td class="pos">${fmt(amt)}</td></tr><tr class="tot"><td>Post-money market cap</td><td>${fmt(post)}</td></tr><tr><td>Your share: now → after</td><td>${myShare().toFixed(1)}% → ${after.toFixed(1)}%</td></tr><tr><td>Your stake on paper</td><td>${fmt(post*after/100)}</td></tr></table>
+    <div class="lesson">An ${G('IPO','ipo')} is still dilution. The difference: the buyer is the public, the price is printed every day, and you report every quarter.</div>
+    <div class="choices"><button class="btn pri" id="ipoYes">Ring the bell</button><button class="btn" id="ipoNo">Delay the listing</button></div>`);
+  $('#ipoYes').onclick=()=>{ closeModal(); ipoList(pre, amt, sold); };
+  $('#ipoNo').onclick=()=>{ I.status='filed'; I.roadDay=S.day+14; closeModal(); news('You delayed the listing. Roadshow reopens in two weeks.','info'); };
+}
+function ipoList(pre, amt, sold){
+  const I=S.ipo, post=pre+amt, k=pre/post;
+  S.funding.cap.forEach(c=>c.pct*=k); S.funding.cap.push({name:'Public shareholders', pct:amt/post*100});
+  S.funding.rounds.push({id:'ipo', amt, pre, day:S.day});
+  S.cash+=amt; S.month.funding=(S.month.funding||0)+amt; S.stats.raised=(S.stats.raised||0)+amt;
+  Object.assign(I,{status:'listed', day:S.day, raise:amt, pre, sold, bump:amt*.15, nextEarn:S.day+90, lastRev:avgRev()});
+  if(S.story&&S.story.flags){ S.story.flags.ending=S.story.flags.ending||'ipo'; S.story.flags.endV=post; }
+  confetti(); sfx('fanfare');
+  news(S.name+' listed on the Bot City Exchange as '+I.ticker+'. Raised '+fmt(amt)+'.','good');
+  advise('We rang the bell. '+I.ticker+' is live. Spend the raise on things that show up in next quarter\'s numbers.',{mood:'celebrate', dur:14000});
+  openModal(`<div class="eyebrow">${I.ticker} · ${dateStr()}</div><h2>You are a public company</h2>
+    <div class="take"><img src="${PORT.celebrate}" alt=""><p>The opening print is in. ${S.name} is on the board next to the giants. Keep playing. The market is watching.</p></div>
+    <table class="pl"><tr><td>Ticker</td><td>${I.ticker}</td></tr><tr><td>Raised</td><td class="pos">${fmt(amt)}</td></tr><tr><td>You still own</td><td>${myShare().toFixed(1)}%</td></tr><tr><td>Next earnings</td><td>${dateStr(I.nextEarn)}</td></tr></table>
+    <div class="lesson">Public companies do not get to hide a bad month. Ship, collect, and keep ${G('gross margin','gm')} honest.</div>
+    <div class="mactions"><button class="btn pri" data-close>Back to work</button></div>`);
+  checkGoals(); refreshHUD();
+}
+function ipoEarnings(){
+  const I=S.ipo, m=saasNow(), u=unitEcon(), rev=avgRev(), prev=num(I.lastRev, rev), up=rev>=prev*.95;
+  I.lastRev=rev; I.nextEarn=S.day+90; I.bump=num(I.bump,0)+(up?Math.max(0,rev)*2:-Math.max(1000,rev));
+  queueModal(()=>openModal(`<div class="eyebrow">Earnings · ${I.ticker} · ${dateStr()}</div><h2>${up?'In line':'Missed'}</h2>
+    <div class="take"><img src="${PORT[up?'wave':'concerned']}" alt=""><p>${up?'The print held. Analysts wanted the numbers you already had.':'The print slipped. Public markets punish a miss faster than a board meeting does.'}</p></div>
+    <table class="pl"><tr><td>${G('MRR','mrr')}</td><td>${fmt(m.mrr)}</td></tr><tr><td>Avg monthly revenue</td><td>${fmt(rev)}</td></tr><tr><td>${G('Gross margin','gm')}</td><td>${u.mrr?Math.round(u.gm*100)+'%':'—'}</td></tr><tr><td>Cash</td><td>${fmt(S.cash)}</td></tr></table>
+    <div class="lesson">Quarterly earnings are a habit. The story you tell has to match the books.</div>
+    <div class="mactions"><button class="btn pri" data-close>OK</button></div>`));
+  news(I.ticker+' reported earnings. '+(up?'In line.':'The stock took a hit.'), up?'good':'warn');
 }
 
 /* ---------------- MoneyBot Tower ---------------- */
@@ -1659,7 +1767,12 @@ const GLOSS = {
   fixed:'Fixed costs: bills that come every month no matter how much you sell, like salaries and rent.',
   mrr:'MRR (monthly recurring revenue): what your subscription products would earn in a month if today kept repeating. One-time game sales are not MRR.',
   arr:'ARR (annual recurring revenue): MRR times 12. Investors use it to compare subscription businesses.',
-  demo:'Demo Day: the last day of an accelerator. Startups pitch a room of investors in a few minutes.'
+  demo:'Demo Day: the last day of an accelerator. Startups pitch a room of investors in a few minutes.',
+  ltv:'LTV (lifetime value): how much a subscriber is worth before they cancel. Price divided by monthly churn.',
+  cac:'CAC (customer acquisition cost): what you spend on ads to win one new user.',
+  gm:'Gross margin: leftover subscription money after server costs. High margin means the product scales.',
+  ipo:'IPO (initial public offering): listing shares so anyone can buy a piece of the company.',
+  s1:'S-1: the filing that tells the public how the company makes money before it lists.'
 };
 function G(word, key){ return `<abbr class="gl" tabindex="0" title="${GLOSS[key]}" data-gl="${key}">${word}</abbr>`; }
 document.addEventListener('click', e=>{ const a=e.target.closest('[data-gl]'); if(a){ _toastRaw('<b>'+GLOSS[a.dataset.gl].replace(':', ':</b>'), 'info'); } });
@@ -1680,6 +1793,8 @@ function nextUp(){
   const rw=runway(); if(rw!==Infinity && rw<3 && S.day>20) return {ic:'⚠️', t:'Cash runs out in about <b>'+rw.toFixed(1)+' months</b>', b:'Check money', f:()=>openPanel('finance'), g:'company'};
   const nx=STAGES[S.stage+1]; if(nx && S.chapter>=nx.need.ch && S.rep>=nx.need.rep && S.cash>=nx.cost) return {ic:'🏢', t:'You can move to the <b>'+nx.name+'</b>', b:'Take a look', f:()=>openPanel('build'), g:'office'};
   if(S.accel && S.accel.status==='demo') return {ic:'🎤', t:'<b>Demo Day</b> is today. Pitch the Bot City Accelerator', b:'Pitch', f:()=>openPanel('accel'), g:'company'};
+  if(S.ipo && S.ipo.status==='road') return {ic:'🔔', t:'The <b>IPO roadshow</b> is live', b:'Pitch', f:()=>openPanel('funding'), g:'company'};
+  if(ipoEligible()) return {ic:'📈', t:'You can file for an <b>IPO</b>', b:'File S-1', f:()=>openPanel('funding'), g:'company'};
   if(accelEligible() && !S.accel) return {ic:'🚀', t:'You can apply to the <b>Bot City Accelerator</b>', b:'Apply', f:()=>openPanel('accel'), g:'company'};
   const nr=nextRound(); if(nr && nr.ok() && !(S.funding.cool>S.day)) return {ic:'💰', t:'Investors are ready for your <b>'+nr.name+'</b>', b:'Pitch', f:()=>openPanel('funding'), g:'company'};
   const free=S.projects.length < Math.max(2, Math.ceil(S.team.filter(x=>!x.job).length/2)+1); if(free && S.offers.length && idle.length) return {ic:'📋', t:'You have room for another contract', b:'See contracts', f:()=>openPanel('contracts'), g:'work'};
@@ -1697,7 +1812,7 @@ function renderNextUp(){ const N=$('#nextUp'); if(!S || titleMode){ N.hidden=tru
 function refreshBadges(){ if(!S) return; const set=(g,n,cls)=>{ const el=$(`#dockInner [data-g="${g}"] .badge`); if(!el) return; el.hidden=!n; el.textContent=n>9?'9+':n; el.className='badge '+(cls||''); };
   const ready=S.projects.filter(p=>p.done>=p.pts).length; set('work', ready||S.offers.length, ready?'gold':'');
   set('team', idlePeople().length && S.projects.some(p=>p.done<p.pts) ? idlePeople().length : 0, 'red');
-  set('company', ((nextRound()&&nextRound().ok()&&!(S.funding.cool>S.day)) || (S.accel&&S.accel.status==='demo') || (accelEligible()&&!S.accel))?1:0, 'gold');
+  set('company', ((nextRound()&&nextRound().ok()&&!(S.funding.cool>S.day)) || (S.accel&&S.accel.status==='demo') || (accelEligible()&&!S.accel) || (S.ipo&&S.ipo.status==='road') || ipoEligible())?1:0, 'gold');
   const g=goalNext(); set('story', 0);
   $$('#dockInner [data-g]').forEach(b=>b.classList.toggle('attn', b.dataset.g===ui.nuGroup && !b.classList.contains('on'))); }
 function refreshPaused(){ const el=$('#paused'); if(!S || titleMode){ el.hidden=true; return; } if(modalOpen){ el.hidden=false; el.textContent='⏸ Paused while this window is open'; } else if(S.speed===0){ el.hidden=false; el.innerHTML='⏸ Paused · press <b>Space</b> or ▶ to resume'; } else el.hidden=true; }
@@ -1948,7 +2063,7 @@ function dateStr(d){ d=d||S.day; const m=Math.floor((d-1)/30), y=Math.floor(m/12
 function setSpeed(v){ S.speed=v; refreshHUD(); }
 function refreshHUD(){
   if(!S) return;
-  const inc=S.products.reduce((a,p)=>a+(p.launched?(p.rate||0)-(p.srv||0):0),0); $('#hInc').textContent=inc? (inc>=0?'+':'')+fmt(inc)+'/day':''; $('#hInc').hidden=!inc; refreshHustleBox();  $('#hCash').classList.toggle('neg',S.cash<0);
+  const inc=S.products.reduce((a,p)=>a+(p.launched?num(p.rate,0)-num(p.srv,0):0),0); $('#hInc').textContent=inc? (inc>=0?'+':'')+fmt(inc)+'/day':''; $('#hInc').hidden=!inc; refreshHustleBox();  $('#hCash').classList.toggle('neg',num(S.cash)<0);
   const rw=runway(); const R=$('#hRunway'); R.textContent = rw===Infinity ? 'Profitable' : rw>=24 ? '24+ mo' : rw.toFixed(1)+' mo'; R.style.color = rw===Infinity||rw>=6 ? 'var(--neon)' : rw>=3 ? 'var(--gold)' : 'var(--red)';
   $('#hDate').textContent=dateStr(); const h=Math.floor(S.min/60), m=Math.floor(S.min%60); $('#hClock').textContent=((h%12)||12)+':'+String(m).padStart(2,'0')+(h<12?' AM':' PM');
   $('#hStars').querySelector('i').style.width=(S.rep)+'%'; $('#hStars').title=(S.rep/20).toFixed(1)+' stars';
@@ -2174,10 +2289,23 @@ function saasNow(){
   if(!S) return {mrr:0,arr:0,gameMo:0,prodMo:0,srvMo:0,apps:0,games:0};
   const apps=S.products.filter(p=>p.launched && p.kind!=='game');
   const games=S.products.filter(p=>p.launched && p.kind==='game');
-  const mrr=apps.reduce((a,p)=>a+(p.rate||0)*30,0);
-  const srvMo=S.products.reduce((a,p)=>a+(p.srv||0)*30,0);
-  const gameMo=games.reduce((a,p)=>a+(p.rate||0)*30,0);
+  const mrr=apps.reduce((a,p)=>a+num(p.rate,0)*30,0);
+  const srvMo=S.products.reduce((a,p)=>a+num(p.srv,0)*30,0);
+  const gameMo=games.reduce((a,p)=>a+num(p.rate,0)*30,0);
   return {mrr, arr:mrr*12, gameMo, prodMo:mrr+gameMo-srvMo, srvMo, apps:apps.length, games:games.length};
+}
+function unitEcon(){
+  if(!S) return {ltv:0,cac:0,gm:0,ratio:null,payback:null,users:0,mrr:0,srv:0,acq:0,mkt:0};
+  const apps=S.products.filter(p=>p.launched && p.kind!=='game');
+  let users=0, ltvW=0, mrr=0, srv=0;
+  apps.forEach(p=>{
+    const u=num(p.users,0), ch=Math.max(.02,num(p.churn,.1)), pr=num(p.price,0);
+    users+=u; ltvW+=(pr/ch)*u; mrr+=num(p.rate,0)*30; srv+=num(p.srv,0)*30;
+  });
+  const ltv=users?ltvW/users:0, mkt=num(S.stats&&S.stats.mktSpend,0), acq=num(S.stats&&S.stats.acqUsers,0);
+  const cac=acq>0&&mkt>0?mkt/acq:0, gm=mrr>0?(mrr-srv)/mrr:0, ratio=cac>0?ltv/cac:null;
+  const arpu=users?mrr/users:0, payback=arpu>0&&gm>0&&cac>0?cac/(arpu*gm):null;
+  return {ltv,cac,gm,ratio,payback,users,mrr,srv,acq,mkt};
 }
 function pathToProfit(){
   const b=burn(), rw=runway();
@@ -2196,13 +2324,19 @@ function pathToProfit(){
 }
 function financePanel(){
   const M=S.month, rw=runway(), b=burn(), fixed=S.team.reduce((a,p)=>a+p.salary,0)+rentNow()+stageDef().util+45*S.team.length;
-  const recvTot=S.recv.reduce((a,r)=>a+r.amt,0), m=saasNow(), path=pathToProfit();
-  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Finances · ${dateStr()}</div><h2>${money(Math.round(S.cash))} in the bank</h2>
+  const recvTot=S.recv.reduce((a,r)=>a+r.amt,0), m=saasNow(), path=pathToProfit(), u=unitEcon();
+  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Finances · ${dateStr()}</div><h2>${money(Math.round(num(S.cash)))} in the bank</h2>
     <div class="saas">
       <div class="tile"><label>${G('MRR','mrr')}</label><b>${fmt(m.mrr)}</b><small>${m.apps?m.apps+' subscription product'+(m.apps===1?'':'s'):'Launch an app to start MRR'}</small></div>
       <div class="tile"><label>${G('ARR','arr')}</label><b>${fmt(m.arr)}</b><small>MRR × 12 · what investors quote</small></div>
       <div class="tile ${b!=null&&b<0?'warn':'ok'}"><label>${G('Burn','burn')}</label><b>${b==null?'—':(b>=0?'+':'−')+fmt(Math.abs(b))}</b><small>${b==null?'Need a full month of books':b>=0?'Collected more than you spent':'Average monthly cash going out'}</small></div>
       <div class="tile ${rw!==Infinity&&rw<4?'warn':''}"><label>${G('Runway','runway')}</label><b>${rw===Infinity?'Profitable':rw.toFixed(1)+' mo'}</b><small>${rw===Infinity?'Cash is growing on its own':'Months until cash hits zero at this burn'}</small></div>
+    </div>
+    <div class="saas">
+      <div class="tile"><label>${G('LTV','ltv')}</label><b>${u.ltv?money(Math.round(u.ltv)):'—'}</b><small>What one subscriber is worth before they cancel</small></div>
+      <div class="tile"><label>${G('CAC','cac')}</label><b>${u.cac?money(Math.round(u.cac)):'—'}</b><small>${u.acq?Math.round(u.acq).toLocaleString()+' users from ads':'Run an ad campaign on a product'}</small></div>
+      <div class="tile ${u.ratio!=null&&u.ratio<3?'warn':u.ratio>=3?'ok':''}"><label>LTV : CAC</label><b>${u.ratio==null?'—':u.ratio.toFixed(1)+'×'}</b><small>${u.payback?('Pays back in ~'+Math.max(1,Math.round(u.payback))+' mo'):'Healthy is 3× or more'}</small></div>
+      <div class="tile"><label>${G('Gross margin','gm')}</label><b>${u.mrr?Math.round(u.gm*100)+'%':'—'}</b><small>Subscription revenue after server costs</small></div>
     </div>
     <div class="pathcard"><b>Path to profit.</b> ${path.t}</div>
     <canvas id="chart" width="1160" height="320"></canvas><p class="hint">Green bars: cash collected each month. Red bars: what you spent. Gold line: cash in the bank. Game sales are one-time; ${G('MRR','mrr')} only counts subscriptions.</p>
@@ -2211,7 +2345,7 @@ function financePanel(){
     <div class="sec"><h5>Money owed to you (${G('receivables','receivables')})</h5>${S.recv.length?'<table class="pl">'+S.recv.slice().sort((a,b)=>a.due-b.due).map(r=>`<tr><td>${r.client} · in ${r.due-S.day} day${r.due-S.day===1?'':'s'}</td><td>${money(r.amt)}</td></tr>`).join('')+'</table>':'<p class="hint">Nobody owes you money right now.</p>'}</div>
     <div class="sec"><h5>Ownership</h5><div class="row"><span>You own <b>${myShare().toFixed(1)}%</b> of ${S.name}${S.funding.rounds.length?' after '+S.funding.rounds.length+' round'+(S.funding.rounds.length>1?'s':''):''}.</span><button class="btn pri" id="fFund">Raise money</button></div></div>
     <div class="sec"><h5>Bank</h5><div class="row"><span>Loan balance <b style="font-family:var(--mono)">${money(S.loan)}</b> · 1.5% interest a month</span><span class="btnrow"><button class="btn" id="fRepay" ${S.loan&&S.cash>=5000?'':'disabled'}>Repay $5,000</button><button class="btn" id="fBorrow" ${S.loan<loanMax()?'':'disabled'}>Borrow $5,000</button></span></div><p class="hint">Borrowing limit: ${money(loanMax())}. It grows with your reputation and office.</p></div>
-    <div class="lesson">Runway is how many months you can survive at today's burn before the money runs out. ${G('MRR','mrr')} is the part that can stack. Most startups don't die from a lack of ideas. They die from a lack of runway.</div>`);
+    <div class="lesson">Runway is how many months you can survive at today's burn before the money runs out. ${G('LTV','ltv')} over ${G('CAC','cac')} tells you whether ads pay back. Most startups don't die from a lack of ideas. They die from a lack of runway.</div>`);
   drawChart($('#chart'));
   $('#fFund').onclick=()=>{ openPanel('funding'); };
   $('#fBorrow').onclick=()=>{ S.loan+=5000; S.cash+=5000; sfx('coin'); openPanel('finance'); refreshHUD(); };
@@ -2489,18 +2623,18 @@ scrapco:()=>{ const friend=F().rusty==='friend', price=Math.round(Math.max(80000
       {t:'Hire Rusty. Just Rusty.', s:'Rusty joins as a mentor · ScrapCo closes', f:()=>{ F().scrap='hired'; rustyJoin(); }, then:[['rusty',`Me? Working for you? ...What's the dental plan like?`]]},
       {t:'Pass. Good luck, Rusty.', s:'ScrapCo closes', f:()=>{ F().scrap='closed'; }, then:[['rusty',`Yeah. I figured.`],['n',`A month later, Rusty opens a food truck. It's actually great.`]]}]}; },
 
-finale:()=>{ const v=Math.round(Math.max(valuation(), ...S.funding.rounds.map(r=>r.pre+r.amt))*1.25/1000)*1000, A=S.funding.rounds.some(r=>r.id==='a'); return {title:'The offer', lines:[
+finale:()=>{ const v=Math.round(Math.max(valuation(), ...S.funding.rounds.map(r=>r.pre+r.amt))*1.25/1000)*1000, A=S.funding.rounds.some(r=>r.id==='a'), listed=S.ipo&&S.ipo.status==='listed'; return {title:'The offer', lines:[
   ['n',`Midnight. The tower is dark except for one window: yours.`],
   ['n',`The elevator dings. Mr. Gray steps out, alone, holding two coffees.`],
   ['gray',`I'll skip the small talk. MegaBot failed. Customers hated it. It turns out you can't copy something you don't understand.`],
   ['gray',`MegaCorp wants to buy ${S.name}. All of it. The team, the products, the tower. And the robot.`],
   ['gray',`Our offer is <b>${fmt(v)}</b>. You own ${myShare().toFixed(0)}%, so your share is <b>${fmt(v*myShare()/100)}</b>. You'd never worry about runway again.`],
   ['mb',`Partner. Whatever you choose, I'm with you. That's what co-founders do.`,'wave'],
-  A ? ['mb',`One more option. Bolt Capital says we're ready to go <b>public</b>: anyone could buy a piece of us on the stock market.`,'point'] : ['mb',`Bolt Capital could take us public one day, but only after a Series A.`,'point'],
+  listed ? ['mb',`We're already public. ${S.ipo.ticker} trades every morning. Selling means taking the company private again — under MegaCorp.`,'point'] : A ? ['mb',`One more option. File an ${G('IPO','ipo')} from Company → Funding, or ring the bell right here.`,'point'] : ['mb',`Bolt Capital could take us public one day, but only after a Series A.`,'point'],
   ['n',`Everything you've built comes down to this.`]],
   choices:[
     {t:`Sell to MegaCorp for ${fmt(v)}`, s:'The big payday · the company becomes MegaCorp\'s', f:()=>ending('sold',v), then:[['gray',`Pleasure doing business. Welcome back to MegaCorp.`]]},
-    {t:'Go public. Ring the bell.', s: A ? 'IPO · the biggest legacy, and every number becomes public' : 'Needs a Series A first', need:()=>A, f:()=>ending('ipo',Math.round(v*1.15)), then:[['gray',`Public. Bold. I'll be buying shares. Don't tell anyone.`]]},
+    listed ? {t:'Stay listed. Keep building.', s:S.ipo.ticker+' already trades · no second IPO', f:()=>ending('indie',v), then:[['gray',`Public and still yours. I'll be in the comments on earnings day.`]]} : {t:'Go public. Ring the bell.', s: A ? 'IPO · the biggest legacy, and every number becomes public' : 'Needs a Series A first', need:()=>A, f:()=>ending('ipo',Math.round(v*1.15)), then:[['gray',`Public. Bold. I'll be buying shares. Don't tell anyone.`]]},
     {t:`Say no. ${S.name} stays independent.`, s:'Keep building forever · no exit now', f:()=>ending('indie',v), then:[['gray',`...Nobody has ever said no to me.`],['you',`First time for everything.`]]}]}; }
 };
 
@@ -2592,7 +2726,12 @@ function titleCard(kick, title, quote){
 function ending(kind, v){
   const f=F(); f.ending=kind; f.endV=v;
   const mine=v*myShare()/100, pts = kind==='indie' ? 0 : Math.max(1, Math.floor(Math.sqrt(mine/100000)*(kind==='ipo'?1.3:1)));
-  if(kind==='ipo'){ const raise=Math.round(v*.12); S.cash+=raise; S.month.funding=(S.month.funding||0)+raise; S.funding.cap.forEach(c=>c.pct*=.88); S.funding.cap.push({name:'Public shareholders', pct:12}); }
+  if(kind==='ipo' && !(S.ipo&&S.ipo.status==='listed')){
+    const raise=Math.round(v*.12);
+    S.cash+=raise; S.month.funding=(S.month.funding||0)+raise; S.stats.raised=(S.stats.raised||0)+raise;
+    S.funding.cap.forEach(c=>c.pct*=.88); S.funding.cap.push({name:'Public shareholders', pct:12});
+    S.ipo={status:'listed', ticker:ipoTicker(), day:S.day, raise, pre:v, sold:12, bump:raise*.15, nextEarn:S.day+90, lastRev:avgRev()};
+  }
   titleCard('EPILOGUE', kind==='sold'?'The Deal':kind==='ipo'?'The Bell':'The Tower', kind==='sold'?`Sold to MegaCorp for ${fmt(v)}.`:kind==='ipo'?`${S.name} is a public company.`:`${S.name} stays yours.`);
   queueModal(()=>epilogue(kind, v, pts));
 }
@@ -2646,10 +2785,13 @@ function banner(ic, t, s, c){ bannerQ.push({ic,t,s,c}); logInbox('<b>'+t+'</b>'+
 function nextBanner(){ const b=bannerQ.shift(), el=$('#banner'); if(!b){ bannerOn=false; return; } bannerOn=true; el.innerHTML=`<i>${b.ic}</i><div><b>${b.t}</b><span>${b.s||''}</span></div>`; el.style.setProperty('--bc', b.c||'#00E676'); el.hidden=false; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in'); sfx('chime'); setTimeout(()=>{ el.classList.remove('in'); setTimeout(()=>{ el.hidden=true; nextBanner(); }, 380); }, 2700); }
 
 function tickCash(dt){
-  if(!S || titleMode) return; if(ui.cashShown==null) ui.cashShown=S.cash;
-  const d=S.cash-ui.cashShown;
+  if(!S || titleMode) return;
+  if(S.cash==null || !Number.isFinite(S.cash)){ healSave(); try{ productsDay(true); }catch(e){} }
+  if(!Number.isFinite(ui.cashShown)) ui.cashShown=S.cash;
+  if(ui.cashShown==null) ui.cashShown=S.cash;
+  const d=num(S.cash,0)-num(ui.cashShown,0);
   if(Math.abs(d)<1) ui.cashShown=S.cash; else ui.cashShown += d*Math.min(1,dt*5) + Math.sign(d)*Math.min(Math.abs(d), dt*30);
-  const el=$('#hCash'), txt=fmt(Math.round(ui.cashShown)); if(el.textContent!==txt) el.textContent=txt;
+  const el=$('#hCash'), txt=fmt(Math.round(num(ui.cashShown,0))); if(el.textContent!==txt) el.textContent=txt;
   const box=el.closest('.stat'); if(box){ box.classList.toggle('gain', d>3); box.classList.toggle('loss', d<-3); }
 }
 function cashPop(amt){ if(!amt || ui.reduce) return; const r=$('#hCash').getBoundingClientRect(); const el=document.createElement('div'); el.className='cashpop '+(amt>0?'pos':'neg'); el.textContent=(amt>0?'+':'−')+fmt(Math.abs(Math.round(amt))).replace('-',''); el.style.left=(r.left)+'px'; el.style.top=(r.bottom+4)+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(), 1600); }
@@ -2887,8 +3029,9 @@ function accelPanel(){
     $('#accPitch').onclick=()=>{ closeModal(); accelPitch(); };
     return;
   }
+  const demo=(S.funding.rounds||[]).find(r=>r.id==='demo');
   openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Accelerator · alumni</div><h2>Demo Day is done</h2>
-    <p>You pitched on ${dateStr(A.day)}. Stipend <b class="pos">${fmt(A.grant||0)}</b>. The Demo Day bump still sits in your valuation.</p>
+    <p>You pitched on ${dateStr(A.day)}. Stipend <b class="pos">${fmt(A.grant||0)}</b>. ${demo?'Term sheet taken: <b>'+fmt(demo.amt)+'</b> at <b>'+fmt(demo.pre)+'</b>.':'You passed on the hallway term sheet.'} The Demo Day bump still sits in your valuation.</p>
     <div class="lesson">Alumni networks are the real product of an accelerator. The check is the souvenir.</div>`);
 }
 function accelPitch(){
@@ -2918,12 +3061,27 @@ function accelFinish(score){
   confetti(); sfx('fanfare');
   const line=score>=2?'The room clapped. Two angels asked for a follow-up.':score>=0?'Polite applause. The stipend still clears.':'A tough room. You still leave with the stipend and a list of homework.';
   openModal(`<div class="eyebrow">Demo Day</div><h2>${score>=2?'You crushed it':'Demo Day is over'}</h2>
-    <div class="take"><img src="${PORT[score>=2?'celebrate':'wave']}" alt=""><p>${line}</p></div>
+    <div class="take"><img src="${PORT[score>=2?'celebrate':'wave']}" alt=""><p>${line} Ada is in the hallway with a term sheet.</p></div>
     <table class="pl"><tr><td>Stipend in the bank</td><td class="pos">${fmt(grant)}</td></tr><tr><td>Paper valuation bump</td><td>${fmt(bump)}</td></tr><tr><td>Fans from the livestream</td><td>+${40+Math.max(0,score)*40}</td></tr></table>
     <div class="lesson">Demo Day is theater with a term sheet waiting in the hallway. The number that matters next is still ${G('runway','runway')}.</div>
-    <div class="mactions"><button class="btn pri" data-close>Back to work</button></div>`);
+    <div class="mactions"><button class="btn pri" data-close>See the term sheet</button></div>`);
   news(S.name+' finished the Bot City Accelerator. Stipend: '+fmt(grant)+'.','good');
+  queueModal(()=>demoTermSheet(score));
   checkGoals(); refreshHUD();
+}
+function demoTermSheet(score){
+  if(!S || (S.funding.rounds||[]).some(r=>r.id==='demo')) return;
+  const r={id:'demo', name:'Demo Day round', who:score>=1?'Ada Vault & Launchpad SPV':'Bot City Scout Fund'};
+  const amt=Math.round((score>=2?220000:score>=0?110000:35000)*Math.pow(1.4,Math.max(0,S.stage))/1000)*1000;
+  const pre=Math.round(Math.max(amt*5, valuation()*(score>=2?3.2:score>=0?2.4:1.6))/1000)*1000;
+  const post=pre+amt, sold=amt/post*100, after=myShare()*(pre/post);
+  openModal(`<div class="eyebrow">Term sheet · Demo Day</div><h2>${fmt(amt)} offer</h2>
+    <p>${r.who} will invest <b>${fmt(amt)}</b> at a <b>${fmt(pre)}</b> pre-money valuation. This is a real check, not the stipend.</p>
+    <table class="pl"><tr><td>Company value before the money (pre-money)</td><td>${fmt(pre)}</td></tr><tr><td>Plus the investment</td><td>${fmt(amt)}</td></tr><tr class="tot"><td>Company value after (post-money)</td><td>${fmt(post)}</td></tr><tr><td>Share the investors get</td><td>${sold.toFixed(1)}%</td></tr><tr><td>Your share: now → after</td><td>${myShare().toFixed(1)}% → ${after.toFixed(1)}%</td></tr><tr><td>Your stake is worth (on paper)</td><td>${fmt(post*after/100)}</td></tr></table>
+    <div class="lesson">A term sheet is an offer to buy a slice of the company. Taking it is ${G('dilution','dilution')} in exchange for runway.</div>
+    <div class="choices"><button class="btn pri" id="demoYes">Take the deal</button><button class="btn" id="demoNo">Pass for now</button></div>`);
+  $('#demoYes').onclick=()=>{ closeModal(); takeDeal(r, amt, pre); };
+  $('#demoNo').onclick=()=>{ closeModal(); news('You passed on the Demo Day term sheet. The stipend still cleared.','info'); };
 }
 
 /* =====================================================================
@@ -2983,7 +3141,7 @@ function rankPanel(){
   openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Leaderboard</div><h2>How big is ${S.name}?</h2>
     <p>Your studio is worth about <b class="pos">${bigFmt(v)}</b>. That ranks <b>#${pos}</b> of ${all.length}. ${nx?`Next up: <b>${nx.n}</b>${nx.fic?'':' (CEO '+nx.ceo+')'}, ${bigFmt(nx.v-v)} ahead.`:'You are the most valuable company on the board!'}</p>
     ${nx?`<div class="upbar"><i style="width:${Math.max(2,Math.min(100,Math.log10(Math.max(1,v))/Math.log10(nx.v)*100))}%"></i></div>`:''}
-    <div class="ladder">${all.map((c,i)=>`<div class="lrow ${c.me?'me':''} ${!c.me&&v>c.v?'passed':''}" ${c.me?'id="lrMe"':''}><span class="lp">${i+1}</span><span class="li">${c.i}</span><div class="ln"><b>${c.me?c.n+' (you)':c.n}${c.priv?'<span class="tag priv">Private</span>':''}</b><small>${c.me?'Founder: you':c.fic?c.ceo+' · Bot City':(c.priv?'Latest reported valuation · ':'CEO: ')+c.ceo}</small></div><span class="lv">${bigFmt(c.v)}</span></div>`).join('')}</div>
+    <div class="ladder">${all.map((c,i)=>`<div class="lrow ${c.me?'me':''} ${!c.me&&v>c.v?'passed':''}" ${c.me?'id="lrMe"':''}><span class="lp">${i+1}</span><span class="li">${c.i}</span><div class="ln"><b>${c.me?c.n+' (you)':c.n}${c.me&&S.ipo&&S.ipo.status==='listed'?'<span class="tag pub">'+S.ipo.ticker+'</span>':c.priv?'<span class="tag priv">Private</span>':''}</b><small>${c.me?(S.ipo&&S.ipo.status==='listed'?'Public · '+S.ipo.ticker:'Founder: you'):c.fic?c.ceo+' · Bot City':(c.priv?'Latest reported valuation · ':'CEO: ')+c.ceo}</small></div><span class="lv">${bigFmt(c.v)}</span></div>`).join('')}</div>
     <p class="hint">Public companies are ranked by market value around ${RANK_ASOF}, rounded. Private companies (OpenAI, Stripe, Databricks and others) use the latest reported round or tender. Real values move. Bot City companies are made up. Your studio's value comes from cash, revenue, products and what investors last paid.</p>
     <div class="lesson"><b>Market cap</b> is what the stock market says a whole company is worth. Most of the giants at the top started tiny: Apple and Amazon both started in a garage.</div>`);
   setTimeout(()=>{ const m=$('#lrMe'), L=$('.ladder'); if(m&&L) L.scrollTop=m.offsetTop-L.offsetTop-L.clientHeight/2+m.offsetHeight/2; }, 50);
@@ -3208,7 +3366,27 @@ function floorBtns(kind, cur, attr){ if(S.stage<3 || S.floors.length<2) return '
 
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
-function load(){ try{ const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); if(s && s.v===1){ S=s; if(!S.floors) S.floors=[{dept:'general'}]; if(!S.rsch) S.rsch={done:{},cur:null,prog:0}; if(!S.funding) S.funding={cap:[{name:'You',pct:100,you:true}],rounds:[],target:null,misses:0}; ['products','upg','known'].forEach(k=>{ if(!S[k]) S[k]=k==='products'?[]:{}; }); S.bots=S.bots||0; S.fans=S.fans||0; S.combo=0; S.frenzy=S.frenzy||0; S.hustles=S.hustles||0; S.bugT=90; S.products.forEach(registerProd); if(!S.story){ S.story=freshStory(); S.story.ch=S.chapter; S.story.seen.intro=1; BEATS.forEach(([id,c])=>{ try{ if(c()) S.story.seen[id]=S.day; }catch(e){} }); } return true; } }catch(e){} return false; }
+function healSave(){
+  if(!S) return false;
+  const broke=S.cash==null || S.cash==='' || !Number.isFinite(+S.cash);
+  if(broke){ const last=(S.history||[]).slice().reverse().find(r=>Number.isFinite(+r.cash)); S.cash=last?+last.cash:0; }
+  else S.cash=+S.cash;
+  S.loan=num(S.loan,0); S.rep=num(S.rep,0); S.fans=num(S.fans,0);
+  if(S.month) for(const k in S.month) S.month[k]=num(S.month[k],0);
+  (S.history||[]).forEach(r=>{ r.revenue=num(r.revenue,0); r.collected=num(r.collected,0); r.expenses=num(r.expenses,0); r.cash=num(r.cash,0); });
+  (S.products||[]).forEach(p=>{
+    if(!SIZES[p.size]) p.size='S';
+    p.users=num(p.users,0); p.units=num(p.units,0); p.rev=num(p.rev,0); p.revM=num(p.revM,0);
+    p.rate=num(p.rate,0); p.srv=num(p.srv,0); p.score=num(p.score,5); p.age=num(p.age,0);
+    p.price=num(p.price, p.kind==='game'?SIZES[p.size].price.game:SIZES[p.size].price.app);
+    p.peak=num(p.peak,0); p.grow=num(p.grow,0); p.churn=num(p.churn,.1);
+  });
+  S.stats=S.stats||{};
+  if(!Number.isFinite(+S.stats.mktSpend)) S.stats.mktSpend=(S.history||[]).reduce((a,r)=>a+((r.M&&r.M.marketing)||0),0)+num(S.month&&S.month.marketing,0);
+  if(!Number.isFinite(+S.stats.acqUsers)) S.stats.acqUsers=0;
+  return broke;
+}
+function load(){ try{ const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); if(s && s.v===1){ S=s; if(!S.floors) S.floors=[{dept:'general'}]; if(!S.rsch) S.rsch={done:{},cur:null,prog:0}; if(!S.funding) S.funding={cap:[{name:'You',pct:100,you:true}],rounds:[],target:null,misses:0}; ['products','upg','known'].forEach(k=>{ if(!S[k]) S[k]=k==='products'?[]:{}; }); S.bots=S.bots||0; S.fans=S.fans||0; S.combo=0; S.frenzy=S.frenzy||0; S.hustles=S.hustles||0; S.bugT=90; S.products.forEach(registerProd); if(!S.story){ S.story=freshStory(); S.story.ch=S.chapter; S.story.seen.intro=1; BEATS.forEach(([id,c])=>{ try{ if(c()) S.story.seen[id]=S.day; }catch(e){} }); } if(healSave()) S._healedCash=1; try{ productsDay(true); healSave(); }catch(e){} return true; } }catch(e){} return false; }
 
 /* ---------------- main loop ---------------- */
 function frame(){
@@ -3242,6 +3420,7 @@ function startGame(fresh){
   if(heroTitle){ scene.remove(heroTitle.root); heroTitle=null; }
   if(!fresh) offlineEarnings();
   ui.cashShown=null; if(fresh) setTimeout(storyStart, 450); else advise('Welcome back, partner. It\'s '+dateStr()+'.',{mood:'wave', dur:4000});
+  if(S._healedCash){ delete S._healedCash; toast('Your cash display got stuck on a broken number. We repaired the books from your last month report.','warn'); }
 }
 function newGame(name, founder){
   S=freshState(name, founder); S.legacy=legacy().points; S.cash+=S.legacy*1000;
