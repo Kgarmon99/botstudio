@@ -5743,6 +5743,27 @@ allch:()=>({title:'The End (for now)', kicker:'Epilogue · Every chapter complet
   choices:[{t:'Keep building', s:'+500 XP', f:()=>{ gainXP(500); F().allch=1; }, then:[['mb','Onward. Always onward.','happy']]}]})
 });
 
+/* =====================================================================
+   ROUND 27 · QUIET AUTOMATION — work your department heads do on their own
+   gets a small notice instead of a full celebration
+   ===================================================================== */
+let QUIET=0;
+const LOUD_CARD=/Delivered ·|Launch day ·|Patch notes ·/;
+(function(){
+  const _hd=headsDay; headsDay=function(){ if(UIP.autoCele) return _hd(); QUIET++; try{ return _hd(); } finally { QUIET--; } };
+  const _qm=queueModal; queueModal=function(fn){ if(!QUIET) return _qm(fn); return _qm(()=>{ QUIET++; try{ fn(); } finally { QUIET--; } if(!modalOpen && modalQueue.length) modalQueue.shift()(); }); };
+  const _om=openModal; openModal=function(html, onClose){ if(QUIET && LOUD_CARD.test(String(html).slice(0,400))) return; return _om(html, onClose); };
+  const _lsh=launchShow; launchShow=function(prod){ if(QUIET){ const sc=(prod.score||0).toFixed(1); banner(prodIcon(prod),'', `Launched <b>${prod.name}</b> · score ${sc}/10`, prod.score>=8?'#FBBF24':'#00E676', {small:1, dur:2600}); return; } return _lsh.apply(this, arguments); };
+  const _dl=deliver; deliver=function(pr, auto){ if(!QUIET || pr.own) return _dl(pr, auto); const st=stars(projQuality(pr)), i0=S.stats.invoiced, name=PTYPES[pr.type].name, cl=pr.client; const r=_dl(pr, auto); const pay=S.stats.invoiced-i0;
+    banner('✅','', `Delivered <b>${name}</b> for ${cl} · ${'★'.repeat(st)}${'☆'.repeat(5-st)} · ${money(pay)}`, st>=4?'#00E676':st<=2?'#FBBF24':'#38BDF8', {small:1, dur:2600}); return r; };
+  const _cf=confetti; confetti=function(){ if(QUIET) return; return _cf.apply(this, arguments); };
+  const _sx=sfx; sfx=function(k){ if(QUIET && (k==='fanfare'||k==='chime'||k==='build')) k='coin'; return _sx(k); };
+  const _ce=celebrate; celebrate=function(crew, st){ if(!QUIET) return _ce(crew, st); const p=crew[0], w=p&&walkers.get(p.id); if(w && w.rig.root.visible){ const top=w.pos.clone(); top.y=1.3; fxText(top, '✓', '#00E676'); } };
+  const _bn=banner; banner=function(ic,t,s,c,o){ if(QUIET){ o=Object.assign({}, o||{}); if(!o.small){ o.small=1; o.dur=Math.min(o.dur||2700, 2800); } } return _bn(ic,t,s,c,o); };
+  const _ts=toast; toast=function(html, type){ if(QUIET && !type){ logInbox(html, type); return; } return _ts(html, type); };
+  const _op=openPanel; openPanel=function(p){ const r=_op(p); if(p==='menu') setTimeout(()=>{ const sx=$('#modalCard .setx'); if(!sx || sx.querySelector('#sAuto')) return; const k=sx.querySelector('#sKeys'); const row=document.createElement('label'); row.className='setrow'; row.innerHTML=`<span>Celebrate automated work<small style="display:block;color:var(--txt-3,#94A3B8);font-size:11.5px">Full cards and confetti when department heads sign, ship or launch on their own</small></span><input type="checkbox" id="sAuto" ${UIP.autoCele?'checked':''}>`; sx.insertBefore(row, k); row.querySelector('input').onchange=e=>{ UIP.autoCele=e.target.checked; uiSave(); }; },0); return r; };
+})();
+
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
 function healSave(){
