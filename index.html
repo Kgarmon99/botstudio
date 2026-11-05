@@ -176,7 +176,7 @@ body.photo #vig{opacity:.5}
 <meta name="description" content="BotStudio: a MoneyBot startup tycoon game. Start a tech studio in a garage and grow it into a company.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Chakra+Petch:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 /* Layout: full-bleed 3D diorama of Bot City; glass HUD top, build dock bottom, inspector right (bottom sheet on phones). Single dark look by design, from the MoneyBot brand guide and brand bible. */
 :root{
@@ -1127,6 +1127,164 @@ body.focus #side,body.focus #hustleBox,body.focus #camctl,body.focus #advisor,bo
 
 
 
+
+/* =====================================================================
+   ROUND 33 · "OPERATOR" SKIN — a control room for your startup
+   ===================================================================== */
+:root{
+  --display:'Chakra Petch','Rajdhani',system-ui,sans-serif;
+  --body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --ink:#E9EFF3; --muted:#8C99A6; --txt-1:#E9EFF3; --txt-2:#B9C4CD; --txt-3:#7F8C98;
+  --neon:#00E676; --gold:#FFC233; --sig:#38D9F5; --warn:#FF6B4A;
+  --k0:#06080B; --k1:#0B1015; --k2:#111820; --k3:#18212B; --edge:#22303B; --edge2:#2E3F4C;
+  --panel:rgba(11,16,21,.94); --line:var(--edge); --line-2:var(--edge2);
+  --bg-1:var(--k1); --bg-2:var(--k2); --bg-3:var(--k3);
+  --r-s:3px; --r-m:4px; --r-l:6px; --r:4px;
+  --cut:8px; --chamfer:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+  --brk:linear-gradient(var(--bc2,var(--neon)),var(--bc2,var(--neon))) top left/12px 2px no-repeat,linear-gradient(var(--bc2,var(--neon)),var(--bc2,var(--neon))) top left/2px 12px no-repeat,linear-gradient(var(--bc2,var(--neon)),var(--bc2,var(--neon))) bottom right/12px 2px no-repeat,linear-gradient(var(--bc2,var(--neon)),var(--bc2,var(--neon))) bottom right/2px 12px no-repeat;
+  --scan:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);
+}
+html,body{font-family:var(--body);letter-spacing:.005em}
+body{background:var(--k0)}
+
+/* ---------- panels ---------- */
+.glass{background:var(--brk),var(--scan),linear-gradient(180deg,rgba(255,255,255,.03),transparent 40%),var(--panel)!important;border:1px solid var(--edge)!important;border-radius:var(--r-m)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;--bc2:rgba(0,230,118,.55);box-shadow:0 10px 30px rgba(0,0,0,.45)}
+#modal .card{background:var(--brk),var(--scan),radial-gradient(120% 60% at 0 0,rgba(0,230,118,.06),transparent 60%),linear-gradient(180deg,#0F151C,#0A0E13)!important;border:1px solid var(--edge2)!important;border-radius:var(--r-l)!important;box-shadow:0 30px 90px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05)!important;--bc2:var(--neon)}
+#modal.drawer .card{border-top-left-radius:var(--r-l)!important;border-bottom-left-radius:var(--r-l)!important}
+#inspect{border-radius:var(--r-l)!important}
+.card2,.nbc,.hofrow,.slot2,.city,.upg,.tech,.pitem,.ach,.chap,.lrow,.im,.cmdrow,.todo button,.hqt,.pinrow,.cw,.slot2 img,.slot2 .noth{border-radius:var(--r-m)!important}
+.card2{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01))!important;border:1px solid var(--edge)!important;transition:border-color .15s,background .15s,transform .15s}
+.card2:hover{border-color:var(--edge2)!important}
+.take{border-radius:var(--r-m)!important;background:linear-gradient(90deg,rgba(0,230,118,.10),rgba(0,230,118,.02))!important;border:1px solid rgba(0,230,118,.22)!important;border-left:3px solid var(--neon)!important}
+.lesson{position:relative;padding:10px 12px 10px 14px;border-left:3px solid var(--gold);background:rgba(255,194,51,.06);color:#FFE3A3!important;border-radius:0 var(--r-m) var(--r-m) 0}
+
+/* ---------- type ---------- */
+#modal h2,.panel h2,h2{font-family:var(--display)!important;font-weight:700;letter-spacing:-.005em;line-height:1.05}
+#modal h2{font-size:30px}
+.eyebrow,.sech,.inday,.crewh,.unlh,h5,.hqt label,.stat small,.stat .l,.chap h5{font-family:var(--display)!important;font-weight:600!important;letter-spacing:.16em!important;text-transform:uppercase}
+.eyebrow{color:var(--neon)!important;font-size:11px!important;display:flex;align-items:center;gap:8px}
+.eyebrow::before{content:"";width:14px;height:2px;background:currentColor;flex:none;box-shadow:0 0 8px currentColor}
+.hint{color:var(--txt-3)}
+b,strong{font-weight:700}
+
+/* ---------- buttons ---------- */
+.btn{font-family:var(--display)!important;font-weight:600!important;text-transform:uppercase;letter-spacing:.07em!important;font-size:12.5px!important;border-radius:0!important;clip-path:var(--chamfer);background:var(--k3)!important;border:0!important;box-shadow:inset 0 0 0 1px var(--edge2)!important;color:var(--ink);padding:9px 15px!important}
+.btn:hover:not([disabled]){background:#1E2934!important;box-shadow:inset 0 0 0 1px var(--neon)!important;transform:none!important}
+.btn.pri{background:linear-gradient(180deg,#2BFF8F,var(--neon))!important;color:#032612!important;box-shadow:none!important;text-shadow:none}
+.btn.pri:hover:not([disabled]){background:linear-gradient(180deg,#5CFFA9,#14F082)!important;filter:drop-shadow(0 0 10px rgba(0,230,118,.45))}
+.btn[disabled]{opacity:.45}
+.x{border-radius:0!important;clip-path:var(--chamfer);--cut:6px;background:var(--k3)!important;box-shadow:inset 0 0 0 1px var(--edge2)}
+.x:hover{box-shadow:inset 0 0 0 1px var(--warn);color:var(--warn)}
+.choices .btn{text-transform:none;letter-spacing:.01em!important;font-size:14px!important;text-align:left}
+.choices .btn small{font-family:var(--body);text-transform:none;letter-spacing:0;font-weight:500}
+
+/* ---------- HUD ---------- */
+#hud .glass{box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.brand{border-radius:var(--r-m)!important}
+.brand b,.brand .bname,#hud .brand span{font-family:var(--display)!important;letter-spacing:.08em}
+.stat{border-radius:var(--r-m)!important;position:relative;padding:5px 12px 5px 14px!important}
+.stat::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:2px;background:var(--edge2)}
+.stat:has(#cash)::before,.stat:has(#hCash)::before{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.stat b,.stat .v,#cash,#hCash,#runway,#hRun,#clock,#hTime{font-family:var(--display)!important;font-weight:700!important;letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.stat small,.stat .l{font-size:9.5px!important;color:var(--txt-3)!important}
+#hud .hbtns button,#hud .spd button{border-radius:var(--r-s)!important}
+#hud .spd button.on,#hud .spd .on{background:var(--neon)!important;color:#032612!important;box-shadow:0 0 12px rgba(0,230,118,.5)}
+
+/* ---------- dock ---------- */
+#dock .inner{border-radius:var(--r-l)!important;padding:4px!important;gap:2px!important}
+#dockInner .tool,.tool{border-radius:var(--r-s)!important;font-family:var(--display)!important;font-weight:600!important;text-transform:uppercase;letter-spacing:.1em;font-size:10.5px!important;color:var(--txt-3)!important;position:relative}
+#dockInner .tool:hover,.tool:hover{background:rgba(255,255,255,.04)!important;color:var(--ink)!important}
+#dockInner .tool.on,.tool.on,#dockInner .tool[aria-current],#dockInner .tool.act{background:linear-gradient(180deg,rgba(0,230,118,.16),rgba(0,230,118,.02))!important;color:var(--neon)!important;border:0!important;box-shadow:none!important}
+#dockInner .tool.on::after,#dockInner .tool.act::after{content:"";position:absolute;left:18%;right:18%;top:-4px;height:2px;background:var(--neon);box-shadow:0 0 10px var(--neon)}
+
+/* ---------- tabs ---------- */
+.dtabs{background:transparent!important;border-radius:0!important;padding:0!important;gap:0!important;border-bottom:1px solid var(--edge)}
+.dtabs button{border-radius:0!important;font-family:var(--display)!important;text-transform:uppercase;letter-spacing:.1em;font-size:11.5px!important;font-weight:600!important;padding:10px 8px!important;color:var(--txt-3)!important;border-bottom:2px solid transparent!important;margin-bottom:-1px}
+.dtabs button.on{background:transparent!important;color:var(--neon)!important;border-bottom-color:var(--neon)!important;text-shadow:0 0 12px rgba(0,230,118,.5)}
+.fchips button,.modchips button,.cw,.rct button{border-radius:var(--r-s)!important;font-family:var(--display)!important;text-transform:uppercase;letter-spacing:.07em;font-size:11.5px!important;font-weight:600!important}
+.fchips button.on{background:rgba(0,230,118,.12)!important;box-shadow:inset 0 -2px 0 var(--neon)}
+.fsearch,.fchips select,input[type=text],input[type=search],input:not([type]),select{border-radius:var(--r-s)!important}
+.fsearch{background:var(--k1)!important;border-color:var(--edge2)!important}
+
+/* ---------- notices, tooltip, sidebar ---------- */
+#banner{border-radius:var(--r-m)!important;background:var(--scan),linear-gradient(90deg,color-mix(in srgb,var(--bc) 16%,#0B1015),#0B1015 60%)!important;border:1px solid var(--edge2)!important;border-left:3px solid var(--bc)!important;backdrop-filter:none!important;box-shadow:0 14px 40px rgba(0,0,0,.55)!important}
+#banner b{font-family:var(--display);letter-spacing:.03em}
+#banner i{border-radius:var(--r-s)!important}
+#tip{border-radius:var(--r-s)!important;background:#0B1015!important;border:1px solid var(--edge2)!important;border-top:2px solid var(--neon)!important;backdrop-filter:none!important}
+#tip b{font-family:var(--display);letter-spacing:.03em}
+#gs,#pins,#crew,#abil,#nextUp,#goalChip,#trendChip,#side .glass{border-radius:var(--r-m)!important}
+#gs b,#pins b,.pinh b,#nextUp b,#abil b{font-family:var(--display);letter-spacing:.03em}
+.pbar,.nbprog,.stakebar,.rategrid i,#gs .bar,.prog,.pb{border-radius:1px!important}
+#abil.ready{--bc2:var(--gold)}
+#perkChip{border-radius:var(--r-s)!important}
+#hLvl{border-radius:var(--r-s)!important;font-family:var(--display)}
+
+/* ---------- title screen ---------- */
+#title h1,#title .big,#title .logo{font-family:var(--display)!important;letter-spacing:-.01em}
+.slot2{background:var(--scan),linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.01))!important;border:1px solid var(--edge2)!important}
+.slot2.cur{border-color:var(--neon)!important;box-shadow:inset 3px 0 0 var(--neon)}
+.slot2 b{font-family:var(--display);letter-spacing:.03em}
+#founderList > *{border-radius:var(--r-m)!important}
+
+/* ---------- light polish ---------- */
+.badge,.pill,.tag,.etag,.boss,.bx{border-radius:2px!important}
+::selection{background:rgba(0,230,118,.35)}
+#vig{background:radial-gradient(ellipse 120% 90% at 50% 45%,transparent 50%,rgba(2,4,6,.5) 100%)}
+.stat label{font-family:var(--display)!important;font-weight:600!important;letter-spacing:.16em!important;text-transform:uppercase;font-size:9.5px!important;color:var(--txt-3)!important}
+.stat em,.stat span{font-family:var(--display)!important;font-style:normal;font-weight:700!important;letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.stat.cash::before{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+#side #nextUp,#sideBody #nextUp{flex-wrap:wrap}
+#side #nextUp .btn,#sideBody #nextUp .btn{flex:1 1 100%;justify-content:center;text-align:center}
+#nextUp > div{min-width:0}
+#nextUp .nuh,#nextUp small{font-family:var(--display);letter-spacing:.14em;text-transform:uppercase}
+@media (max-width:640px){ #modal h2{font-size:24px} .btn{padding:9px 12px!important} }
+/* ---- round 33b · keycap buttons ---- */
+.btn{position:relative;overflow:hidden;isolation:isolate;
+  background:linear-gradient(180deg,#1F2B37,#16202A)!important;
+  box-shadow:inset 0 0 0 1px var(--edge2),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -3px 0 rgba(0,0,0,.45)!important;
+  padding:9px 15px 11px!important;transition:transform .08s ease,box-shadow .12s ease,filter .15s ease!important}
+.btn::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.14) 45%,transparent 60%);transform:translateX(-120%);transition:transform .5s ease}
+.btn:hover:not([disabled])::after{transform:translateX(120%)}
+.btn:hover:not([disabled]){background:linear-gradient(180deg,#263544,#1B2632)!important;box-shadow:inset 0 0 0 1px var(--neon),inset 0 1px 0 rgba(255,255,255,.1),inset 0 -3px 0 rgba(0,0,0,.45)!important;color:#fff}
+.btn:active:not([disabled]),.btn.pressed{transform:translateY(2px)!important;box-shadow:inset 0 0 0 1px var(--edge2),inset 0 2px 4px rgba(0,0,0,.45)!important;padding:10px 15px 10px!important}
+.btn.pri{background:linear-gradient(180deg,#3DFF9C 0%,#00E676 55%,#00C965 100%)!important;color:#02240F!important;font-weight:700!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -3px 0 #00994D,0 0 0 1px rgba(0,230,118,.35)!important}
+.btn.pri:hover:not([disabled]){background:linear-gradient(180deg,#6BFFB4 0%,#1AF087 55%,#00D46B 100%)!important;filter:drop-shadow(0 0 12px rgba(0,230,118,.5))}
+.btn.pri:active:not([disabled]),.btn.pri.pressed{box-shadow:inset 0 2px 4px rgba(0,80,40,.6),0 0 0 1px rgba(0,230,118,.35)!important}
+.btn.pri::after{background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%)}
+.btn.gold,.btn.special{background:linear-gradient(180deg,#FFD873,#FFC233 55%,#E6A400)!important;color:#2A1A00!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -3px 0 #B37F00!important}
+.btn.dng,.btn.danger,.btn.bad,.btn.red{background:linear-gradient(180deg,#3A1A17,#2A1311)!important;color:#FFB4A5!important;box-shadow:inset 0 0 0 1px rgba(255,107,74,.5),inset 0 -3px 0 rgba(0,0,0,.45)!important}
+.btn.dng:hover:not([disabled]),.btn.danger:hover:not([disabled]),.btn.bad:hover:not([disabled]){box-shadow:inset 0 0 0 1px var(--warn),inset 0 -3px 0 rgba(0,0,0,.45)!important;color:#fff}
+.btn[disabled]{opacity:1!important;filter:saturate(.25) brightness(.7);cursor:not-allowed}
+.btn.pri[disabled]{background:linear-gradient(180deg,#2A3A33,#1E2A25)!important;color:#7FA190!important;box-shadow:inset 0 0 0 1px #2E4A3C,inset 0 -3px 0 rgba(0,0,0,.4)!important;filter:none}
+.choices .btn{padding:12px 16px 14px!important;display:block;width:100%}
+.choices .btn small{display:block;margin-top:3px;opacity:.85}
+.choices .btn:not(.pri){border-left:3px solid var(--edge2)}
+.choices .btn:hover:not(.pri):not([disabled]){border-left-color:var(--neon)}
+/* close button */
+.x{display:grid!important;place-items:center;font-size:15px!important;color:var(--txt-2)!important;transition:color .15s,box-shadow .15s}
+/* small chips become little keycaps too */
+.fchips button,.modchips button,.cw,.rct button,.dchips button{background:linear-gradient(180deg,#18222C,#121A22)!important;border:1px solid var(--edge2)!important;box-shadow:inset 0 -2px 0 rgba(0,0,0,.4);color:var(--txt-2)!important}
+.fchips button:hover,.modchips button:hover,.cw:hover{border-color:var(--neon)!important;color:#fff!important}
+.fchips button.on,.modchips button.on,.dchips button.on{background:linear-gradient(180deg,rgba(0,230,118,.22),rgba(0,230,118,.08))!important;border-color:var(--neon)!important;color:#fff!important;box-shadow:inset 0 -2px 0 var(--neon)!important}
+.modchips button.on{border-color:#FF9A3C!important;box-shadow:inset 0 -2px 0 #FF9A3C!important;background:linear-gradient(180deg,rgba(255,154,60,.22),rgba(255,154,60,.06))!important}
+/* title */
+#title .acts{display:flex;flex-wrap:wrap;gap:8px}
+#title .acts .btn{font-size:13px!important;padding:12px 18px 14px!important}
+#title .acts .btn.pri{font-size:14.5px!important;padding:14px 26px 16px!important;letter-spacing:.12em!important}
+#title .teach span,#title .chips span,#title .tags span,#title .pills span,#title .concepts span,#title .tag{border-radius:2px!important;font-family:var(--display)!important}
+/* HUD speed + icon keys */
+#hud .spd button,#hud .hbtns button{transition:background .12s,color .12s,transform .08s}
+#hud .spd button:active,#hud .hbtns button:active{transform:translateY(1px)}
+/* dock keys */
+#dockInner .tool{transition:background .15s,color .15s,transform .08s}
+#dockInner .tool:active{transform:translateY(1px)}
+#dockInner .tool svg,#dockInner .tool .ico{transition:transform .15s}
+#dockInner .tool:hover svg,#dockInner .tool:hover .ico{transform:translateY(-2px)}
+/* hustle + ability cards feel pressable */
+#abil{transition:transform .08s,border-color .15s}#abil:active{transform:translateY(1px)}
+#abil.ready{background:var(--brk),linear-gradient(90deg,rgba(255,194,51,.12),rgba(255,194,51,.02)),var(--panel)!important}
+body.reduce .btn::after{display:none}
 
 </style>
 <canvas id="gl" tabindex="0"></canvas>
