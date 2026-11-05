@@ -1350,7 +1350,7 @@ h5,.sech,.eyebrow,.stat label,.stat small,.hqt label,.crewh{font-family:var(--mx
 #rain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0}
 body:not(.ingame) #rain{opacity:.6;z-index:2;-webkit-mask-image:linear-gradient(90deg,#000 0,#000 40%,transparent 68%);mask-image:linear-gradient(90deg,#000 0,#000 40%,transparent 68%)}
 @media (max-width:640px){ body:not(.ingame) #rain{-webkit-mask-image:linear-gradient(180deg,#000 0,#000 55%,transparent 90%);mask-image:linear-gradient(180deg,#000 0,#000 55%,transparent 90%);opacity:.4} }
-body.mx-modal #rain{opacity:.22;z-index:19}
+
 body.reduce #rain{display:none}
 #title{background:transparent}
 #title::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(1,4,2,.92) 0%,rgba(1,4,2,.75) 38%,transparent 70%);pointer-events:none;z-index:-1}
@@ -6496,7 +6496,7 @@ ACH.push({id:'nb10', ic:'📓', n:'Note Taker', d:'Collect 10 money concepts', t
       cols[i]+= .5+((i*7)%5)*.12; if(y>H && Math.random()>.975) cols[i]=Math.random()*-20; } }
   requestAnimationFrame(tick);
   /* in-game vs title, and a faint rain behind big windows */
-  setInterval(()=>{ document.body.classList.toggle('ingame', !!(window.S && !titleMode)); document.body.classList.toggle('mx-modal', !!(window.S && !titleMode && modalOpen && !ui.drawer)); }, 300);
+  setInterval(()=>{ document.body.classList.toggle('ingame', !!(typeof S!=='undefined' && S && !titleMode)); }, 250);
   /* decode effect: headings scramble in from glyphs */
   const DG='01アカサタナ$#%<>/\\|=+*';
   window.mxDecode=function(el, dur){ if(!el||reduce()||el.dataset.mx) return; const final=el.textContent; if(!final.trim()||final.length>60) return; el.dataset.mx=1; el.classList.add('mxdec'); const t0=performance.now(), D=dur||420;
