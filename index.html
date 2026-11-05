@@ -154,6 +154,21 @@ body.photo #vig{opacity:.5}
 .hofrec{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}.hofrec > div{padding:10px 12px;border-radius:var(--r-m,14px);background:var(--bg-2,rgba(255,255,255,.04));border:1px solid var(--line-2,rgba(255,255,255,.12))}.hofrec label{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#FBBF24}.hofrec b{display:block;font-size:15px;margin-top:3px}.hofrec span{font-size:11.5px;color:var(--txt-3,#94A3B8)}
 .hofruns{display:grid;gap:6px}.hofrow{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line-2,rgba(255,255,255,.1))}.hofrow .hr{font:800 14px var(--mono);color:#FBBF24;width:22px;text-align:center}.hofrow > div{flex:1;min-width:0}.hofrow b{display:block}.hofrow span{display:block;font-size:12px;color:var(--txt-3,#94A3B8)}.hofrow em{font:700 13px var(--mono);font-style:normal;color:var(--neon)}
 .slot2.weekly{border-color:rgba(249,115,22,.5)}.slot2.weekly em{color:#FDBA74}
+/* ---- round 32 · Founder's Notebook ---- */
+.nbprog{height:8px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden;margin:6px 0 8px}.nbprog i{display:block;height:100%;background:linear-gradient(90deg,#A78BFA,#00E676)}
+.nbch{margin:6px 0 10px}
+.nbgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.nbc{padding:12px 14px;border-radius:var(--r-m,14px);border:1px solid var(--line-2,rgba(255,255,255,.12));background:var(--bg-2,rgba(255,255,255,.04));display:flex;flex-direction:column;gap:8px;min-width:0}
+.nbc.did{border-color:rgba(0,230,118,.45)}
+.nbc.locked{opacity:.6;border-style:dashed}
+.nbh{display:flex;align-items:center;gap:8px}.nbh span{font-size:18px}.nbh b{font-size:15px;flex:1;min-width:0}.nbh em{font-style:normal;font:700 11px var(--mono);color:var(--neon)}
+.nbc > p{margin:0;font-size:13.5px;line-height:1.5;color:var(--txt-2,#CBD5E1)}
+.nbwhere{font-size:11.5px;color:var(--txt-3,#94A3B8);line-height:1.4}.nbwhere b{color:var(--txt-2,#CBD5E1)}
+.nbchal{margin-top:auto;padding:10px;border-radius:10px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25)}
+.nbchal label{display:block;font:700 10px var(--body,inherit);letter-spacing:.12em;text-transform:uppercase;color:#C4B5FD}
+.nbchal p{margin:4px 0 8px;font-size:13px;line-height:1.45}
+.nbchal .btnrow{display:flex;flex-wrap:wrap;gap:6px}.nbchal .btn{padding:6px 10px;font-size:12.5px;text-decoration:none}
+.nbdot{position:absolute;top:-4px;left:-4px;font-style:normal;font-size:12px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
 </style></head><body>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -6141,6 +6156,92 @@ sub('story','hof','Hall of Fame', hofPanel);
   const _ci=cmdIndex; cmdIndex=function(){ const R=_ci(); const a=FABIL[S.founder]; if(a) R.unshift({g:'Action', n:'Founder ability: '+a.n, kw:'ability power skill founder', meta:abilityReady()?'Ready':'Recharging', run:useAbility}); R.push({g:'Go to', n:'Rival wars', kw:'takeover acquire rivals shares', run:()=>openPanel('wars')},{g:'Go to', n:'Studio rating', kw:'rate office photo', run:()=>openPanel('rating')},{g:'Go to', n:'Hall of Fame', kw:'records legends history', run:()=>openPanel('hof')},{g:'Action', n:'Photo mode', kw:'screenshot camera picture', run:()=>photoMode(true)}); return R; };
   const _hq=hqPanel; hqPanel=function(){ const r=_hq(); const s=seasonNow(); const eb=$('#modalCard h2'); if(s && eb && !$('#modalCard .seasonchip')) eb.insertAdjacentHTML('afterend', `<div class="seasonchip">${s.ic} <b>${s.n}</b> · ${s.t}</div>`); return r; };
   const _kp=keysPanel; keysPanel=function(){ _kp(); const K=$('#modalCard .keys'); if(K) K.insertAdjacentHTML('beforeend', `<div><kbd>K</kbd><span>Photo mode</span></div>`); }; })();
+
+/* =====================================================================
+   ROUND 32 · FOUNDER'S NOTEBOOK — every money concept you meet, kept
+   across all your studios, with optional real-world challenges
+   ===================================================================== */
+const MB_URL='https://getmoneybot.com';
+const NB_CATS={cash:['💵','Cash & budgeting'], earn:['📈','Earning'], debt:['💳','Spending & debt'], own:['🏦','Investing & ownership'], risk:['🎲','Risk & decisions'], biz:['🏢','Running a business']};
+// id, category, term, plain definition, real-world challenge, unlock (regex on what you read OR a state test), hint
+const NB=[
+ ['cashflow','cash','Cash flow','Money coming in versus money going out over time. A business can be profitable on paper and still run out of cash if the money arrives too late.','Write down every dollar you got and spent this week. Did more come in or go out?',/cash flow|collected|cash in/i,'Get paid by a client'],
+ ['runway','cash','Runway','How many months you can keep going with the cash you have if nothing new comes in. Cash ÷ monthly costs = runway.','Work out your own runway: savings ÷ what you spend in a month.',/runway/i,'Watch your runway in the top bar'],
+ ['burn','cash','Burn rate','How much money a company spends each month. High burn means the runway gets shorter, fast.','Add up your fixed monthly spending: phone, subscriptions, transport. That\'s your burn.',/burn rate|monthly costs|burn/i,'Read a monthly report'],
+ ['budget','cash','Budget','A plan for where your money will go before you spend it. Founders budget so surprises don\'t sink them.','Make a simple budget for next month: needs, wants, savings.',()=>S&&S.history&&S.history.length>=1,'Finish your first month'],
+ ['fixedvar','cash','Fixed vs variable costs','Fixed costs stay the same every month (rent, salaries). Variable costs go up and down with how busy you are (servers, materials).','List three of your fixed costs and three variable ones.',/rent|salar/i,'Hire someone or move offices'],
+ ['emergency','cash','Emergency fund','Money set aside for when things go wrong. Most experts suggest 3 to 6 months of costs.','Start an emergency fund, even $5 a week counts. Track it in MoneyBot.',()=>S&&typeof runway==='function'&&runway()>=6&&S.day>60,'Keep 6+ months of runway'],
+ ['receivable','cash','Accounts receivable','Money people owe you but haven\'t paid yet. It isn\'t cash until it\'s in your account.','Ever lent money to a friend? That\'s a receivable. Did you get it back on time?',/late payment|paid late|owe|invoice/i,'Send an invoice'],
+ ['revenue','earn','Revenue','All the money a business brings in from sales, before costs are taken out.','Find a company you like and look up its yearly revenue.',/revenue|sales/i,'Launch a product'],
+ ['profit','earn','Profit','What\'s left after you subtract all costs from revenue. Revenue is vanity, profit is sanity.','If you sold something for $20 that cost you $12 to make, what\'s your profit?',/profit/i,'Have a profitable month'],
+ ['margin','earn','Profit margin','Profit as a percentage of revenue. A 25% margin means you keep 25 cents of every dollar.','Pick something you\'d sell. Work out its margin.',/margin/i,'Read a monthly report'],
+ ['pricing','earn','Pricing','Choosing what to charge. Too low and you can\'t cover costs; too high and nobody buys.','Look at three apps or games you like. What do they charge, and why?',/price|pricing/i,'Set a product price'],
+ ['recurring','earn','Recurring revenue','Money that arrives again and again, like subscriptions. Investors love it because it\'s predictable.','Count your own subscriptions. How much recurring revenue are you giving companies?',/recurring|subscription|per month|\/mo/i,'Launch a product'],
+ ['passive','earn','Passive income','Money that keeps arriving without you working for it each time, like a product that sells while you sleep.','Brainstorm one thing you could make once and sell many times.',/passive income|while you were away/i,'Come back after a break'],
+ ['negotiate','earn','Negotiating pay','Asking for more money with good reasons. Most first offers have room to move.','Practice: write down three reasons you\'d deserve a raise or higher price.',/counter-offer|match it \(|ask(ing)? for a raise/i,'Have an employee get poached'],
+ ['debt','debt','Debt','Borrowed money you must pay back, usually with extra on top. It can help you grow, or sink you.','Look up the interest rate on a typical credit card. Surprised?',/loan|debt|borrow/i,'Take a loan'],
+ ['interest','debt','Interest','The cost of borrowing money, or the reward for saving it. It\'s usually a percentage per year.','If you save $100 at 4% a year, how much do you have after one year?',/interest/i,'Take a loan'],
+ ['opportunity','debt','Opportunity cost','What you give up when you choose one thing over another. Every yes is a no to something else.','Next time you buy something, ask: what else could this money have done?',/politely say no|turn(ed)? (it )?down|opportunity cost|no thanks/i,'Turn down an offer'],
+ ['sunk','debt','Sunk cost','Money already spent that you can\'t get back. It shouldn\'t decide what you do next, but it often does.','Think of something you kept doing only because you\'d already paid for it.',/already (spent|paid)|can't get back|refund/i,'Sell some furniture'],
+ ['scope','debt','Scope creep','When a project keeps growing without more time or money. It quietly eats profit.','Next group project, write down exactly what\'s included before you start.',/scope creep/i,'Get a scope creep event'],
+ ['equity','own','Equity','Owning a piece of a company. If you own 10% and the company is sold for $1M, your share is $100,000.','Look up who owns the most of a famous company.',/equity|cap table|ownership|stake/i,'Open Funding'],
+ ['dilution','own','Dilution','When a company sells new shares, everyone\'s slice of the pie gets smaller, even if the pie grows.','Draw a pie: you own 100%, then sell 20%. What\'s left?',/dilut/i,'Raise money'],
+ ['valuation','own','Valuation','What a company is considered to be worth. It\'s part math, part story, part what investors believe.','Look up a startup that\'s valued at over $1 billion. What does it actually sell?',/valuation|valued at|worth \$/i,'Check the leaderboard'],
+ ['angel','own','Angel investors & VCs','Angels are people who invest their own money early. Venture capital firms invest other people\'s money in risky startups for big returns.','Find one startup and look up who invested in it first.',/angel|venture|investor/i,'Meet an investor'],
+ ['ipo','own','IPO','An Initial Public Offering: when a company first sells shares to anyone on the stock market.','Look up a famous IPO. What was the price on day one versus today?',/\bIPO\b|go public|public company|Exchange/i,'Reach chapter 5'],
+ ['stock','own','Stocks & shares','Small pieces of a company you can buy and sell. Prices move with how people think the company will do.','Pick one company and follow its stock price for a week.',/share price|stock|shares/i,'Go public'],
+ ['takeover','own','Takeover','When one company buys enough of another to control it, usually more than 50%.','Look up a famous acquisition, like a big tech company buying a game studio.',/takeover|51%/i,'Buy part of a rival'],
+ ['diversify','own','Diversification','Not putting all your eggs in one basket. Spreading money or bets so one failure doesn\'t wipe you out.','If you had $100 to invest, how would you split it to lower your risk?',()=>S&&(S.products.filter(p=>p.launched).length>=3||Object.keys(S.cities||{}).length>=2),'Launch 3 products or open 2 world offices'],
+ ['compound','own','Compound growth','Growth on top of growth. Small gains every month snowball into huge gains over years.','Use a compound interest calculator: $50 a month at 7% for 30 years.',()=>S&&S.day>=360,'Survive your first year'],
+ ['risk','risk','Risk vs reward','Bigger possible rewards usually come with bigger chances of losing. Smart risk means knowing the odds.','Think of a choice you made with a 50/50 chance. Was the reward worth the risk?',/\d+% chance|risky|gamble/i,'Make a risky choice'],
+ ['insurance','risk','Planning for bad days','Outages, lawsuits and late payments happen to everyone. Insurance and savings turn disasters into bumps.','Ask an adult what kinds of insurance they have and why.',/outage|lawsuit|patent|servers are down/i,'Survive a crisis'],
+ ['competition','risk','Competition','Other companies chasing the same customers. It pushes everyone to get better, or get beaten.','Pick two competing brands. Why do people choose one over the other?',/rival|copycat|competitor/i,'Meet a rival'],
+ ['churn','biz','Churn','The share of customers who leave each month. Keeping customers is usually cheaper than finding new ones.','Think of an app you stopped using. What made you leave?',/churn|leav(e|ing) each month|lose some users/i,'Run a product for a while'],
+ ['roi','biz','Return on investment','What you get back compared to what you put in. Spend $100 on ads, earn $300: that\'s a 200% ROI.','Did something you bought this year pay you back? Work out its ROI.',/return on|ROI|marketing|ad spend|campaign/i,'Market a product'],
+ ['reputation','biz','Reputation','What people think of you. It\'s hard to build and easy to lose, and it decides who wants to work with you.','Read the reviews of a company you like. What do people praise or complain about?',/reputation/i,'Deliver a 5-star project'],
+ ['tax','biz','Taxes','Money businesses and people pay to the government for roads, schools and more. Founders plan for it so it\'s not a surprise.','Look at a paycheck or receipt. How much went to tax?',/tax/i,'Live through a Tax Season'],
+ ['burnout','biz','People are the business','Overworked people make mistakes and quit. Rest is part of the plan, not a reward.','Plan one real break into your week, and keep it.',/burnout|exhausted|running on empty|tired/i,'Have a tired team']
+];
+const NBMAP={}; NB.forEach(n=>NBMAP[n[0]]=n);
+function nbLoad(){ try{ return JSON.parse(localStorage.getItem('bs-notebook')||'{}'); }catch(e){ return {}; } }
+function nbSave(o){ try{ localStorage.setItem('bs-notebook', JSON.stringify(o)); }catch(e){} }
+let NBK=nbLoad(); NBK.got=NBK.got||{}; NBK.done=NBK.done||{};
+function nbCount(){ return Object.keys(NBK.got).length; }
+let nbQ=[], nbT=0;
+function nbUnlock(id, where){ if(NBK.got[id]||!NBMAP[id]||!S||titleMode) return; NBK.got[id]={day:S.day, studio:S.name, where:(where||'').slice(0,120)}; nbSave(NBK); nbQ.push(id); nbFlush(); }
+function nbFlush(){ if(!nbQ.length || performance.now()-nbT<2500){ if(nbQ.length) setTimeout(nbFlush, 2600); return; } nbT=performance.now(); if(nbQ.length>1){ const ids=nbQ.splice(0); banner('📓', ids.length+' new in your notebook', ids.map(i=>NBMAP[i][2]).join(' · ')+'. Open Story → Notebook.', '#A78BFA', {small:1, dur:4200}); sfx('pop'); gainXP(8*ids.length); nbBadge(); return; } const id=nbQ.shift(); const n=NBMAP[id];
+  banner('📓','New in your notebook: '+n[2], n[3].split('. ')[0]+'.', '#A78BFA', {small:1, dur:3600}); sfx('pop'); gainXP(8); nbBadge(); }
+function nbScan(text, where){ if(!S||titleMode||!text) return; const t=String(text).replace(/<[^>]+>/g,' '); NB.forEach(n=>{ if(!NBK.got[n[0]] && n[5] instanceof RegExp && n[5].test(t)) nbUnlock(n[0], where||t.replace(/\s+/g,' ').trim().slice(0,110)); }); }
+function nbTick(){ if(!S||titleMode) return; NB.forEach(n=>{ if(!NBK.got[n[0]] && typeof n[5]==='function'){ try{ if(n[5]()) nbUnlock(n[0], 'Day '+S.day+' at '+S.name); }catch(e){} } }); }
+let NB_PANEL=0;
+(function(){ const _opn=openPanel; openPanel=function(p){ NB_PANEL++; try{ return _opn(p); } finally { NB_PANEL--; } }; })();
+(function(){ const _om=openModal; openModal=function(html, onClose){ const r=_om(html, onClose); try{ if(!NB_PANEL && !ui.toDrawer && !/Founder's Notebook/.test(String(html).slice(0,600))) nbScan(html, ($('#modalCard h2')||{}).textContent); }catch(e){} return r; };
+  const _bn=banner; banner=function(ic,t,s,c,o){ if(ic!=='📓') try{ nbScan((t||'')+' '+(s||''), (t||s||'').replace(/<[^>]+>/g,'')); }catch(e){} return _bn(ic,t,s,c,o); };
+  const _ed=endDay; endDay=function(){ const r=_ed.apply(this,arguments); nbTick(); return r; };
+  const _op=openPanel; openPanel=function(p){ const r=_op(p); if(p==='funding') nbUnlock('equity','Opened the Funding panel'); if(p==='finance' && S.history && S.history.length) nbUnlock('burn','Read your money report'); return r; }; })();
+function nbBadge(){ const t=$('#dockInner [data-g="story"]'); if(!t) return; let b=t.querySelector('.nbdot'); const fresh=Object.keys(NBK.got).filter(k=>!NBK.got[k].seen).length; if(!fresh){ if(b) b.remove(); return; } if(!b){ b=document.createElement('i'); b.className='nbdot'; t.appendChild(b); } b.textContent='📓'; }
+function nbPanel(){ const tot=NB.length, got=nbCount(), done=Object.keys(NBK.done).length; const cat=ui.nbcat||'all';
+  Object.keys(NBK.got).forEach(k=>NBK.got[k].seen=1); nbSave(NBK); setTimeout(nbBadge,0);
+  openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Founder's Notebook · kept across all your studios</div><h2>📓 ${got} of ${tot} money concepts</h2>
+    <div class="nbprog"><i style="width:${got/tot*100}%"></i></div>
+    <p class="hint">Every money idea you run into while building your studio lands here. Real-world challenges are optional: try them in your own life, then tick them off for XP. ${done} done so far.</p>
+    <div class="fchips nbch">${[['all','All']].concat(Object.entries(NB_CATS).map(([k,v])=>[k,v[0]+' '+v[1]])).map(([k,t])=>`<button class="${cat===k?'on':''}" data-nbc="${k}">${t}</button>`).join('')}</div>
+    <div class="nbgrid">${NB.filter(n=>cat==='all'||n[1]===cat).map(n=>{ const g=NBK.got[n[0]], d=NBK.done[n[0]];
+      return g?`<div class="nbc ${d?'did':''}"><div class="nbh"><span>${NB_CATS[n[1]][0]}</span><b>${n[2]}</b>${d?'<em>✓ Tried it</em>':''}</div><p>${n[3]}</p>
+        <div class="nbwhere">Learned at <b>${g.studio}</b>, day ${g.day}${g.where?': “'+g.where.replace(/</g,'')+'”':''}</div>
+        <div class="nbchal"><label>Real-world challenge</label><p>${n[4]}</p><div class="btnrow"><button class="btn ${d?'':'pri'}" data-nbd="${n[0]}">${d?'Undo':'I did this · +25 XP'}</button><a class="btn" href="${MB_URL}" target="_blank" rel="noopener">Track it in MoneyBot ↗</a></div></div></div>`
+        :`<div class="nbc locked"><div class="nbh"><span>🔒</span><b>???</b></div><p class="hint">${NB_CATS[n[1]][1]} · Hint: ${n[6]}.</p></div>`; }).join('')}</div>`);
+  $$('#modalCard [data-nbc]').forEach(b=>b.onclick=()=>{ ui.nbcat=b.dataset.nbc; sfx('tick'); openPanel('notebook'); });
+  $$('#modalCard [data-nbd]').forEach(b=>b.onclick=()=>{ const id=b.dataset.nbd; if(NBK.done[id]) delete NBK.done[id]; else { NBK.done[id]=Date.now(); gainXP(25); sfx('coin'); toast('Nice. Real money skills beat game money every time.',''); } nbSave(NBK); openPanel('notebook'); }); }
+sub('story','notebook','Notebook', nbPanel);
+ACH.push({id:'nb10', ic:'📓', n:'Note Taker', d:'Collect 10 money concepts', test:()=>nbCount()>=10},
+         {id:'nb25', ic:'📚', n:'Money Nerd', d:'Collect 25 money concepts', test:()=>nbCount()>=25},
+         {id:'nball', ic:'🎓', n:'MBA (Mostly Bot Academy)', d:'Collect every money concept', test:()=>nbCount()>=NB.length},
+         {id:'nbreal', ic:'🌎', n:'Real World Founder', d:'Complete 5 real-world challenges', test:()=>Object.keys(NBK.done).length>=5});
+(function(){ const _ci=cmdIndex; cmdIndex=function(){ const R=_ci(); R.push({g:'Go to', n:"Founder's Notebook", kw:'notebook money concepts learn lessons glossary', run:()=>openPanel('notebook')}); NB.forEach(n=>{ if(NBK.got[n[0]]) R.push({g:'Notebook', n:n[2], kw:n[3], run:()=>{ ui.nbcat=n[1]; openPanel('notebook'); }}); }); return R; };
+  const _kp=keysPanel; keysPanel=function(){ _kp(); const K=$('#modalCard .keys'); if(K) K.insertAdjacentHTML('beforeend', `<div><kbd>N</kbd><span>Founder's Notebook</span></div>`); };
+  window.addEventListener('keydown', e=>{ if(!S||titleMode||modalOpen&&!ui.drawer) return; const tg=e.target.tagName; if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT'||e.ctrlKey||e.metaKey) return; if(e.key==='n'||e.key==='N'){ e.preventDefault(); openPanel('notebook'); } });
+  const _rh=refreshHUD; let did=0; refreshHUD=function(){ const r=_rh(); if(!did && S && !titleMode){ did=1; nbBadge(); } return r; }; })();
 
 /* ---------------- save / load ---------------- */
 function save(){ try{ S.lastSeen=Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
