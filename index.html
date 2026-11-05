@@ -1232,6 +1232,25 @@ b,strong{font-weight:700}
 #vig{background:radial-gradient(ellipse 120% 90% at 50% 45%,transparent 50%,rgba(2,4,6,.5) 100%)}
 .stat label{font-family:var(--display)!important;font-weight:600!important;letter-spacing:.16em!important;text-transform:uppercase;font-size:9.5px!important;color:var(--txt-3)!important}
 .stat em,.stat span{font-family:var(--display)!important;font-style:normal;font-weight:700!important;letter-spacing:.03em;font-variant-numeric:tabular-nums}
+
+/* ---------- 100,000× feel ---------- */
+.stat b,#hCash{font-variant-numeric:tabular-nums;transition:color .2s}
+.sparkmini{display:block;width:44px;height:14px;margin-top:2px;opacity:.85}
+.card2{transition:transform .18s ease,border-color .18s,box-shadow .18s}
+.card2:hover{transform:perspective(600px) rotateX(1.2deg) rotateY(-1.5deg) translateY(-1px)}
+.meter i.shimmer{background-size:200% 100%!important;animation:shimmerBar 1.4s linear infinite}
+@keyframes shimmerBar{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.nudge:hover{transform:translateY(-1px) scale(1.04)}
+#gl.cur-hand{cursor:pointer}
+#gl.cur-move{cursor:move}
+#gl.cur-no{cursor:not-allowed}
+#gl.cur-grab{cursor:grabbing}
+body.shake #gl{animation:shakeCam .28s ease}
+@keyframes shakeCam{0%,100%{transform:translate(0,0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,-1px)}80%{transform:translate(2px,1px)}}
+body.slo{animation:none}
+#advText.typing::after{content:'▋'; margin-left:2px; opacity:.7; animation:blinkC .8s step-end infinite}
+@keyframes blinkC{50%{opacity:0}}
+.desk-cup{pointer-events:none}
 .stat.cash::before{background:var(--gold);box-shadow:0 0 8px var(--gold)}
 #side #nextUp,#sideBody #nextUp{flex-wrap:wrap}
 #side #nextUp .btn,#sideBody #nextUp .btn{flex:1 1 100%;justify-content:center;text-align:center}
@@ -1551,11 +1570,23 @@ function musicTick(){ if(!AC) return; if(muted||!MUSIC.on){ musicStop(); return;
     MUSIC.step++; MUSIC.next+=spb; } }
 let AMB=null;
 function ambStart(){ if(!AC||AMB) return; try{ const len=AC.sampleRate*2, buf=AC.createBuffer(1,len,AC.sampleRate), d=buf.getChannelData(0); for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
-  const mk=(type,f,q)=>{ const src=AC.createBufferSource(); src.buffer=buf; src.loop=true; const fl=AC.createBiquadFilter(); fl.type=type; fl.frequency.value=f; fl.Q.value=q; const g=AC.createGain(); g.gain.value=0; src.connect(fl); fl.connect(g); g.connect(AC.destination); src.start(); return g; };
-  AMB={crowd:mk('bandpass',520,.8), rain:mk('highpass',2400,.3)}; }catch(e){} }
+  const dest=(typeof BUS!=='undefined'&&BUS&&BUS.fx)?BUS.fx:AC.destination;
+  const mk=(type,f,q)=>{ const src=AC.createBufferSource(); src.buffer=buf; src.loop=true; const fl=AC.createBiquadFilter(); fl.type=type; fl.frequency.value=f; fl.Q.value=q; const g=AC.createGain(); g.gain.value=0; src.connect(fl); fl.connect(g); g.connect(dest); src.start(); return g; };
+  AMB={crowd:mk('bandpass',520,.8), rain:mk('highpass',2400,.3), keys:mk('bandpass',1800,1.2), coffee:mk('lowpass',420,.6), hum:mk('lowpass',110,.4)}; }catch(e){} }
 function ambUpdate(){ if(!AMB||!S) return; const on=!muted && !titleMode && S.speed>0; const z=camera?camera.position.distanceTo(controls.target):30;
-  const crowd=on ? Math.min(.035, S.bots.length/2600) * clamp(28/z,.3,1.2) : 0, rain=on && S.fx.label==='Rain' ? .045 : 0;
-  AMB.crowd.gain.setTargetAtTime(crowd, AC.currentTime, .4); AMB.rain.gain.setTargetAtTime(rain, AC.currentTime, .6); }
+  const working=S.team?S.team.filter(p=>{ const w=walkers.get(p.id); return w&&w.state==='work'; }).length:0;
+  const night=Math.floor((S.min||540)/60)>=18;
+  const crowd=on ? Math.min(.04, (.008+working*.004+(S.bots||0)*.001)) * clamp(28/z,.3,1.2) : 0;
+  const rain=on && S.fx && /rain/i.test(S.fx.label||'') ? .05 : 0;
+  const keys=on ? Math.min(.028, working*.0045) : 0;
+  const coffee=on && S.furn && S.furn.some(f=>f.kind==='coffee') ? (working? .012:.006) : 0;
+  const hum=on && night ? .018 : on ? .006 : 0;
+  AMB.crowd.gain.setTargetAtTime(crowd, AC.currentTime, .4);
+  AMB.rain.gain.setTargetAtTime(rain, AC.currentTime, .6);
+  if(AMB.keys) AMB.keys.gain.setTargetAtTime(keys, AC.currentTime, .35);
+  if(AMB.coffee) AMB.coffee.gain.setTargetAtTime(coffee, AC.currentTime, .5);
+  if(AMB.hum) AMB.hum.gain.setTargetAtTime(hum, AC.currentTime, .8);
+}
 /* ---------- ride cam ---------- */
 function enterRideCam(r){
   const g=objMeshes.get(r.id); if(!g) return; closeInspect(); hidePalette(); setTool('select');
@@ -1953,19 +1984,60 @@ function hire(c){
 function fire(p, quit){ if(p.founder) return; S.team=S.team.filter(x=>x!==p); const w=walkers.get(p.id); if(w){ scene.remove(w.rig.root); scene.remove(w.bar); scene.remove(w.ico); walkers.delete(p.id); } journal(quit?p.name+' quit':p.name+' was let go', quit?'Morale was too low. The empty desk is the story.':'Severance paid. The room got quieter.'); if(!quit){ const sev=Math.round(p.salary*.5); S.cash-=sev; S.month.other+=sev; S.team.forEach(q=>q.morale=clamp(q.morale-4,0,100)); toast(p.name+' was let go. Severance: '+money(sev)+'. The team is a little shaken.','warn'); } assignDesks(); refreshHUD(); }
 function journal(t, c){ if(!S||!S.story) return; S.story.log.push({d:S.day, t, c:c||'', j:1}); }
 function say(p, line){ if(!p||!line) return line; const w=walkers.get(p.id); if(w && w.rig.root && w.rig.root.visible){ const pos=w.pos.clone(); pos.y=1.28; fxText(pos, line.length>22?line.slice(0,20)+'…':line, p.morale<35?'#FCA5A5':p.morale>75?'#A7F3D0':'#F8FAFC', .18); } return line; }
+const CHAT = {
+  train:['Learning {sk}.','{sk} class notes everywhere.','Brain: open. Skill: loading.','This course better pay rent.'],
+  break:['Coffee first.','Five minutes.','Brain reboot.','Stretching the spine.','Don\'t look at me. I\'m on break.','Refilling the tank.','Bathroom. Be kind.'],
+  crunch:['Still here.','This deadline is a person.','I see bugs when I close my eyes.','Pizza is a food group.','Just one more hour.','My eyes are rectangles.','Crunch mode: engaged.','Tell my plant I love it.'],
+  own:['This one is ours.','If {pd} ships, I want my name on the shelf.','Don\'t let Rusty copy this.','Building the thing we keep.','{pd} better be a hit.','Our product. Our rules.','Patch notes already drafting.'],
+  work:['Stuck on bugs.','Almost.','Chip would like this.','The diner work is honest work.','Shipping beats perfect.','One more commit.','Who touched the CSS?','It works on my machine.','Refactor later. Famous last words.','Need another pair of eyes.','This ticket is spicy.','Progress bar lying to me.'],
+  low:['Is this the job?','I could freelance.','Rusty texted.','My morale is a loading spinner.','Maybe I need a raise.','Is the fridge empty again?','Feeling invisible today.','Runway is short. Mood shorter.'],
+  proud:['Proud of {pd}.','Users still opening {pd}?','Ship the update.','{pd} still hits.','Saw a review for {pd}.','Fan mail for {pd}. Nice.','{pd} paid for lunch.'],
+  morn:['Morning. Coffee. Code.','Sun\'s up. So am I.','Fresh day, fresh bugs.','Let\'s not break prod today.','Who made the coffee? Bless.'],
+  aft:['Afternoon fog.','Need a walk. Or a snack.','Post-lunch commits.','Golden hour for shipping.','Desk lamp time soon.'],
+  night:['Night shift vibes.','Desk lamps > sunlight.','Quiet office. Loud keyboard.','Stars out. Bugs in.','Owl hours. Don\'t judge.'],
+  rain:['Rain on the window. Perfect.','Wet day. Dry code.','Rain sounds good on focus.','Forgot an umbrella. Classic.'],
+  snow:['Snow outside. Hot cocoa inside.','December brain.','Whiteout weather. Green text.'],
+  fall:['Pumpkin on the desk energy.','Autumn commits hit different.','Sweater weather. Ship weather.'],
+  free:['Ready.','What\'s next?','I can take a contract.','Put me in, coach.','Bored. Give me work.','Idle is a bug.','Looking for a project.'],
+  fast:['Put me on the slow one.','Faster than the build.','Already done. Next?','Speedrun mode.','I\'ll finish before lunch.'],
+  careful:['I will find the bug.','Don\'t rush me.','Tests first. Always.','I smell a race condition.','Careful is my middle name.'],
+  mentor:['Pair me with the new kid.','Let me show you.','Teaching mode: on.','Ask me anything.','We grow together.'],
+  owl:['I like the late shift.','Night owl reporting.','Call me after 8.','Dark mode forever.','Morning meetings? Pass.'],
+  hothead:['Just tell me the deadline.','Ship it or fight me.','I\'m fired up. Good.','Don\'t soft-pedal it.','Anger is fuel. Use it.'],
+  loyal:['I\'m not going anywhere.','This garage raised me.','Loyal until the IPO.','ScrapCo who?','Still here. Still us.'],
+  learner:['Show me the hard thing.','New skill unlocked soon.','Teach me the weird one.','I want the hard ticket.','Learning is the perk.']
+};
+function chatterPick(pool, key){
+  if(!pool || !pool.length) return '';
+  const last = (ui._chatLast=ui._chatLast||{})[key];
+  let line, n=0; do{ line=pick(pool); n++; }while(line===last && pool.length>1 && n<8);
+  ui._chatLast[key]=line; return line;
+}
 function chatterLine(p){
   if(!p) return '';
   const pr=S.projects.find(q=>q.id===p.proj);
   const prod=S.products.filter(x=>x.launched).slice(-1)[0];
-  if(p.training) return 'Learning '+SKN[p.trainSkill]+'.';
-  if(p.breakT>0) return 'On a break.';
-  if(pr&&pr.crunch) return 'Still here.';
-  if(pr&&pr.own){ const pd=S.products.find(x=>x.id===pr.prod); return ((pd&&pd.name)||'This one')+' is ours.'; }
-  if(pr) return 'Stuck on bugs.';
-  if(p.morale<32) return 'Is this the job?';
-  if(prod) return 'Proud of '+prod.name+'.';
-  const tr={fast:'Put me on the slow one.', careful:'I will find the bug.', mentor:'Pair me with the new kid.', owl:'I like the late shift.', hothead:'Just tell me the deadline.', loyal:'I\'m not going anywhere.', learner:'Show me the hard thing.'};
-  return tr[p.trait]||'Ready.';
+  const h=Math.floor((S.min||540)/60), mo=Math.floor(((S.day||1)-1)/30)%12;
+  const rain=S.fx&&/rain/i.test(S.fx.label||'');
+  let pool;
+  if(p.training) pool=CHAT.train;
+  else if(p.breakT>0) pool=CHAT.break;
+  else if(pr&&pr.crunch) pool=CHAT.crunch;
+  else if(pr&&pr.own) pool=CHAT.own;
+  else if(pr) pool=CHAT.work;
+  else if(p.morale<32) pool=CHAT.low;
+  else if(prod && Math.random()<.35) pool=CHAT.proud;
+  else if(h<11) pool=CHAT.morn;
+  else if(h>=18) pool=CHAT.night;
+  else if(h>=15) pool=CHAT.aft;
+  else if(rain) pool=CHAT.rain;
+  else if(mo===11||mo===0) pool=CHAT.snow;
+  else if(mo===9) pool=CHAT.fall;
+  else if(p.trait && CHAT[p.trait]) pool=CHAT[p.trait];
+  else pool=CHAT.free;
+  const sk=p.trainSkill?SKN[p.trainSkill]:'skills';
+  const pd=pr&&pr.own?(S.products.find(x=>x.id===pr.prod)||{}).name||'it':(prod&&prod.name)||'it';
+  return chatterPick(pool, p.id||'x').replace(/\{sk\}/g,sk).replace(/\{pd\}/g,pd);
 }
 function peopleChatter(){ const pool=S.team.filter(p=>!p.founder); if(!pool.length) return; const n=Math.min(pool.length, S.team.length>=6?2:1); const sh=pool.slice().sort(()=>Math.random()-.5); for(let i=0;i<n;i++) say(sh[i], chatterLine(sh[i])); }
 function prodIcon(p){ const m={Action:'💥',Puzzle:'🧩',RPG:'🗡️',Racing:'🏎️',Simulation:'🏢',Strategy:'♟️',Platformer:'👾',Horror:'👻',Productivity:'✅',Finance:'💰',Social:'💬',Health:'❤️',Education:'📚','AI Assistant':'🤖',Security:'🔒','Creative Tools':'🎨'}; return p.icon||m[p.a]||(p.kind==='game'?'🎮':'📱'); }
@@ -3207,7 +3279,7 @@ function gameOver(){ openModal(`<div class="eyebrow">${dateStr()}</div><h2 style
 function helpPanel(){ openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Controls</div><h2>How to play</h2><p>The bottom bar has five sections: <b>Work</b> (contracts, projects, products), <b>Team</b> (people and hiring), <b>Office</b> (furniture and moving), <b>Company</b> (money, funding, upgrades, research) and <b>Story</b> (goals and inbox). The <b>Next up</b> card in the top-left always shows the most useful thing to do. Take client contracts, put the right people on them, and deliver before the deadline. Good reviews grow your reputation, which brings bigger contracts. Pay salaries and rent every month, and don't run out of cash.</p><div class="keys"><kbd>Left-drag</kbd><span>Move the camera</span><kbd>Right-drag</kbd><span>Rotate</span><kbd>Scroll</kbd><span>Zoom</span><kbd>Click</kbd><span>Select a person or furniture</span><kbd>C</kbd><span>Contracts</span><kbd>P</kbd><span>Projects</span><kbd>T</kbd><span>Team</span><kbd>H</kbd><span>Hire</span><kbd>B</kbd><span>Office and furniture</span><kbd>F</kbd><span>Finances</span><kbd>G</kbd><span>Story goals</span><kbd>Z</kbd><span>Rotate furniture while placing (click placed furniture to rotate, move or upgrade it)</span><kbd>X</kbd><span>Hustle: add work to the project on the Hustle card</span><kbd>I</kbd><span>Inbox</span><kbd>M</kbd><span>Menu</span><kbd>Esc</kbd><span>Close a panel or stop placing</span><kbd>Space</kbd><span>Pause</span><kbd>1 2 3</kbd><span>Speed</span></div>`); }
 
 /* sound */
-function initAudio(){ if(AC) return; try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ AC=null; } if(AC) musicStart(); }
+function initAudio(){ if(AC) return; try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ AC=null; } if(AC){ musicStart(); try{ ambStart(); }catch(e){} } }
 function sfx(k){ if(!AC||muted) return;
   if(k==='coin'){ tone(988,.06,'square',.022); tone(1319,.12,'square',.022,.05); }
   if(k==='build'){ tone(160,.18,'triangle',.12,0,60); tone(320,.1,'square',.03,.02); }
@@ -3624,9 +3696,19 @@ function tickCash(dt){
   if(!Number.isFinite(ui.cashShown)) ui.cashShown=S.cash;
   if(ui.cashShown==null) ui.cashShown=S.cash;
   const d=num(S.cash,0)-num(ui.cashShown,0);
-  if(Math.abs(d)<1) ui.cashShown=S.cash; else ui.cashShown += d*Math.min(1,dt*5) + Math.sign(d)*Math.min(Math.abs(d), dt*30);
+  // terminal-style counter: digit-by-digit chase
+  if(Math.abs(d)<1) ui.cashShown=S.cash;
+  else {
+    const step=Math.max(1, Math.abs(d)*Math.min(1,dt*6)) + Math.min(Math.abs(d), dt*(Math.abs(d)>5000?800:120));
+    ui.cashShown += Math.sign(d)*Math.min(Math.abs(d), step);
+  }
   const el=$('#hCash'), txt=fmt(Math.round(num(ui.cashShown,0))); if(el.textContent!==txt) el.textContent=txt;
   const box=el.closest('.stat'); if(box){ box.classList.toggle('gain', d>3); box.classList.toggle('loss', d<-3); }
+  // rolling fans / rep mini if present
+  if(ui.fansShown==null) ui.fansShown=num(S.fans,0);
+  const fd=num(S.fans,0)-ui.fansShown; if(Math.abs(fd)>0){ ui.fansShown += Math.sign(fd)*Math.min(Math.abs(fd), Math.max(.5, Math.abs(fd)*dt*4)); const fe=$('#hFans'); if(fe) fe.textContent=Math.round(ui.fansShown).toLocaleString(); }
+  if(d>20) ui._coinStreak=(ui._coinStreak||0)+dt; else ui._coinStreak=Math.max(0,(ui._coinStreak||0)-dt*2);
+  if(typeof sparkTick==='function') sparkTick();
 }
 function cashPop(amt){ if(!amt || ui.reduce) return; const r=$('#hCash').getBoundingClientRect(); const el=document.createElement('div'); el.className='cashpop '+(amt>0?'pos':'neg'); el.textContent=(amt>0?'+':'−')+fmt(Math.abs(Math.round(amt))).replace('-',''); el.style.left=(r.left)+'px'; el.style.top=(r.bottom+4)+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(), 1600); }
 let coinsLive=0;
@@ -3653,22 +3735,34 @@ function ambientFx(dt){
   for(const p of S.team){ const w=walkers.get(p.id); if(!w || w.state!=='work' || !w.rig.root.visible || Math.random()>dt*.45) continue; const pr=S.projects.find(q=>q.id===p.proj); if(!pr) continue; const d=S.furn.find(f=>f.id===p.desk); const g=d&&furnMeshes.get(d.id); if(!g || !g.userData.screen) continue; g.userData.screen.getWorldPosition(_v3); const pos=_v3.clone(); pos.y+=.22; pos.x+=rand(-.1,.1); fxSpawn(glyphTex(pick(GLYPHS), CATC[PTYPES[pr.type].cat]||'#00E676', 40), pos, {h:.1, v:new THREE.Vector3(rand(-.05,.05),.34,rand(-.05,.05)), life:1.6, op:.9}); }
 }
 
-/* time of day */
-const SKY=[[0,'#FFD6A5',1.1,'#FDBA74',.8],[.4,'#FFF7ED',1.4,'#7DD3FC',.85],[.75,'#FFC48A',1.15,'#FCA5A5',.75],[1,'#FF8A5B',.7,'#818CF8',.6]];
+/* time of day · morning sun → golden afternoon → desk lamps after 6 */
+const SKY=[
+  [0,'#FFE4C4',1.25,'#FDBA74',.95],
+  [.22,'#FFF7ED',1.45,'#7DD3FC',.9],
+  [.48,'#FFFBEB',1.35,'#93C5FD',.85],
+  [.68,'#FFD4A3',1.05,'#FDBA74',.72],
+  [.82,'#FF9B6B',.78,'#A78BFA',.58],
+  [1,'#3B4A7A',.42,'#6366F1',.45]
+];
 const _c1=new THREE.Color(), _c2=new THREE.Color();
 function dayLight(){
   if(!S || titleMode) return; const t=clamp((S.min-540)/540,0,1);
   let a=SKY[0], b=SKY[SKY.length-1]; for(let i=0;i<SKY.length-1;i++){ if(t>=SKY[i][0] && t<=SKY[i+1][0]){ a=SKY[i]; b=SKY[i+1]; break; } }
   const k=(t-a[0])/Math.max(.001,b[0]-a[0]);
   sun.color.copy(_c1.set(a[1]).lerp(_c2.set(b[1]),k)); sun.intensity=a[2]+(b[2]-a[2])*k; hemi.intensity=a[4]+(b[4]-a[4])*k;
-  sun.position.set(-14+28*t, 14+5*Math.sin(t*Math.PI), 12);
-  const eve=clamp((t-.62)/.38,0,1);
+  sun.position.set(-16+32*t, 12+8*Math.sin(t*Math.PI), 10+4*Math.cos(t*Math.PI));
+  const eve=clamp((t-.58)/.42,0,1), night=clamp((t-.78)/.22,0,1);
   if(!world.eveL){ world.eveL=new THREE.PointLight(0xFFB86B,0,40,1.6); world.eveL.position.set(0,3.2,0); scene.add(world.eveL); }
-  world.eveL.intensity=eve*.95*(ui.fl===-1?0:1);
+  if(!world.deskL){ world.deskL=new THREE.PointLight(0x93C5FD,0,18,2); world.deskL.position.set(1.5,1.6,0); scene.add(world.deskL); }
+  world.eveL.intensity=eve*1.05*(ui.fl===-1?0:1);
+  world.deskL.intensity=night*1.4*(ui.fl===-1?0:1);
+  if(scene.fog){ const fogC=_c1.set(a[3]).lerp(_c2.set(b[3]),k); scene.fog.color.copy(fogC); scene.background.copy(_c1.set('#0A0A1A').lerp(fogC,.12*eve)); }
   const wc=_c1.set(a[3]).lerp(_c2.set(b[3]),k);
-  (world.wins||[]).forEach(m=>{ m.emissive.copy(wc); m.color.copy(wc); m.emissiveIntensity=.45+.25*(1-eve); });
-  (world.bulbs||[]).forEach(m=>{ m.emissiveIntensity=.5+eve*2.2; });
-  (world.neon||[]).forEach(m=>{ m.opacity=.82+.18*eve - (Math.random()<.004?.5:0); });
+  (world.wins||[]).forEach(m=>{ m.emissive.copy(wc); m.color.copy(wc); m.emissiveIntensity=.35+.35*(1-eve)+night*.55; });
+  (world.bulbs||[]).forEach(m=>{ m.emissiveIntensity=.35+eve*2.4+night*.6; });
+  (world.neon||[]).forEach(m=>{ m.opacity=.75+.25*eve - (Math.random()<.003?.4:0); });
+  // monitor glow after 6
+  for(const g of furnMeshes.values()){ if(!g.userData.screen) continue; const m=g.userData.screen.material; if(m && !m.userData.working) m.emissiveIntensity=Math.max(m.emissiveIntensity||.12, .12+night*.55); }
   if(world.clock){ const h=S.min/60, mm=S.min%60; world.clock.h.rotation.z=-((h%12)/12+mm/720)*Math.PI*2; world.clock.m.rotation.z=-(mm/60)*Math.PI*2; }
 }
 
@@ -6545,7 +6639,7 @@ function frame(){
   }
   if(titleMode && heroTitle){ heroTitle.mixer.update(dt); }
   if(coachSel) positionCoach();
-  tickCash(dt);
+  tickCash(dt); try{ ambUpdate(); }catch(e){}
   controls.update(); renderer.render(scene,camera);
   hudT+=dt; if(hudT>.25 && S && !titleMode){ hudT=0; refreshHUD(); refreshInspect(); }
   if(confettiParts.length || confettiDirty){ const had=confettiParts.length>0; drawConfetti(); confettiDirty=had; }
@@ -6618,6 +6712,226 @@ async function boot(){
   if(had){ $('#btnCont').hidden=false; $('#btnCont').textContent='Continue '+S.name+' · '+dateStr(); }
   setTimeout(()=>{ $('#loadbar').style.opacity='0'; },300);
 }
+/* =====================================================================
+   100,000× FEEL · juice players feel every minute
+   time · idle · work props · weather · sound · matrix · writing · camera
+   ===================================================================== */
+(function juice100k(){
+  function ago(day){ if(!S) return ''; const d=Math.max(0,(S.day||1)-(day||1)); if(d<=0) return 'just now'; if(d===1) return 'yesterday'; if(d<7) return d+' days ago'; if(d<30) return Math.floor(d/7)+' week'+(Math.floor(d/7)>1?'s':'')+' ago'; return Math.floor(d/30)+' month'+(Math.floor(d/30)>1?'s':'')+' ago'; }
+  function sparkSVG(arr, color){ if(!arr||arr.length<2) return ''; const w=44,h=14, mn=Math.min(...arr), mx=Math.max(...arr), span=Math.max(1,mx-mn);
+    const pts=arr.map((v,i)=> (i/(arr.length-1)*w).toFixed(1)+','+(h-((v-mn)/span)*(h-2)-1).toFixed(1)).join(' ');
+    return `<svg class="sparkmini" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline fill="none" stroke="${color||'#00E676'}" stroke-width="1.4" points="${pts}"/></svg>`; }
+  window.sparkTick=function(){
+    if(!S || titleMode || ui.reduce) return;
+    S.sparks=S.sparks||{cash:[],fans:[],rep:[]};
+    if((ui._sparkDay||0)!==S.day){ ui._sparkDay=S.day; S.sparks.cash.push(Math.round(num(S.cash,0))); S.sparks.fans.push(Math.round(num(S.fans,0))); S.sparks.rep.push(Math.round(num(S.rep,0)));
+      ['cash','fans','rep'].forEach(k=>{ S.sparks[k]=S.sparks[k].slice(-30); });
+      const cashStat=$('#hCash')&&$('#hCash').closest('.stat'); if(cashStat){ let s=cashStat.querySelector('.sparkmini'); const html=sparkSVG(S.sparks.cash,'#00E676'); if(html){ if(s) s.outerHTML=html; else cashStat.insertAdjacentHTML('beforeend', html); } }
+      const stars=$('#hStars')&&$('#hStars').closest('.stat'); if(stars){ let s=stars.querySelector('.sparkmini'); const html=sparkSVG(S.sparks.rep,'#FBBF24'); if(html){ if(s) s.outerHTML=html; else stars.insertAdjacentHTML('beforeend', html); } }
+    }
+  };
+
+  // —— Screen shake & slow-mo ——
+  window.juiceShake=function(ms){ if(ui.reduce) return; const b=document.body; b.classList.add('shake'); clearTimeout(juiceShake._t); juiceShake._t=setTimeout(()=>b.classList.remove('shake'), ms||280); };
+  window.juiceSlow=function(ms){ if(ui.reduce||!S) return; const was=S.speed; S.speed=Math.max(.15, was*.2); clearTimeout(juiceSlow._t); juiceSlow._t=setTimeout(()=>{ if(S) S.speed=was; }, ms||420); };
+  window.camFocusPerson=function(p, ms){
+    if(!p||ui.reduce||!camera||!controls) return; const w=walkers.get(p.id); if(!w||!w.rig.root.visible) return;
+    ui._camSnap={pos:camera.position.clone(), tgt:controls.target.clone()};
+    const t=w.pos.clone(); t.y=.6; controls.target.lerp(t,.55); camera.position.lerp(t.clone().add(new THREE.Vector3(2.2,2.4,2.8)),.4);
+    clearTimeout(camFocusPerson._t); camFocusPerson._t=setTimeout(()=>{ if(ui._camSnap){ camera.position.copy(ui._camSnap.pos); controls.target.copy(ui._camSnap.tgt); ui._camSnap=null; } }, ms||900);
+  };
+
+  // —— Pitch-varied SFX + rising coin streak ——
+  const _sfx=sfx;
+  sfx=function(k){
+    if(!AC||muted) return;
+    const jitter=1+(Math.random()-.5)*.08;
+    if(k==='coin'){ const streak=Math.min(8, Math.floor((ui._coinStreak||0)*2)); const base=988*(1+streak*.04)*jitter; tone(base,.06,'square',.022); tone(base*1.33,.12,'square',.022,.05); return; }
+    if(k==='tick'){ tone((1200+Math.random()*180)*jitter,.025,'triangle',.03); return; }
+    if(k==='key'){ tone(1800+Math.random()*900,.018,'square',.012); if(S&&S.combo>8) tone(400+S.combo*40,.05,'triangle',.02); return; }
+    if(k==='blip'){ tone((560+Math.random()*90)*jitter,.025,'square',.008); return; }
+    return _sfx(k);
+  };
+
+  // —— Typewriter MoneyBot + personalized asides ——
+  const _advise=advise;
+  advise=function(html, o){
+    o=o||{};
+    if(!o.skipJuice && S && Math.random()<.45){
+      const rw=typeof runway==='function'?runway():null;
+      const asides=[];
+      if(rw===Infinity) asides.push(' Your runway is longer than my antenna. Nice.');
+      else if(rw!=null && rw<2) asides.push(' Runway is '+rw.toFixed(1)+' months. That number is loud.');
+      else if(rw!=null && rw>12) asides.push(' '+rw.toFixed(0)+' months of runway. Sleep is allowed.');
+      if(num(S.fans,0)>500) asides.push(' '+Math.round(S.fans).toLocaleString()+' fans. They remember.');
+      if(S.team&&S.team.length>=8) asides.push(' '+S.team.length+' people. You\'re a manager now.');
+      if(S.ipo&&S.ipo.status==='listed') asides.push(' The ticker is watching. So am I.');
+      if(asides.length) html=String(html)+'<br><span class="hint">'+pick(asides)+'</span>';
+    }
+    _advise(html, o);
+    const el=$('#advText'); if(!el||ui.reduce||o.noType) return;
+    const final=el.innerHTML; el.classList.add('typing'); el.innerHTML='';
+    let i=0; clearInterval(advise._type);
+    advise._type=setInterval(()=>{
+      if(!el.isConnected){ clearInterval(advise._type); return; }
+      // advance past tags in chunks
+      if(final[i]==='<'){ const j=final.indexOf('>',i); i=j<0?final.length:j+1; }
+      else i=Math.min(final.length, i+1+(Math.random()<.3?1:0));
+      el.innerHTML=final.slice(0,i); if(i%4===0) sfx('blip');
+      if(i>=final.length){ clearInterval(advise._type); el.classList.remove('typing'); el.innerHTML=final; }
+    }, 16);
+  };
+
+  // —— Relative timestamps in inbox ——
+  const _inbox=inboxPanel;
+  inboxPanel=function(){ ui.unread=0; const b=$('#bellN'); if(b) b.hidden=true; const L=(S.inbox||[]);
+    openModal(`<button class="x" data-close aria-label="Close">×</button><div class="eyebrow">Inbox · everything that happened</div><h2>Inbox</h2>${L.length?'<div class="inbox">'+L.map(m=>`<div class="im ${m.type}"><span>${ago(m.day)}${m.who?' · '+m.who:''}</span><div>${m.h}</div></div>`).join('')+'</div>':'<p class="hint">Nothing yet.</p>'}`); };
+
+  // —— Client personality emails ——
+  const _cd=clientDelivered;
+  clientDelivered=function(pr, st){ _cd(pr, st); try{
+    const c=clientRec(pr.client); c.lastSt=st; c.lastDay=S.day;
+    if(pr.client==="Chip's Diner"){
+      if(st>=4) news('Chip says hi again! "The kids loved it. Extra cheese on me."','good');
+      else if(st<=2) news('Chip emailed: "It\'s a little buggy, partner. Come by for pizza anyway."','warn');
+    } else if(st>=5) news(pr.client+' left a love note in the inbox. Five stars, zero notes.','good');
+    else if(st<=2) news(pr.client+': "We expected more." They\'ll remember next time.','warn');
+  }catch(e){} };
+
+  // —— Contracts remember last job ——
+  const _ob=offerScore; // keep
+  const _loyal=loyalOffer;
+  loyalOffer=function(o){ o=_loyal(o); try{
+    const c=(S.clients||{})[o.client]; if(c&&c.jobs){ o._note = c.lastSt>=4 ? 'They loved the last one.' : c.lastSt<=2 ? 'Last job was rough. Win them back.' : 'Returning client.'; }
+  }catch(e){} return o; };
+
+  // —— Deliver / launch / fire / level juice ——
+  const _dl=deliver;
+  deliver=function(pr, auto){
+    const before=S.stats&&S.stats.fiveStar; const r=_dl(pr, auto);
+    try{
+      if(pr&&!pr.own){ const st=stars(projQuality(pr)); if(st>=5){ juiceShake(320); juiceSlow(500); }
+        const crew=teamOf(pr); if(crew[0]) camFocusPerson(crew[0], 700);
+        // tidy desks after delivery
+        crew.forEach(p=>{ const d=S.furn.find(f=>f.id===p.desk); if(d){ d.mess=0; juiceDeskDress(d); } });
+      }
+    }catch(e){}
+    return r;
+  };
+  const _ln=typeof launch==='function'?launch:null;
+  if(_ln){ launch=function(pr){ const r=_ln(pr); try{ if(!pr.update){ juiceShake(260); if((S.products.find(p=>p.id===pr.prod)||{}).score>=8) juiceSlow(450); } }catch(e){} return r; }; }
+  const _fire=fire;
+  fire=function(p, quit){ if(p) camFocusPerson(p, 1100); juiceShake(200); return _fire(p, quit); };
+  const _lvl=lvlUp;
+  lvlUp=function(p,k,w){ _lvl(p,k,w); if(p) camFocusPerson(p, 800); };
+
+  // —— Desk mess / cups / whiteboard scribbles / monitor content ——
+  window.juiceDeskDress=function(f){
+    const g=furnMeshes.get(f.id); if(!g||f.kind!=='desk') return;
+    // clear prior juice props
+    (g.userData.juice||[]).forEach(m=>g.remove(m)); g.userData.juice=[];
+    const mess=num(f.mess,0), cups=Math.min(4, Math.floor(mess/25));
+    for(let i=0;i<cups;i++){ const cup=cy(g,.035,.05, -.55+i*.12, .43, -.15+ (i%2)*.08, mat(pick(['#F8FAFC','#FEF3C7','#FED7AA'])), false); g.userData.juice.push(cup); }
+    if(mess>60){ const paper=bx(g,.18,.01,.14, .45, .43, -.25, mat('#F8FAFC'), false); g.userData.juice.push(paper); }
+  };
+  function juiceWhiteboard(f){
+    const g=furnMeshes.get(f.id); if(!g||f.kind!=='whiteboard') return;
+    (g.userData.juice||[]).forEach(m=>g.remove(m)); g.userData.juice=[];
+    const prog=S.projects.reduce((a,p)=>a+(p.done/Math.max(1,p.pts)),0);
+    const scribbles=['MRR↑','ship it','LTV>CAC','fix later','v2.0','!!!','bugs→0','Demo Day'];
+    const n=Math.min(5, 1+Math.floor(prog));
+    for(let i=0;i<n;i++){ const t=signTex(pick(scribbles),'#ffffff00', pick(['#2563EB','#EF4444','#16A34A','#7C3AED']), 256, 64);
+      const p=new THREE.Mesh(new THREE.PlaneGeometry(.45,.14), new THREE.MeshBasicMaterial({map:t, transparent:true}));
+      p.position.set(-.5+(i%3)*.5, .85+Math.floor(i/3)*.22, .04); g.add(p); g.userData.juice.push(p); }
+  }
+  function juiceMonitors(){
+    const glyphs={Games:['▶','HP','XP','lvl'], Apps:['API','sync','UX','v2'], AI:['nn','loss','GPU','tok'], Security:['TLS','CVE','🔒','auth'], Web:['div','css','SEO','200'], Design:['px','grid','Figma','色']};
+    for(const p of S.team){
+      const w=walkers.get(p.id), pr=S.projects.find(q=>q.id===p.proj), desk=S.furn.find(f=>f.id===p.desk);
+      if(!w||!desk) continue; const g=furnMeshes.get(desk.id); if(!g||!g.userData.screen) continue;
+      const m=g.userData.screen.material; const on=w.state==='work'&&pr;
+      m.userData.working=!!on;
+      if(on){ const cat=(PTYPES[pr.type]||{}).cat||'Web'; const c=CATC[cat]||'#22C55E'; m.emissive.set(c); m.emissiveIntensity=.95; m.userData.c=c+'1';
+        // rare easter egg
+        if(Math.random()<.0008){ fxText(w.pos.clone().setY(1.35), 'Wake up, founder…', '#00FF66', .2); S._matrixEgg=(S._matrixEgg||0)+1; if(S._matrixEgg===1){ journal('Wake up, founder…', 'You saw it on a monitor.'); try{ if(typeof grantAch==='function') grantAch('wake'); }catch(e){} banner('🟢','Wake up, founder…','You spotted the Matrix line.','#00FF66'); } }
+        // occasional logo glitch
+        if(Math.random()<.01){ const was=m.emissiveIntensity; m.emissiveIntensity=2.2; m.emissive.set('#00FF66'); setTimeout(()=>{ if(m){ m.emissiveIntensity=was; m.emissive.set(c); } }, 60); }
+      }
+      // mess accumulates on long projects
+      if(on && pr){ desk.mess=Math.min(100, num(desk.mess,0)+.015*(pr.crunch?2:1)); if(Math.random()<.02) juiceDeskDress(desk); }
+    }
+    S.furn.filter(f=>f.kind==='whiteboard').forEach(f=>{ if(Math.random()<.01) juiceWhiteboard(f); });
+  }
+
+  // —— Weather / season props outside & on desks ——
+  function juiceWeatherProps(s, W, H, wh){
+    if(!S) return; const mo=Math.floor((S.day-1)/30)%12; const rain=S.fx&&/rain/i.test(S.fx.label||'');
+    // rain streaks on windows (simple sprites)
+    if(rain && !ui.reduce){ for(let i=0;i<8;i++){ const drop=bx(roomG,.01,rand(.15,.35),.01, -W/2+.05, rand(.8,wh-.3), rand(-H/2+1,H/2-1), mat('#93C5FD',{transparent:true,opacity:.35}), false); drop.userData.rain=1; } }
+    if(mo===9){ // October pumpkin on a desk
+      const desks=S.furn.filter(f=>f.kind==='desk'&&floorOf(f)===curFloor()); if(desks.length){ const f=desks[0], g=furnMeshes.get(f.id); if(g){ const pump=sp(g,.08,.07,.08,.5,.48,-.2,mat('#F97316')); g.userData.juice=(g.userData.juice||[]).concat([pump]); } } }
+    if(mo===11||mo===0){ // December snow flecks near windows
+      for(let i=0;i<12;i++){ const sn=sp(roomG,.02,.02,.02, rand(-W/2,W/2), rand(1,wh), -H/2+.08, mat('#F8FAFC',{transparent:true,opacity:.7}), false); sn.userData.snow=1; } }
+  }
+  const _bd=buildDecor;
+  buildDecor=function(s,W,H,wh){ const r=_bd(s,W,H,wh); try{ juiceWeatherProps(s,W,H,wh); }catch(e){} return r; };
+
+  // —— Idle behaviour: stretch, spin, high-five, coffee gather, pets to stressed ——
+  const _uw=updateWalkers;
+  updateWalkers=function(dt, simDt){
+    _uw(dt, simDt);
+    if(!S||titleMode||ui.fl===-1) return;
+    try{
+      // stretch / spin while idle
+      for(const p of S.team){
+        const w=walkers.get(p.id); if(!w||!w.rig.root.visible) continue;
+        if(w.state==='idle' && Math.random()<dt*.08){ if(w.rig.acts.RightHand) rigPlay(w.rig,'RightHand',true); }
+        if(w.state==='idle' && Math.random()<dt*.04){ w.face+=Math.PI*2; /* chair spin */ w.rig.root.rotation.y+=Math.PI; }
+        if(w.state==='hang' && w.furn&&w.furn.kind==='coffee' && Math.random()<dt*.1){ fxText(w.pos.clone().setY(1.2), 'sip', '#FED7AA', .14); }
+      }
+      // high-five after recent ship
+      if(ui._hi5 && ui._hi5>0){ ui._hi5-=dt; if(ui._hi5<=0){ const free=S.team.filter(p=>{ const w=walkers.get(p.id); return w&&(w.state==='idle'||w.state==='hang'); }); if(free.length>=2){ const a=free[0], b=free[1]; const wa=walkers.get(a.id), wb=walkers.get(b.id); if(wa&&wb){ fxText(wa.pos.clone().lerp(wb.pos,.5).setY(1.2), '✋', '#FBBF24', .22); if(wa.rig.acts.RightHand){ rigPlay(wa.rig,'RightHand',true); rigPlay(wb.rig,'RightHand',true); } } } } }
+      // gather at coffee when many are tired
+      const tired=S.team.filter(p=>p.energy<30); if(tired.length>=2 && Math.random()<dt*.03){ const coffee=S.furn.find(f=>f.kind==='coffee'&&floorOf(f)===curFloor()); if(coffee){ tired.slice(0,3).forEach(p=>{ const w=walkers.get(p.id); if(w&&w.state!=='walk') go(w, seatWorld(coffee), 'hang', coffee); }); } }
+      // pets wander to stressed
+      if(typeof petObjs!=='undefined' && petObjs.size){ const stressed=S.team.filter(p=>p.morale<35||p.energy<25); if(stressed.length){ for(const o of petObjs.values()){ if(o.t>1) continue; const p=pick(stressed); const w=walkers.get(p.id); if(w){ o.tgt=w.pos.clone().add(new THREE.Vector3(rand(-.4,.4),0,rand(.3,.6))); o.t=rand(3,6); } } } }
+      juiceMonitors();
+      // shimmer progress bars in UI
+      $$('#projList .meter i, #hbBar').forEach(el=>{ if(el && el.style.width && parseFloat(el.style.width)>0 && parseFloat(el.style.width)<100) el.classList.add('shimmer'); });
+    }catch(e){}
+  };
+  const _cel=celebrate;
+  celebrate=function(crew, st){ _cel(crew, st); if(st>=4) ui._hi5=.8; };
+
+  // —— Context cursors ——
+  const _ii=initInput;
+  // already called; patch pointermove on #gl
+  const cv=$('#gl'); if(cv){
+    cv.addEventListener('pointermove', e=>{
+      if(!S||titleMode) return;
+      if(ui.tool==='place'){ cv.className=ui.place&&!ui.place.ok?'cur-no':'cur-move'; return; }
+      if(ui.pdrag&&ui.pdrag.live){ cv.className='cur-grab'; return; }
+      if(ui.hoverBot){ cv.className='cur-hand'; return; }
+      cv.className='';
+    }, {passive:true});
+  }
+
+  // —— Water plants / droop ——
+  const _ed=endDay;
+  endDay=function(){ const r=_ed.apply(this,arguments); try{
+    S.furn.filter(f=>f.kind==='plant').forEach(f=>{ f.water=num(f.water,S.day); if(S.day-f.water>12){ f.droop=1; const g=furnMeshes.get(f.id); if(g) g.scale.y=.75; } else { f.droop=0; const g=furnMeshes.get(f.id); if(g) g.scale.y=1; } });
+    // random plant watering when someone hangs near
+    S.team.forEach(p=>{ const w=walkers.get(p.id); if(w&&w.state==='hang'&&w.furn&&w.furn.kind==='plant') w.furn.water=S.day; });
+    // MoneyBot occasional personalized ping
+    if(S.day%9===0 && !modalOpen && Math.random()<.5){ const rw=runway(); advise(rw===Infinity?'Partner: we\'re profitable. That\'s the rare kind of quiet.':('Partner: runway is about <b>'+(rw===Infinity?'∞':rw.toFixed(1))+' months</b>. Cash '+fmt(S.cash)+'.'),{mood:'point', dur:9000, skipJuice:true}); }
+  }catch(e){} return r; };
+
+  // —— Achievement for matrix egg if ach system allows ——
+  try{
+    if(typeof ACH==='undefined' && typeof checkAch==='function'){ /* noop */ }
+  }catch(e){}
+})();
+
 boot();
 
 </script>
